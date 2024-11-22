@@ -1,0 +1,26 @@
+TODO:
+A. Add Fullscreen Mode to AWC2
+B. Separate Window Space from Fluid Space 
+
+REST:
+C. gpu-gems-38
+D. Test proper memory release for AWC2 & main files
+E. Add User Input/Obstacles to the simulation
+F. marker needs to be de-coupled into 2 different headers, one for basic printing, and the other for marker itself
+	Ex. debug_message() & debug_messagefmt() in base.hpp
+G. splitting Development into native-linux and native-windows,
+	Each with their own respective configurations 
+		(can be used with WSL for cross-platform development):
+		=> Specific Makefile config
+		=> Specific Platform Folder + Executable 
+		=> Windows: Minimal DLLs 		+ GLFW + ImGui
+		=> Linux  : Minimal Shared Libs + GLFW + ImGui
+		=> Platform-Specific ImGui Init+Impl Code
+		=> ...
+		=> Related:
+			1. https://stackoverflow.com/questions/714100/os-detecting-makefile
+			2. https://stackoverflow.com/questions/22467604/how-can-you-use-capturestackbacktrace-to-capture-the-exception-stack-not-the-ca
+			3. (2) Related to test/trace.hpp [ stack-trace for linux ]
+	Related To => G.
+H. There are some config's in the makefile that NEED to be read from settings.json/other external file to work properly
+	> find a solution to that
