@@ -36,12 +36,12 @@ workspace (WORKSPACE_NAME)
         architecture "mips64"
 
 
-    filter "configurations:Debug"
+    filter "configurations:*Debug"
         defines { "DEBUG" }
         runtime  "Debug"
         symbols  "on"
         optimize "off"
-    filter "configurations:Release"
+    filter "configurations:*Release"
         defines { "NDEBUG" }
         runtime  "Release"
         symbols  "off"
@@ -51,7 +51,7 @@ workspace (WORKSPACE_NAME)
     filter "architecture:x86"
         defines { "__x86__" }
     filter "architecture:x86_64"
-        defines { "__x86_64_" }
+        defines { "__x86_64__" }
     filter "system:linux"
         defines { "__linux__" }
     filter { "system:windows", "architecture:x86" }

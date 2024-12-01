@@ -5,7 +5,6 @@ end
 
 
 GetLibraryType = function()
-    defaultplatform "Static"
     filter "platforms:Static"
         kind "StaticLib"
         staticruntime "on"
@@ -15,10 +14,10 @@ GetLibraryType = function()
 end
 
 
-PROJECT_DIR     = ROOT_PATH "projects"
-DEPENDENCY_DIR  = ROOT_PATH "dependencies"
-BIN_DIR         = ROOT_PATH "build/bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}"
-OBJ_DIR         = ROOT_PATH "build/obj/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}"
+PROJECT_DIR     = ROOT_PATH("projects")
+DEPENDENCY_DIR  = ROOT_PATH("dependencies")
+BIN_DIR         = ROOT_PATH("build/bin/%{cfg.buildcfg}-%{cfg.platform}-%{cfg.system}-%{cfg.architecture}/%{prj.name}")
+OBJ_DIR         = ROOT_PATH("build/obj/%{cfg.buildcfg}-%{cfg.platform}-%{cfg.system}-%{cfg.architecture}/%{prj.name}")
 WORKSPACE_NAME  = "example-awc2-program"
 START_PROJECT   = "example-mdk"
 
