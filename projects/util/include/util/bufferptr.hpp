@@ -7,7 +7,7 @@
 namespace util {
 
 
-template<typename T, bool deallocate_on_destroy, class Deallocator> class __buffer_pointer_manager
+template<typename T, bool deallocate_on_destroy, class Deallocator> class UTIL_API __buffer_pointer_manager
 {
 public:
     void create(void* buffer, u32 maximal_size) {

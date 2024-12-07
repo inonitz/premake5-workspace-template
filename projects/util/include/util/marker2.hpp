@@ -33,18 +33,18 @@
 
 #if MARKER_FLAG_LOG_TO_FILE == 1
 namespace marker {
-    void marker_flag_close_logfile_handle();
+    UTIL_API void marker_flag_close_logfile_handle();
 }
 #endif
 
 
 namespace detail::marker {
-    void __begin_exclusion();
-    void __end_exclusion();
-    unsigned long long __load_atomic_counter();
-    void __increment_atomic_counter();
-    void __common_print_function_nofmt(const char* str);
-    void __common_print_function_fmt(const char* format, ...);
+    UTIL_API void __begin_exclusion();
+    UTIL_API void __end_exclusion();
+    UTIL_API unsigned long long __load_atomic_counter();
+    UTIL_API void __increment_atomic_counter();
+    UTIL_API void __common_print_function_nofmt(const char* str);
+    UTIL_API void __common_print_function_fmt(const char* format, ...);
 } // namespace detail::marker
 
 

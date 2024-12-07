@@ -41,14 +41,14 @@ namespace util {
 /* 
 	for whatever reason you may need this 
 */
-__force_inline size_t __readtsc() {
+__force_inline UTIL_API size_t __readtsc() {
     u32 lo, hi;
     __asm__ volatile("rdtsc" : "=a" (lo), "=d" (hi));
     return ((size_t)hi << 32) | lo;
 }
 
 
-template<typename T> constexpr T round2(T v) 
+template<typename T> constexpr UTIL_API T round2(T v)
 {
 	static_assert(type_trait::__is_integral_type<T>::value, 
 	"Value must be an Integral Type! (Value v belongs to group N [0 -> +inf]. ");
@@ -63,7 +63,7 @@ template<typename T> constexpr T round2(T v)
 	return v;
 }
 
-template<typename T> constexpr T roundN(T powof2, T v) 
+template<typename T> constexpr UTIL_API T roundN(T powof2, T v)
 {
 	static_assert(type_trait::__is_integral_type<T>::value, 
 		"Value must be an Integral Type! (Value v belongs to group N [0 -> +inf]. "
@@ -88,7 +88,7 @@ inline void internal_memset(byte* dest, byte* src, u64 src_obj_size, u64 obj_to_
 }
 
 
-template<typename T> __force_inline void __memset(T* p, u64 count, T val = T())
+template<typename T> __force_inline UTIL_API void __memset(T* p, u64 count, T val = T())
 {
 	for(u64 i = 0; i < count; ++i) {
 		*p = val;
@@ -104,7 +104,7 @@ template<typename T> __force_inline void __memset(T* p, u64 count, T val = T())
 }
 
 
-template<typename T> __force_inline void __memcpy(T* pdest, T const* psrc, u64 count)
+template<typename T> __force_inline UTIL_API void __memcpy(T* pdest, T const* psrc, u64 count)
 {
 	while(count) {
 		*pdest = *psrc;
@@ -116,7 +116,7 @@ template<typename T> __force_inline void __memcpy(T* pdest, T const* psrc, u64 c
 }
 
 
-template<> __force_inline void __memcpy<void>(void* pdest, void const* psrc, u64 bytes) {
+template<> __force_inline UTIL_API void __memcpy<void>(void* pdest, void const* psrc, u64 bytes) {
 	byte* 		dest = __rcast(byte *, 		pdest);
 	byte const* src  = __rcast(byte const*, psrc );
 	while(bytes) {

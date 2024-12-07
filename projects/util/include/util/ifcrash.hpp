@@ -8,9 +8,9 @@ namespace detail::ifcrash_macro {
 	constexpr const char* str_msg_mid   = "\n[IFCRASH_%s] ";
 	constexpr const char* str_msg_end   = "\n[IFCRASH_%s] ifcrash(...) macro triggered\n";
 
-	void __common_print_fmt(const char* format, ...);
-	void __common_print_nofmt(const char* str);
-	[[noreturn]] void __common_abort() noexcept;
+	UTIL_API void __common_print_fmt(const char* format, ...);
+	UTIL_API void __common_print_nofmt(const char* str);
+	[[noreturn]] UTIL_API void __common_abort() noexcept;
 }
 
 

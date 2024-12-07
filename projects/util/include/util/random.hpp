@@ -1,12 +1,13 @@
 #pragma once
+#include "util_api.hpp"
 #include "types.hpp"
 
 
-u32 random32u();
-i32 random32i();
-f32 random32f();
-f32 randnorm32f();
-u64 random64u();
-i64 random64i();
-f64 random64f();
-f32 randnorm64f();
+UTIL_API u32 random32u();
+UTIL_API i32 random32i();
+UTIL_API f32 random32f();
+UTIL_API f32 randnorm32f();
+UTIL_API u64 random64u();
+UTIL_API i64 random64i();
+UTIL_API f64 random64f();
+UTIL_API f32 randnorm64f();

@@ -1,5 +1,5 @@
-#ifndef __EXECUTION_COUNTERS__
-#define __EXECUTION_COUNTERS__
+#ifndef __UTIL_EXECUTION_COUNTERS__
+#define __UTIL_EXECUTION_COUNTERS__
 #include <vector>
 #include "pool.hpp"
 #include "aligned_malloc.hpp"

@@ -1,16 +1,18 @@
 #ifndef __UTIL_LOAD_FILE__
 #define __UTIL_LOAD_FILE__
+#include "util_api.hpp"
 
 
 namespace util {
 
 
 /* 
-	Recommended to pass size = 0 and out = nullptr to find the size of the buffer.
-	When you know the size, allocate an appropriate buffer and pass the args to the function.
-	Then the function will load the File properly. 
+	Recommended to set size{0}, out{nullptr} to find the size of the buffer that should be allocated 
+	(if you didn't know the filesize beforehand)
+	when 'size' is known, allocate a buffer and pass it in 'out', 
+	After which the function will proceed with file loading
 */
-bool loadFile(
+UTIL_API bool loadFile(
 	const char* 		path, /* filepath 														   */ 
 	unsigned long long* size, /* the size of the out array that was pre-allocated.                 */
 	char*				out   /* Where to place the file contents (Buffer of Min-Size 'size')      */

@@ -18,7 +18,7 @@
 		refresh() 						   [for changing the seed] 
 */
 template<typename Key, typename Value, class Hasher = Hash>
-struct flat_hash
+struct UTIL_API flat_hash
 {
 public:
 	using StringFromKV = std::function<std::string(const_ref<Key>, const_ref<Value>)>;
@@ -54,7 +54,7 @@ private:
 
 
 
-	template<bool KeyValPairIterator = false> struct Iterator
+	template<bool KeyValPairIterator = false> struct UTIL_API Iterator
 	{
 	private:
 		std::vector<ValKeyPair> const& m_pairs; /* [index, key] pairs */

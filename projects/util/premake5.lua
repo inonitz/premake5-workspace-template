@@ -1,18 +1,25 @@
-project "libutil"
-    GetLibraryType()
+project "util"
     language      "C++"
     cppdialect    "C++17"
-    buildoptions {
-        "-msse3"
-    }
+    cdialect      "C11"
     systemversion "latest"
     warnings      "extra"
-    targetdir     (BIN_DIR)
-    objdir        (OBJ_DIR)
-    files {
+    files { 
+        "include/**.h",
+        "source/**.c",
         "include/**.hpp",
         "source/**.cpp"
     }
-    includedirs {
-        "include"
-    }
+    includedirs { "include" }
+    SetupBuildDirectoriesForLibrary()
+    filter ""
+    filter "toolset:clang"
+        buildoptions {
+            "-msse3"
+        }
+    links {}
+    filter { "configurations:*Lib" }
+        defines { "UTIL_STATIC_DEFINE" }
+    filter { "configurations:*Dll" }
+        defines { "UTIL_EXPORTS" }
+    filter {}

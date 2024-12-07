@@ -1,5 +1,6 @@
 #ifndef __UTIL_BASE_MACRO_DEFINITIONS__
 #define __UTIL_BASE_MACRO_DEFINITIONS__
+#include "util_api.hpp"
 
 
 /* All credit goes to: https://www.fluentcpp.com/2019/08/30/how-to-disable-a-warning-in-cpp/ */

@@ -48,7 +48,7 @@ protected:
 } // namespace detail
 
 
-template<u32 objectSizeInBytes, bool userManagedMemoryPointer = false> class Pool {};
+template<u32 objectSizeInBytes, bool userManagedMemoryPointer = false> class UTIL_API Pool {};
 
 
 template<u32 objectSizeInBytes> class Pool<objectSizeInBytes, false> : public detail::CommonPoolDef<objectSizeInBytes>

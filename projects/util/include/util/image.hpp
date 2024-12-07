@@ -2,7 +2,7 @@
 #include "base.hpp"
 
 
-struct LoadedImage 
+struct UTIL_API LoadedImage 
 {
 private:    
     u8 m_channelCount; /* Last Bit Enabled means data is floats */
@@ -38,7 +38,7 @@ public:
 };
 
 
-void convertRGBA_U32_TO_F32(
+UTIL_API void convertRGBA_U32_TO_F32(
     u8*  inData_AlignmentNotRequired, 
     f32* outData_AlloateAligned64Bytes, 
     i32  dimx, 
