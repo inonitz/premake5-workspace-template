@@ -166,8 +166,10 @@ newaction {
     trigger     = "CleanAllBuild",
     description = "Delete All Object Files & Executables created during the build process",
     execute     = function ()
-        os.remove("build/**") 
+        os.remove("build/**")
         os.rmdir("build/**")
+        os.remove(".vs/**")
+        os.rmdir(".vs/**")
         print("Done")
     end
 }
