@@ -1,10 +1,18 @@
 workspace (WORKSPACE_NAME)
     startproject(START_PROJECT)
-    -- default system parameters, required for proper folder structure.
-    system          "windows"  -- can be overriden using --os='x'   flag
-    architecture    "x86_64"   -- can be overriden using --arch='x' flag
-    toolset "msc-llvm-vs2022"
-    llvmversion "19"
+    architecture "x86_64" -- can be overriden using --arch='x' flag
+    
+
+    -- 'system' can be overriden using --os='x' flag
+    filter { "system:windows", _ACTION == "vs2022" }
+        toolset "msc-llvm-vs2022"
+        llvmdir     = os.getenv("LLVMInstallDir")
+        llvmversion = os.getenv("LLVMToolsVersion")
+    filter {}
+
+    filter "system:linux"
+        toolset "clang"
+    filter {}
 
 
     configurations {

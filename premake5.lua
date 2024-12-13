@@ -166,10 +166,18 @@ newaction {
     trigger     = "CleanAllBuild",
     description = "Delete All Object Files & Executables created during the build process",
     execute     = function ()
-        os.remove("build/**")
-        os.rmdir("build/**")
-        os.remove(".vs/**")
-        os.rmdir(".vs/**")
+        local dirs_to_delete = { "./build", "./.vs" }
+        local ok, err
+        printf("----------------------------------------")
+        for _, path in ipairs(dirs_to_delete) do
+            ok, err = os.rmdir(path)
+            if ok then
+                printf("%-30s: %s", "Removed Directory", path)
+            else
+                printf("%-30s: %s", "Got Error", err)
+            end
+        end
+        printf("----------------------------------------")
         print("Done")
     end
 }
