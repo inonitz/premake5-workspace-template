@@ -1,6 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <LLVMInstallDir>C:\CTools\llvm</LLVMInstallDir>
-    <LLVMToolsVersion>19.1.0</LLVMToolsVersion>
-  </PropertyGroup>
-</Project>

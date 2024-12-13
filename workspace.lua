@@ -4,12 +4,12 @@ workspace (WORKSPACE_NAME)
     
 
     -- 'system' can be overriden using --os='x' flag
-    filter { "system:windows", _ACTION == "vs2022" }
+    filter { "system:windows", "action:vs2022" }
         toolset "msc-llvm-vs2022"
         llvmdir     = os.getenv("LLVMInstallDir")
         llvmversion = os.getenv("LLVMToolsVersion")
+        flags { "MultiProcessorCompile" } -- NOTE: no equivalent in linux, must use makefiles and -j$NPROC
     filter {}
-
     filter "system:linux"
         toolset "clang"
     filter {}
