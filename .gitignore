@@ -1,5 +1,6 @@
 # Build output
 build/
+compile_commands/
 
 # Makefiles
 Makefile
@@ -13,3 +14,7 @@ Makefile
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+
+
+# misc
+imgui.ini

@@ -7,9 +7,9 @@
 #define run_legacy_code 1
 
 
-int main() {
+int main(int argc, char* argv[]) {
     i32 out = (run_legacy_code == 1) ? render_fluid_awc2_fuckyou() : render_gpugems38();
-     markstr("Successful Exit");
+    markstr("Successful Exit");
     return out;
     // return 1;
 

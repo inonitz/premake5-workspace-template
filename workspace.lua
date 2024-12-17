@@ -10,6 +10,18 @@ workspace (WORKSPACE_NAME)
         llvmversion = os.getenv("LLVMToolsVersion")
         flags { "MultiProcessorCompile" } -- NOTE: no equivalent in linux, must use makefiles and -j$NPROC
     filter {}
+    filter { "system:windows", "action:gmake2" } -- Should Still Be Relevant In the future: https://stackoverflow.com/questions/29504627/adjusting-g-location-with-premake
+        toolset "clang"
+        llvmdir     = os.getenv("LLVMInstallDir")
+        llvmversion = os.getenv("LLVMToolsVersion")
+        -- flags { "LinkTimeOptimization" } -- easy fix to switch from 'ar' to 'llvm-ar' 
+        makesettings {
+            "CC = " .. llvmdir .. "/bin/clang.exe --verbose",
+            "CXX = " .. llvmdir .. "/bin/clang++.exe -ferror-limit=0 --verbose -fuse-ld=lld-link.exe",
+            "LD = " .. llvmdir .. "/bin/ld.lld.exe --verbose",
+            "AR = " .. llvmdir .. "/bin/llvm-ar.exe --verbose"
+        }
+    filter {}
     filter "system:linux"
         toolset "clang"
     filter {}

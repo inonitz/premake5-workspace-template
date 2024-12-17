@@ -25,4 +25,13 @@ project "program-test"
     LinkProjectLibrary("imgui")
     LinkProjectLibrary("awc2")
     LinkGLFWLibrary()
+    links {
+        "gdi32",
+        "shell32"
+    }
     defines {}
+
+
+    postbuildcommands {
+        "{LINKFILE} compile_commands/%{cfg.buildcfg}_%{cfg.architecture}.json compile_commands/compile_commands.json"
+    }

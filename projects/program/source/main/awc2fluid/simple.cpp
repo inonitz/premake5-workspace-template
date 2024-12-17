@@ -98,11 +98,13 @@ i32 render_fluid_awc2_fuckyou()
     /* OpenGL Data Initialization */
     {
         markstr("Opengl Data init begin");
+        /* This is Not Portable on Unix-like OS's. Problem is std::current_file::path()*/
         static constexpr const char* shaderName[2] = { "old_sim.comp", "old_visual.comp" };
-        static constexpr const char* dirName       = "source/main/awc2fluid/";
+        static constexpr const char* dirName       = "C:/CTools/Projects/premake-mdk-wip/projects/program/source/main/awc2fluid";
         static const std::string shaderPath[2] = {
-            ( fs::current_path()/fs::path{dirName}/fs::path{shaderName[0]} ).generic_u8string(),
-            ( fs::current_path()/fs::path{dirName}/fs::path{shaderName[1]} ).generic_u8string()
+            
+            ( fs::path{dirName}/fs::path{shaderName[0]} ).generic_u8string(),
+            ( fs::path{dirName}/fs::path{shaderName[1]} ).generic_u8string()
         };
 
         gfx.m_simulation.createFrom({

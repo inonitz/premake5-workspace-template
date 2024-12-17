@@ -50,15 +50,17 @@ end
 
 
 LinkGLFWLibrary = function()
-    libdirs { DEPENDENCY_DIR .. "/GLFW/windows/%{cfg.architecture}/lib-vc2022" }
-
-    -- on linux you'll probably build from source and install globally on your machine
+    filter { "system:windows" } 
+        libdirs { DEPENDENCY_DIR .. "/GLFW/windows/%{cfg.architecture}/lib-vc2022" }
+    filter {}
+        -- on linux you'll probably build from source and install globally on your machine
     -- therefore, until I actively develop in a linux env, this'll be the expected folder structure
     filter { "configurations:*Lib", "system:linux" }
         libdirs { DEPENDENCY_DIR .. "/GLFW/linux/%{cfg.architecture}/static" }
+    filter {}
     filter { "configurations:*Dll", "system:linux" }
         libdirs { DEPENDENCY_DIR .. "/GLFW/linux/%{cfg.architecture}/shared" }
-
+    filter {}
     filter { "configurations:*Lib" }
         links { "glfw3_mt" }
     filter { "configurations:*Dll" }
@@ -111,6 +113,7 @@ end
 
 
 -- Add Option to compile for a certain architecture, may not necessarily match the machine architecture
+-- [NOTE]: Deprecated and not used anymore
 -- newoption {
 --     trigger     = "arch",
 --     description = "Manually Specify the architecture of the project",
@@ -138,7 +141,7 @@ newaction {
     trigger     = "CleanProjectConfigs",
     description = "Remove all Project Solutions, Makefiles, Ninja build files, etc...",
     execute     = function ()
-        local build_extensions = { "/Makefile", "/**.sln", "/**.vcxproj", "/**.vcxproj.filters", "/**.vcxproj.user" }
+        local build_extensions = { "/Makefile", "/**.sln", "/**.vcxproj", "/**.vcxproj.filters", "/**.vcxproj.user", "/**.ninja", "/.ninja_deps", "/.ninja_log", "/.ninja_lock"}
         local ok, err
         table.insert(PROJECTS, ".")
         for _, path in ipairs(PROJECTS) do
@@ -166,7 +169,7 @@ newaction {
     trigger     = "CleanAllBuild",
     description = "Delete All Object Files & Executables created during the build process",
     execute     = function ()
-        local dirs_to_delete = { "./build", "./.vs" }
+        local dirs_to_delete = { "./build", "./.vs", "./compile_commands" }
         local ok, err
         printf("----------------------------------------")
         for _, path in ipairs(dirs_to_delete) do

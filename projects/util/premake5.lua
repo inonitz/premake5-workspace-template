@@ -10,13 +10,18 @@ project "util"
         "include/**.hpp",
         "source/**.cpp"
     }
-    includedirs { "include" }
+    includedirs { 
+        "include" 
+    }
     SetupBuildDirectoriesForLibrary()
-    filter ""
     filter "toolset:clang"
         buildoptions {
             "-msse3"
         }
+    filter ""
+    filter "files:stb_image.h"
+        warnings "Off"
+    filter ""
     links {}
     filter { "configurations:*Lib" }
         defines { "UTIL_STATIC_DEFINE" }
