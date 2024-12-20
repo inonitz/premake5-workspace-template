@@ -106,7 +106,7 @@ void Program::refreshShaderSource(u32 shaderID, const char* filepath)
     filepath = m_shaders[shaderID].filepath; /* use default filepath if filepath == nullptr */
 
 
-    loadFile(filepath, &buf.size, nullptr);
+    loadFile(filepath, &buf.size, __scast(char*, nullptr));
     m_sources[shaderID].resize(buf.size);
     loadFile(filepath, &buf.size, m_sources[shaderID].data()); /* will crash if false, so no need to check return bool */
     return;
@@ -138,9 +138,10 @@ bool Program::compile()
 
     /* Shader Compile stage Begin. */
     for(; i < m_shaders.size() && successStatus; ++i) {
+        ifcrash_debug(m_sources[i].size() > UINT32_MAX);
         populate = {
             m_sources[i].data(),
-            m_sources[i].size()
+            __scast(u32, m_sources[i].size())
         };
         // debug_messagefmt("Loading shader [%s/%u ] with Buffer %p [%llu bytes]\nSource:\n%s\n", shaderTypeToString(shaders[i].type), shaders.size(), populate.data, populate.size, sources[i].data());
         successStatus = successStatus && loadShader(m_shaders[i], populate); 

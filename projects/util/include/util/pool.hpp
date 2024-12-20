@@ -6,20 +6,20 @@
 namespace detail {
 
 
-template<u32 objectSizeInBytes> struct CommonPoolDef
+template<u32 objectSizeInBytes> struct UTIL_API CommonPoolDef
 {
 public:
-	void* allocate();
-	void free(void* ptr);
+	void* UTIL_API allocate();
+	void  UTIL_API free(void* ptr);
 
-	u64 allocate_index();
-	void free_index(u64 idx);
+	u64  UTIL_API allocate_index();
+	void UTIL_API free_index(u64 idx);
 
 	u64  availableBlocks() const { return m_freeBlk;         }
 	u64  size()    	       const { return m_elemCount;       }
 	u64  objectSize() 	   const { return objectSizeInBytes; }
 	u64  bytes() 		   const { return size() * objectSize(); }	
-	void print() 		   const;
+	void UTIL_API print()  const;
 
 protected:
 	
@@ -41,7 +41,7 @@ protected:
 	u64 index_from_pointer(void const* p) const { 
 		return __scast(u64, (__rcast(byte const*, p) - m_buffer) ); 
 	}
-	void common_init(u64 amountOfElements);
+	void UTIL_API common_init(u64 amountOfElements);
 };
 
 

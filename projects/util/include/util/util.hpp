@@ -41,10 +41,10 @@ namespace util {
 /* 
 	for whatever reason you may need this 
 */
-__force_inline UTIL_API size_t __readtsc() {
+__force_inline UTIL_API u64 __readtsc() {
     u32 lo, hi;
     __asm__ volatile("rdtsc" : "=a" (lo), "=d" (hi));
-    return ((size_t)hi << 32) | lo;
+    return ((u64)hi << 32) | lo;
 }
 
 

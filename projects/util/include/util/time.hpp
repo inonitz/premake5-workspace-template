@@ -140,11 +140,11 @@ public:
         return static_cast<T>(sum) / static_cast<T>(maxSamples);
 	}
 
-
-    template<> u32 calcTick<u32>(u64 currFrameTick);
-    template<> u64 calcTick<u64>(u64 currFrameTick);
-    template<> f32 calcTick<f32>(u64 currFrameTick);
-    template<> f64 calcTick<f64>(u64 currFrameTick);
+    /* apparently g++ (10.2.1 20210110) doesn't like this code, so I guess no predefined template instatiation to save up compile time :( */
+    // template<> u32 calcTick<u32>(u64 currFrameTick);
+    // template<> u64 calcTick<u64>(u64 currFrameTick);
+    // template<> f32 calcTick<f32>(u64 currFrameTick);
+    // template<> f64 calcTick<f64>(u64 currFrameTick);
 private:
 	u64 totalSamples{0};
 	u32 index{0};

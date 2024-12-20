@@ -1,10 +1,8 @@
 project "program-test"
     kind          "ConsoleApp"
-    language      "C++"
-    cppdialect    "C++17"
-    cdialect      "C11"
     systemversion "latest"
     warnings      "extra"
+    SpecifyGlobalProjectCXXVersion()
     files {
         "include/**.hpp",
         "source/**.hpp",
@@ -25,13 +23,18 @@ project "program-test"
     LinkProjectLibrary("imgui")
     LinkProjectLibrary("awc2")
     LinkGLFWLibrary()
-    links {
-        "gdi32",
-        "shell32"
-    }
+    filter "system:windows"
+        links {
+            "gdi32",
+            "shell32"
+        }
+    filter "system:linux"
+        links {
+            "dl"
+        }
+    filter ""
+    filter {}
     defines {}
-
-
-    postbuildcommands {
-        "{LINKFILE} compile_commands/%{cfg.buildcfg}_%{cfg.architecture}.json compile_commands/compile_commands.json"
+    prebuildcommands {
+        "ln -f %[../../compile_commands/%{cfg.shortname}.json] %[../../compile_commands/compile_commands.json]"
     }

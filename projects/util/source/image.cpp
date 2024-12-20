@@ -4,6 +4,7 @@
 #include "util/aligned_malloc.hpp"
 #include "util/stb_image.h"
 #include <immintrin.h>
+#include <cstring>
 #include <array>
 
 

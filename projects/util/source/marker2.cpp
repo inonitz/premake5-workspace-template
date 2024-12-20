@@ -15,9 +15,7 @@ namespace detail::marker {
     static std::atomic<uint64_t> __markflag{0};
     static write_lock_type __write_lock;
 
-    static FILE* __output_buf_tmp = stdout;
-    static errno_t err_out = fopen_s(&__output_buf_tmp, "__debug_output.txt", "w");
-    static FILE* __output_buf = (MARKER_FLAG_LOG_TO_FILE) ? __output_buf_tmp : stdout;
+    static FILE* __output_buf = (MARKER_FLAG_LOG_TO_FILE) ? fopen("__debug_output.txt", "w") : stdout;
 
     void __begin_exclusion() { __write_lock.lock();   }
     void __end_exclusion()   { __write_lock.unlock(); }
@@ -37,20 +35,21 @@ namespace detail::marker {
 
     void __common_print_function_fmt(const char* format, ...) 
     {
+#define __GENERIC_FORMAT_BUFFER_MAX_SIZE 32768
         static struct __generic_format_buffer {
-            char mem[2048];
+            char mem[__GENERIC_FORMAT_BUFFER_MAX_SIZE];
         } __format_buffer;
         va_list arg, argcopy;
         int size, done = 1;
         bool invalid_state = false;
 
 
-        __format_buffer.mem[2047] = '\0'; /* incase of overflow */
+        __format_buffer.mem[__GENERIC_FORMAT_BUFFER_MAX_SIZE - 1] = '\0'; /* incase of overflow */
         va_start(arg, format);
         va_copy(argcopy, arg);
         size = 1 + vsnprintf(NULL, 0, format, arg);
         va_end(arg);
-        if(size > 2048) {
+        if(size > __GENERIC_FORMAT_BUFFER_MAX_SIZE) {
             std::fputs("\n[marker2.cpp] => __common_print_function_fmt() __VA_ARGS__ too large\n", __output_buf);
             invalid_state = true;
         }
@@ -66,6 +65,7 @@ namespace detail::marker {
         }
         std::fputs(__format_buffer.mem, __output_buf);
         return;
+#undef __GENERIC_FORMAT_BUFFER_MAX_SIZE
     }
 
 

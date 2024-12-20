@@ -41,12 +41,17 @@ void AWC2ContextData::create(
 
     /* GLFW Window */
     util::__memcpy(&win_desc_bits, __rcast(u64*, &win_desc), 1);
-    m_window.create(
+    bool not_good = m_window.create(
         __win_width, 
         __win_height,
         win_desc_bits,
         nullptr
     );
+    if(not_good) {
+        const char* msg;
+        u32 what_happened = glfwGetError(&msg);
+        ifcrashfmt(true, "AWC2ContextData::create(...) ==> Couldn't Create underlying GLFW Window\n  => Error #%u: %s", what_happened, msg);
+    }
     m_window.setCallbacks(&default_callbacks);
     glfwSetWindowUserPointer(m_window.underlying_handle(), &m_id);
     
@@ -90,7 +95,7 @@ void AWC2ContextData::initialize()
     ImGui::SetCurrentContext(__rcast(ImGuiContext*, m_imgui));
     ImGui::StyleColorsDark();
     glver = ImGui_ImplGlfw_InitForOpenGL(m_window.underlying_handle(), false);
-    glver = glver && ImGui_ImplOpenGL3_Init("#version 460");
+    glver = glver && ImGui_ImplOpenGL3_Init("#version 450");
     ifcrashstr_debug(!glver, "Failed to initialize AWC2 context\n");
 
     m_FlagInit = true;

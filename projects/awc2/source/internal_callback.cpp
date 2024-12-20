@@ -5,6 +5,9 @@
 #include "internal_state.hpp"
 
 #include <util/marker2.hpp>
+#ifdef __linux__ /* Happens to be that glext.h has snuck into my codebase so I disable it */
+#	define GL_GLEXT_LEGACY /* https://fsunuc.physics.fsu.edu/git/gwm17/glfw/commit/8db1528c7496bb36884ee93791091d5eb186e6cd */
+#endif
 #include <glbinding/gl/gl.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>
@@ -371,27 +374,27 @@ void gl_debug_message_callback(
 	notused void const* user_param
 ) {
 	const std::pair<gl::GLenum, const char*> srcStr[6] = {
-		{ gl::GL_DEBUG_SOURCE_API,             "API" 			 },
-		{ gl::GL_DEBUG_SOURCE_WINDOW_SYSTEM,   "WINDOW SYSTEM"   },
-		{ gl::GL_DEBUG_SOURCE_SHADER_COMPILER, "SHADER COMPILER" },
-		{ gl::GL_DEBUG_SOURCE_THIRD_PARTY,	   "THIRD PARTY" 	 },
-		{ gl::GL_DEBUG_SOURCE_APPLICATION,	   "APPLICATION" 	 },
-		{ gl::GL_DEBUG_SOURCE_OTHER, 		   "OTHER" 			 }
+		{ gl::GLenum::GL_DEBUG_SOURCE_API,             "API" 			 },
+		{ gl::GLenum::GL_DEBUG_SOURCE_WINDOW_SYSTEM,   "WINDOW SYSTEM"   },
+		{ gl::GLenum::GL_DEBUG_SOURCE_SHADER_COMPILER, "SHADER COMPILER" },
+		{ gl::GLenum::GL_DEBUG_SOURCE_THIRD_PARTY,	   "THIRD PARTY" 	 },
+		{ gl::GLenum::GL_DEBUG_SOURCE_APPLICATION,	   "APPLICATION" 	 },
+		{ gl::GLenum::GL_DEBUG_SOURCE_OTHER, 		   "OTHER" 			 }
 	};
 	const std::pair<gl::GLenum, const char*> typeStr[7] = {
-		{ gl::GL_DEBUG_TYPE_ERROR, 			     "ERROR"               },
-		{ gl::GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR, "DEPRECATED_BEHAVIOR" },
-		{ gl::GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR,  "UNDEFINED_BEHAVIOR"  },
-		{ gl::GL_DEBUG_TYPE_PORTABILITY,		 "PORTABILITY" 	       },
-		{ gl::GL_DEBUG_TYPE_PERFORMANCE,		 "PERFORMANCE" 		   },
-		{ gl::GL_DEBUG_TYPE_MARKER,			   	 "MARKER" 			   },
-		{ gl::GL_DEBUG_TYPE_OTHER,			     "OTHER" 			   }
+		{ gl::GLenum::GL_DEBUG_TYPE_ERROR, 			     "ERROR"               },
+		{ gl::GLenum::GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR, "DEPRECATED_BEHAVIOR" },
+		{ gl::GLenum::GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR,  "UNDEFINED_BEHAVIOR"  },
+		{ gl::GLenum::GL_DEBUG_TYPE_PORTABILITY,		 "PORTABILITY" 	       },
+		{ gl::GLenum::GL_DEBUG_TYPE_PERFORMANCE,		 "PERFORMANCE" 		   },
+		{ gl::GLenum::GL_DEBUG_TYPE_MARKER,			   	 "MARKER" 			   },
+		{ gl::GLenum::GL_DEBUG_TYPE_OTHER,			     "OTHER" 			   }
 	};
 	const std::pair<gl::GLenum, const char*> severityStr[6] = {
-		{ gl::GL_DEBUG_SEVERITY_NOTIFICATION, "NOTIFICATION" },
-		{ gl::GL_DEBUG_SEVERITY_LOW, 		  "LOW"		     },
-		{ gl::GL_DEBUG_SEVERITY_MEDIUM, 	  "MEDIUM"	     },
-		{ gl::GL_DEBUG_SEVERITY_HIGH, 		  "HIGH"	     }
+		{ gl::GLenum::GL_DEBUG_SEVERITY_NOTIFICATION, "NOTIFICATION" },
+		{ gl::GLenum::GL_DEBUG_SEVERITY_LOW, 		  "LOW"		     },
+		{ gl::GLenum::GL_DEBUG_SEVERITY_MEDIUM, 	  "MEDIUM"	     },
+		{ gl::GLenum::GL_DEBUG_SEVERITY_HIGH, 		  "HIGH"	     }
 	};
 	const char* src_str      = srcStr[0].second;
 	const char* type_str     = typeStr[0].second;

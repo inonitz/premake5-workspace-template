@@ -1,29 +1,36 @@
 workspace (WORKSPACE_NAME)
     startproject(START_PROJECT)
-    architecture "x86_64" -- can be overriden using --arch='x' flag
-    
-
-    -- 'system' can be overriden using --os='x' flag
+    -- 'arch'    can be overriden using --arch='x' flag
+    -- 'system'  can be overriden using --os='x'   flag
+    -- 'toolset' can be overriden using --cc='x'   flag (mostly...)
     filter { "system:windows", "action:vs2022" }
         toolset "msc-llvm-vs2022"
-        llvmdir     = os.getenv("LLVMInstallDir")
-        llvmversion = os.getenv("LLVMToolsVersion")
+        if llvmdir and llvmversion then
+            llvmdir     = os.getenv("LLVMInstallDir")
+            llvmversion = os.getenv("LLVMToolsVersion")
+        end
         flags { "MultiProcessorCompile" } -- NOTE: no equivalent in linux, must use makefiles and -j$NPROC
     filter {}
-    filter { "system:windows", "action:gmake2" } -- Should Still Be Relevant In the future: https://stackoverflow.com/questions/29504627/adjusting-g-location-with-premake
+    filter { "system:windows", "action:gmake2" } -- This article should help in the future: https://stackoverflow.com/questions/29504627/adjusting-g-location-with-premake
         toolset "clang"
-        llvmdir     = os.getenv("LLVMInstallDir")
-        llvmversion = os.getenv("LLVMToolsVersion")
-        -- flags { "LinkTimeOptimization" } -- easy fix to switch from 'ar' to 'llvm-ar' 
-        makesettings {
-            "CC = " .. llvmdir .. "/bin/clang.exe --verbose",
-            "CXX = " .. llvmdir .. "/bin/clang++.exe -ferror-limit=0 --verbose -fuse-ld=lld-link.exe",
-            "LD = " .. llvmdir .. "/bin/ld.lld.exe --verbose",
-            "AR = " .. llvmdir .. "/bin/llvm-ar.exe --verbose"
-        }
+        if llvmdir and llvmversion then
+            llvmdir     = os.getenv("LLVMInstallDir")
+            llvmversion = os.getenv("LLVMToolsVersion")
+            -- flags { "LinkTimeOptimization" } -- easy fix to switch from 'ar' to 'llvm-ar' 
+            makesettings {
+                "CC = " .. llvmdir .. "/bin/clang.exe --verbose",
+                "CXX = " .. llvmdir .. "/bin/clang++.exe -ferror-limit=0 --verbose -fuse-ld=lld-link.exe",
+                "LD = " .. llvmdir .. "/bin/ld.lld.exe --verbose",
+                "AR = " .. llvmdir .. "/bin/llvm-ar.exe --verbose"
+            }
+        end
     filter {}
+    -- #1 Link: https://askubuntu.com/questions/1508260/how-do-i-install-clang-18-on-ubuntu
+    -- #2 Link: https://unix.stackexchange.com/questions/596226/how-to-change-clang-10-llvm-10-etc-to-clang-llvm-etc
+    -- #3 I expect clang to be installed and symlinked on your machine, basically.
     filter "system:linux"
         toolset "clang"
+        debugformat "Dwarf"
     filter {}
 
 
@@ -53,7 +60,7 @@ workspace (WORKSPACE_NAME)
     filter {}
 
     filter "configurations:Debug*"
-        defines { "DEBUG" }
+        defines { "_DEBUG", "DEBUG" }
         runtime  "Debug"
         symbols  "on"
         optimize "off"

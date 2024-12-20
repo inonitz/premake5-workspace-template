@@ -74,11 +74,11 @@ template<u32 objectSizeInBytes> void CommonPoolDef<objectSizeInBytes>::print() c
 {
     static const char* strs[2] = { "Occupied", "Free    " };
     bool tmp = false;
-    std::printf("Static Pool Allocator:\nObject Array[%llu]: %p\n    Free:     %llu\n    Occupied: %llu\n    ", m_elemCount, __scast(void*, m_buffer), m_freeBlk, m_elemCount - m_freeBlk);
+    std::printf("Static Pool Allocator:\nObject Array[%lu]: %p\n    Free:     %lu\n    Occupied: %lu\n    ", m_elemCount, __scast(void*, m_buffer), m_freeBlk, m_elemCount - m_freeBlk);
     for(u64 i = 0; i < m_elemCount; ++i)
     {
         tmp = boolean(m_freelist[i].index > 0);
-        std::printf("    Object [i = %llu] [%s] => Object [%llu]\n", i, strs[tmp], __scast(u64, m_freelist[i].index));
+        std::printf("    Object [i = %lu] [%s] => Object [%lu]\n", i, strs[tmp], __scast(u64, m_freelist[i].index));
     }
     return;
 }

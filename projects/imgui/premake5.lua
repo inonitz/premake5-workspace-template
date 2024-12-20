@@ -1,7 +1,5 @@
 project "imgui"
-    language      "C++"
-    cppdialect    "C++17"
-    cdialect      "C11"
+    SpecifyGlobalProjectCXXVersion()
     systemversion "latest"
     warnings      "extra"
     files { 
@@ -15,23 +13,18 @@ project "imgui"
     
 
     SetupBuildDirectoriesForLibrary()
-    filter {}
     filter "system:windows"
         links { 
             "gdi32",
             "user32"
         }
-    filter { "system:linux" }
+    filter "system:linux"
         links { 
             "pthread",
             "dl", 
             "X11", 
-            "Xxf86vm", 
-            "Xrandr",
-            "Xi",
-            "Xinerama", 
-            "Xcursor", 
+            "Xrandr"
         }
-    filter {}
+    filter ""
     LinkGLFWLibrary()
     defines {}

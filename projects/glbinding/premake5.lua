@@ -1,7 +1,5 @@
 project "glbinding"
-    language      "C++"
-    cppdialect    "C++17"
-    cdialect      "C11"
+    SpecifyGlobalProjectCXXVersion()
     systemversion "latest"
     warnings      "extra"
     files { 

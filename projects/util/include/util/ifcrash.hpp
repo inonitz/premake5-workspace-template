@@ -48,11 +48,11 @@ DISABLE_WARNING_POP
 #endif
 
 
-#define ifcrash(condition) 			    ifcrash_generic(condition, "REL",      false, _nofmt,   {}, nullptr)
-#define ifcrashdo(condition, code)      ifcrash_generic(condition, "CODE_REL", false, _nofmt, { code }, nullptr)
-#define ifcrashstr(condition, str) 	    ifcrash_generic(condition, "STR_REL",  true,  _nofmt,   {}, str)
-#define ifcrashfmt(condition, str, ...) ifcrash_generic(condition, "FMT_REL",  true,    _fmt,   {}, str, __VA_ARGS__)
-#define ifcrashfmt_do(condition, str, code, ...) ifcrash_generic(condition, "CODE_FMT_REL", true, _fmt, { code }, str, __VA_ARGS__)
+#define ifcrash(condition) 			    ifcrash_generic(condition, "",     false, _nofmt,   {}, nullptr)
+#define ifcrashdo(condition, code)      ifcrash_generic(condition, "CODE", false, _nofmt, { code }, nullptr)
+#define ifcrashstr(condition, str) 	    ifcrash_generic(condition, "STR",  true,  _nofmt,   {}, str)
+#define ifcrashfmt(condition, str, ...) ifcrash_generic(condition, "FMT",  true,    _fmt,   {}, str, __VA_ARGS__)
+#define ifcrashfmt_do(condition, str, code, ...) ifcrash_generic(condition, "CODE_FMT", true, _fmt, { code }, str, __VA_ARGS__)
 
 
 #endif

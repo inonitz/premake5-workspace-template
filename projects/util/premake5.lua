@@ -1,7 +1,5 @@
 project "util"
-    language      "C++"
-    cppdialect    "C++17"
-    cdialect      "C11"
+    SpecifyGlobalProjectCXXVersion()
     systemversion "latest"
     warnings      "extra"
     files { 
@@ -10,11 +8,13 @@ project "util"
         "include/**.hpp",
         "source/**.cpp"
     }
+
+
     includedirs { 
         "include" 
     }
     SetupBuildDirectoriesForLibrary()
-    filter "toolset:clang"
+    filter "toolset:clang or toolset:gcc"
         buildoptions {
             "-msse3"
         }

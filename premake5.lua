@@ -1,3 +1,6 @@
+require("export-compile-commands")
+
+
 -- Makes a path relative to the folder containing this script file.
 ROOT_PATH = function(path)
     return string.format("%s/%s", _MAIN_SCRIPT_DIR, path)
@@ -8,6 +11,18 @@ PROJECT_DIR     = ROOT_PATH("projects")
 DEPENDENCY_DIR  = ROOT_PATH("dependencies")
 WORKSPACE_NAME  = "example-awc2-program"
 START_PROJECT   = "program-test"
+
+
+
+
+SpecifyGlobalProjectCXXVersion = function()
+    language "C++"
+    cppdialect "C++17"
+    filter "toolset:gcc"
+        cppdialect "gnu++17"
+    filter ""
+    filter {}
+end
 
 
 SetupBuildDirectoriesForLibrary = function()
@@ -50,23 +65,18 @@ end
 
 
 LinkGLFWLibrary = function()
-    filter { "system:windows" } 
+    filter "system:windows"
         libdirs { DEPENDENCY_DIR .. "/GLFW/windows/%{cfg.architecture}/lib-vc2022" }
-    filter {}
-        -- on linux you'll probably build from source and install globally on your machine
-    -- therefore, until I actively develop in a linux env, this'll be the expected folder structure
-    filter { "configurations:*Lib", "system:linux" }
-        libdirs { DEPENDENCY_DIR .. "/GLFW/linux/%{cfg.architecture}/static" }
-    filter {}
-    filter { "configurations:*Dll", "system:linux" }
-        libdirs { DEPENDENCY_DIR .. "/GLFW/linux/%{cfg.architecture}/shared" }
-    filter {}
-    filter { "configurations:*Lib" }
+    filter ""
+    filter { "system:windows", "configurations:*Lib" }
         links { "glfw3_mt" }
-    filter { "configurations:*Dll" }
+    filter { "system:windows", "configurations:*Dll" }
         links { "glfw3dll" }
         defines { "GLFW_DLL" }
     filter {}
+    filter "system:linux" -- requires the following packages [debian]: apt-get install libglfw3 libglfw3-dev libgl-dev 
+        links { "glfw" }
+    filter ""
 end
 
 
@@ -141,7 +151,7 @@ newaction {
     trigger     = "CleanProjectConfigs",
     description = "Remove all Project Solutions, Makefiles, Ninja build files, etc...",
     execute     = function ()
-        local build_extensions = { "/Makefile", "/**.sln", "/**.vcxproj", "/**.vcxproj.filters", "/**.vcxproj.user", "/**.ninja", "/.ninja_deps", "/.ninja_log", "/.ninja_lock"}
+        local build_extensions = { "/Makefile", "/**.sln", "/**.vcxproj", "/**.vcxproj.filters", "/**.vcxproj.user", "/**.ninja", "/.ninja_deps", "/.ninja_log", "/.ninja_lock" }
         local ok, err
         table.insert(PROJECTS, ".")
         for _, path in ipairs(PROJECTS) do
@@ -169,7 +179,7 @@ newaction {
     trigger     = "CleanAllBuild",
     description = "Delete All Object Files & Executables created during the build process",
     execute     = function ()
-        local dirs_to_delete = { "./build", "./.vs", "./compile_commands" }
+        local dirs_to_delete = { "./build", "./.vs" }
         local ok, err
         printf("----------------------------------------")
         for _, path in ipairs(dirs_to_delete) do
@@ -179,6 +189,26 @@ newaction {
             else
                 printf("%-30s: %s", "Got Error", err)
             end
+        end
+        printf("----------------------------------------")
+        print("Done")
+    end
+}
+
+
+-- Delete whatever was generated using export-compile-commands
+newaction {
+    trigger     = "CleanClangd",
+    description = "Delete the compile_commands/* Directory",
+    execute     = function ()
+        local ok, err, path
+        printf("----------------------------------------")
+        path = "./compile_commands"
+        ok, err = os.rmdir(path)
+        if ok then
+            printf("%-30s: %s", "Removed Directory", path)
+        else
+            printf("%-30s: %s", "Got Error", err)
         end
         printf("----------------------------------------")
         print("Done")

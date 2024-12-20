@@ -1,4 +1,4 @@
-#version 460 core
+#version 450 core
 layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
 layout (binding = 3) uniform sampler2D outfield;
 layout (binding = 4, rgba32f) writeonly uniform image2D outpos;
@@ -60,17 +60,17 @@ void main()
     vec4 TextureValue;
     
 
-    TextureValue = texture(outfield, ppos_ss(uv1d), 0);
+    TextureValue = texture(outfield, ppos_ss(uv1d));
     vec2 k1 = dt * TextureValue.xy;
     // switch(RK2_0_RK4_1_Euler2) {
     //     case 0:        
-    //     k2 = dt * texture(outfield, ppos_ss(uv1d) + k1, 0).xy;
+    //     k2 = dt * texture(outfield, ppos_ss(uv1d) + k1).xy;
     //     rkfinal = 0.5f * (k1 + k2);
     //     break;
     //     case 1:
-    //     k2 = dt * texture(outfield, ppos_ss(uv1d) + 0.5f * k1, 0).xy;
+    //     k2 = dt * texture(outfield, ppos_ss(uv1d) + 0.5f * k1).xy;
     //     vec2 k3 = dt * texture(outfield, ppos_ss(uv1d) + 0.5f * k2, 0).xy;
-    //     vec2 k4 = dt * texture(outfield, ppos_ss(uv1d) + k3, 0).xy;
+    //     vec2 k4 = dt * texture(outfield, ppos_ss(uv1d) + k3).xy;
     //     rkfinal = (k1 + 2 * k2 + 2 * k3 + k4) / 6;
     //     break;
     //     case 2:
@@ -79,12 +79,12 @@ void main()
     // }
 #define RK4_2_RK2_1_Euler_0 2
 #if RK4_2_RK2_1_Euler_0 == 2
-vec2 k2 = dt * texture(outfield, ppos_ss(uv1d) + 0.5f * k1, 0).xy;
-vec2 k3 = dt * texture(outfield, ppos_ss(uv1d) + 0.5f * k2, 0).xy;
-vec2 k4 = dt * texture(outfield, ppos_ss(uv1d) + k3, 0).xy;
+vec2 k2 = dt * texture(outfield, ppos_ss(uv1d) + 0.5f * k1).xy;
+vec2 k3 = dt * texture(outfield, ppos_ss(uv1d) + 0.5f * k2).xy;
+vec2 k4 = dt * texture(outfield, ppos_ss(uv1d) + k3).xy;
 rkfinal = (k1 + 2*k2 + 2*k3 + k4) / 6;
 #elif RK4_2_RK2_1_Euler_0 == 1
-vec2 k2 = dt * texture(outfield, ppos_ss(uv1d) + k1, 0).xy;
+vec2 k2 = dt * texture(outfield, ppos_ss(uv1d) + k1).xy;
 rkfinal = 0.5f * (k1 + k2);
 #else
 rkfinal = k1;

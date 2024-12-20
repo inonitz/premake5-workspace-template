@@ -13,9 +13,9 @@ namespace util {
 	After which the function will proceed with file loading
 */
 UTIL_API bool loadFile(
-	const char* 		path, /* filepath 														   */ 
-	unsigned long long* size, /* the size of the out array that was pre-allocated.                 */
-	char*				out   /* Where to place the file contents (Buffer of Min-Size 'size')      */
+	const char*   path, /* filepath 													*/ 
+	unsigned int* size, /* the size of the out array that was pre-allocated.            */
+	char*		  out   /* Where to place the file contents (Buffer of Min-Size 'size') */
 );
 
 

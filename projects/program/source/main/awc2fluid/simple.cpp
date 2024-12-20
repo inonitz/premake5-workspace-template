@@ -90,7 +90,8 @@ i32 render_fluid_awc2_fuckyou()
         markstr("AWC2 init begin");
         AWC2::init();
         g_awc2id = AWC2::createContext();
-        g_simDims = { 1280, 720 };
+        // g_simDims = { 1280, 720 };
+        g_simDims = { 720, 480 };
         AWC2::initializeContext(g_awc2id, g_simDims.x, g_simDims.y, AWC2::WindowDescriptor{});
         AWC2::setContextUserCallback(g_awc2id, &custom_mousebutton_callback);
         markstr("AWC2 init end");
@@ -100,7 +101,11 @@ i32 render_fluid_awc2_fuckyou()
         markstr("Opengl Data init begin");
         /* This is Not Portable on Unix-like OS's. Problem is std::current_file::path()*/
         static constexpr const char* shaderName[2] = { "old_sim.comp", "old_visual.comp" };
-        static constexpr const char* dirName       = "C:/CTools/Projects/premake-mdk-wip/projects/program/source/main/awc2fluid";
+#if defined __linux__
+        static constexpr const char* dirName   = "projects/program/source/main/awc2fluid";
+#elif defined _WIN32
+    static constexpr const char* dirName       = "C:/CTools/Projects/premake-mdk-wip/projects/program/source/main/awc2fluid";
+#endif
         static const std::string shaderPath[2] = {
             
             ( fs::path{dirName}/fs::path{shaderName[0]} ).generic_u8string(),

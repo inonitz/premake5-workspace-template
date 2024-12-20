@@ -1,4 +1,4 @@
-#version 460 core
+#version 450 core
 layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
 layout (binding = 0) uniform sampler2D infield;
 layout (binding = 1) uniform sampler2D externalForces;
@@ -9,7 +9,7 @@ void main()
 {
     const vec2 unitPerAxis = vec2(0.5);
     const vec2 unitPerAxisSq = unitPerAxis * unitPerAxis;
-    const float dt = 0.01f;
+    const float dt = 0.19f;
     const float K  = 0.19f;
     const float initialDensity = 1.0f;
     const float viscosityConst = 0.25f; 

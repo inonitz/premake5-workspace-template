@@ -1,7 +1,5 @@
 project "glbinding-aux"
-    language      "C++"
-    cppdialect    "C++17"
-    cdialect      "C11"
+    SpecifyGlobalProjectCXXVersion()
     systemversion "latest"
     warnings      "extra"
     files { 
@@ -15,11 +13,11 @@ project "glbinding-aux"
     
 
     LinkProjectLibrary("glbinding")
-    defines {
-        "_CRT_SECURE_NO_WARNINGS"
-    }    
+    filter { "system:linux" }
+        links { "pthread" }
+    filter {} 
     filter { "system:windows" }
-        defines { "SYSTEM_WINDOWS" }
+        defines { "SYSTEM_WINDOWS" , "_CRT_SECURE_NO_WARNINGS" }
     filter {}
     filter { "configurations:*Lib" }
         defines { "GLBINDING_STATIC_DEFINE", "GLBINDING_AUX_STATIC_DEFINE" }
