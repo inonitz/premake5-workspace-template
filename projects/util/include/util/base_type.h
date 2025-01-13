@@ -19,4 +19,4 @@ typedef uintptr_t up64;
 typedef intptr_t  ip64;
 
 
-#endif /* __UTIL_C_BASE_TYPES_DEFINITION__ */
+#endif /* __UTIL_C_BASE_TYPES__ */

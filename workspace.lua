@@ -38,6 +38,15 @@ workspace (WORKSPACE_NAME)
     filter "system:linux"
         toolset "clang"
         debugformat "Dwarf"
+        -- if llvmdir then
+        --     llvmdir = os.getenv("LLVMInstallDir")
+        -- end
+        -- makesettings {
+        --     "CC = "  .. '"' .. llvmdir .. "/clang"   .. '"' .. " --verbose",
+        --     "CXX = " .. '"' .. llvmdir .. "/clang++" .. '"' .. " --verbose -ferror-limit=0",
+        --     "LD = "  .. '"' .. llvmdir .. "/ld.lld"  .. '"' .. " --verbose",
+        --     "AR = "  .. '"' .. llvmdir .. "/llvm-ar-19" .. '"' .. " v"
+        -- }
     filter {}
 
 

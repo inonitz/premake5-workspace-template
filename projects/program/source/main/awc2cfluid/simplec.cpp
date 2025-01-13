@@ -116,7 +116,7 @@ i32 render_fluid_awc2_c()
         /* This is Not Portable on Unix-like OS's. Problem is std::current_file::path()*/
         static constexpr const char* shaderName[2] = { "/old_sim.comp", "/old_visual.comp" };
 #if defined __linux__
-        static constexpr const char* dirName   = "projects/program/source/main/awc2fcluid";
+        static constexpr const char* dirName   = "projects/program/source/main/awc2cfluid";
 #elif defined _WIN32
     static constexpr const char* dirName       = "C:/CTools/Projects/main/projects/program/source/main/awc2cfluid";
 #endif

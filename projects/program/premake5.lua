@@ -33,7 +33,7 @@ project "program-test"
     filter "system:windows"
         links { "gdi32", "shell32" }
     filter "system:linux" 
-        links { "dl" }
+        links { "dl", "pthread" }
     filter {}
 
     -- Macros

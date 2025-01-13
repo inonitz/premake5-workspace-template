@@ -8,6 +8,9 @@ Makefile
 .vscode/launch.json
 .vscode/settings.json
 
+# clangd Compilation Database
+.vscode/compile_commands
+
 # Visual Studio files
 .vs/
 *.sln
