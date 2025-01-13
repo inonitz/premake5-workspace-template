@@ -1,12 +1,12 @@
 # Build output
 build/
-compile_commands/
 
 # Makefiles
 Makefile
 
 # Visual Studio Code files
-.vscode/
+.vscode/launch.json
+.vscode/settings.json
 
 # Visual Studio files
 .vs/
