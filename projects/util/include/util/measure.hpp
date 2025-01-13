@@ -1,10 +1,10 @@
 #pragma once
+#include "util_api.h"
 #include "base.hpp"
 #include <chrono>
 #include <array>
 #include <vector>
 #include <string_view>
-#include <memory>
 
 
 
@@ -14,7 +14,8 @@
 #define BENCHMARK_STATUS_FAIL        (0b100)
 
 
-struct BenchmarkResult
+struct UTIL_DEPRECATED_MSG("This is legacy code I used to measure Very Old CPU-side Simulation code") 
+BenchmarkResult
 {
     using chrono_ns = std::chrono::nanoseconds;
     std::array<char, 200> name; /* totally arbitrary array size, i exepct no more than 200 chars per name */
@@ -23,13 +24,13 @@ struct BenchmarkResult
 };
 
 
-struct Benchmark {
+struct UTIL_DEPRECATED Benchmark {
     std::string_view title;
     std::unique_ptr<std::vector<BenchmarkResult>> data;
 };
 
 
-template <class TimeUnit = std::chrono::nanoseconds, class ClockType = std::chrono::steady_clock> class Timer {
+template <class TimeUnit = std::chrono::nanoseconds, class ClockType = std::chrono::steady_clock> class UTIL_DEPRECATED Timer {
     using TimePoint = typename ClockType::time_point;
     
 	TimePoint m_start, m_end;

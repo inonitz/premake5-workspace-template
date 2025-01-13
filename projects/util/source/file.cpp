@@ -29,11 +29,11 @@ bool util::loadFile(
 	fsize = fread(out, sizeof(unsigned char), *size, to_open);
 	ifcrashdo(fsize != *size, {
 		fclose(to_open); 
-		printf("Something went wrong - file size is %lu bytes, read only %lu bytes\n", __scast(uint64_t, *size), fsize);
+		printf("Something went wrong - file size is %llu bytes, read only %llu bytes\n", __scast(uint64_t, *size), fsize);
 	});
 
 
 	fsize = fclose(to_open);
-	ifcrashfmt(fsize, "Couldn't close file handle. ERROR CODE: %lu\n", fsize);
+	ifcrashfmt(fsize, "Couldn't close file handle. ERROR CODE: %llu\n", fsize);
 	return true;
 }

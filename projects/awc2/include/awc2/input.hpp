@@ -1,5 +1,6 @@
 #ifndef __AWC2_INPUT_INTERFACE_HEADER__
 #define __AWC2_INPUT_INTERFACE_HEADER__
+#include "C/awc2_api.h"
 #include "input_types.hpp"
 
 
@@ -16,17 +17,17 @@
     Basically, Don't 
 */
 namespace AWC2::Input {
-    bool isKeyPressed (keyCode key);
-    bool isKeyReleased(keyCode key);
-    bool isKeyRepeated(keyCode key);
-    bool isMouseButtonPressed (mouseButton but);
-    bool isMouseButtonReleased(mouseButton but);
-    bool isMouseMoving();
-    bool isMouseScrollMoving();
-    cursorPosition getMouseScrollOffset();
-    cursorPosition getMousePosition();
-    cursorPosition getMousePositionDelta();
-    void setCursorMode(cursorMode mode);
+    AWC2_API bool isKeyPressed (keyCode key);
+    AWC2_API bool isKeyReleased(keyCode key);
+    AWC2_API bool isKeyRepeated(keyCode key);
+    AWC2_API bool isMouseButtonPressed (mouseButton but);
+    AWC2_API bool isMouseButtonReleased(mouseButton but);
+    AWC2_API bool isMouseMoving();
+    AWC2_API bool isMouseScrollMoving();
+    AWC2_API cursorPosition getMouseScrollOffset();
+    AWC2_API cursorPosition getMousePosition();
+    AWC2_API cursorPosition getMousePositionDelta();
+    AWC2_API void           setCursorMode(cursorMode mode);
 } // namespace AWC2::Input
 
 

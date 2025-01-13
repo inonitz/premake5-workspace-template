@@ -1,5 +1,5 @@
 #pragma once
-#include <awc2/context.hpp>
+#include <awc2/C/context.h>
 #include <util/aligned_malloc.hpp>
 #include <util/vec2.hpp>
 #include <util/time.hpp>
@@ -7,19 +7,19 @@
 #include <cstdio>
 
 
-i32 render_fluid_awc2_fuckyou();
+i32 render_fluid_awc2_c();
 
 
-namespace GenericNamespaceName {
+namespace GenericNamespaceNameC {
 
 
 using namespace util::math;
 
 
-struct ParticleData {
+typedef struct __awc2_c_particleData {
     vec4f position;
     vec4f color;
-};
+} ParticleData;
 
 
 typedef struct __compute_shader_particle_buffer_definition
@@ -103,7 +103,7 @@ struct OpenGLDataV2 {
 
 struct GlobalStateV2
 {
-    AWC2::ContextID m_awc2id;
+    AWC2ContextID   m_awc2id;
     bool            m_shouldRestartSimulation;
     bool            m_shouldRestartUserInputTexture;
     __unused u8     reserved[5];
@@ -127,7 +127,7 @@ struct GlobalStateV2
 // private:
 //     void renderImGui();
 
-//     AWC2::ContextID m_awc2id;
+//     AWC2ContextID m_awc2id;
 //     bool            m_shouldRestartSimulation;
 //     bool            m_shouldRestartUserInputTexture;
 //     __unused u8     reserved[5];

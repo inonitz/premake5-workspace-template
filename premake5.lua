@@ -1,4 +1,24 @@
-require("export-compile-commands")
+-- Thankss to: https://stackoverflow.com/questions/75490124/how-to-require-a-file-with-a-dot-in-the-name
+local function __custom_searcher(module_name)
+    -- Use "/" instead of "." as directory separator
+    local path, err = package.searchpath(module_name, package.path, "/")
+    if path then
+        return assert(loadfile(path))
+    end
+    return err
+end
+
+
+table.insert(package.searchers, __custom_searcher)
+local function __custom_require(module_name)
+    return assert(loadfile(assert(package.searchpath(module_name, package.path, "/"))))
+end
+
+
+-- __custom_require(".vscode/export-compile-comms")
+-- __custom_require(".vscode/ecc")
+-- require(".vscode/ecc")
+require(".vscode/export-compile-comms")
 
 
 -- Makes a path relative to the folder containing this script file.
@@ -13,13 +33,26 @@ WORKSPACE_NAME  = "example-awc2-program"
 START_PROJECT   = "program-test"
 
 
+BUILD_BINARY_DIRECTORY_GENERIC = "/build/bin/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}"
+BUILD_OBJECT_DIRECTORY_GENERIC = "/build/obj/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}"
+BUILD_BINARY_DIRECTORY = "/build/bin/%{cfg.buildcfg}_%{cfg.platform}"
 
 
 SpecifyGlobalProjectCXXVersion = function()
     language "C++"
     cppdialect "C++17"
+    filter "files:**.c"
+        buildoptions { "-std=c11" }
+    filter "files:**.cpp"
+        buildoptions { "-std=c++17" }
+    filter ""
+
     filter "toolset:gcc"
         cppdialect "gnu++17"
+        filter "files:**.c"
+            buildoptions { "-std=gnu11" }
+        filter "files:**.cpp"
+            buildoptions { "-std=gnu++17" }
     filter ""
     filter {}
 end
@@ -28,16 +61,14 @@ end
 SetupBuildDirectoriesForLibrary = function()
     filter "configurations:*Lib"
         kind "StaticLib"
-        staticruntime "on"
-        targetdir (_MAIN_SCRIPT_DIR .. "/build/bin/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}")
-        objdir    (_MAIN_SCRIPT_DIR .. "/build/obj/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}")
+        targetdir (_MAIN_SCRIPT_DIR .. BUILD_BINARY_DIRECTORY_GENERIC)
+        objdir    (_MAIN_SCRIPT_DIR .. BUILD_OBJECT_DIRECTORY_GENERIC)
     filter ""
 
     filter "configurations:*Dll"
         kind "SharedLib"
-        staticruntime "off"
-        targetdir (_MAIN_SCRIPT_DIR .. "/build/bin/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}")
-        objdir    (_MAIN_SCRIPT_DIR .. "/build/obj/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}")
+        targetdir (_MAIN_SCRIPT_DIR .. BUILD_BINARY_DIRECTORY_GENERIC)
+        objdir    (_MAIN_SCRIPT_DIR .. BUILD_OBJECT_DIRECTORY_GENERIC)
     filter ""
     filter {}
 end
@@ -45,16 +76,74 @@ end
 
 SetupBuildDirectoriesForExecutable = function()
     filter "configurations:*Lib"
-        staticruntime "on"
-        targetdir (_MAIN_SCRIPT_DIR .. "/build/bin/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}")
-        objdir    (_MAIN_SCRIPT_DIR .. "/build/obj/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}")
+        targetdir (_MAIN_SCRIPT_DIR .. BUILD_BINARY_DIRECTORY_GENERIC)
+        objdir    (_MAIN_SCRIPT_DIR .. BUILD_OBJECT_DIRECTORY_GENERIC)
     filter ""
 
     filter "configurations:*Dll"
-        staticruntime "off"
-        targetdir (_MAIN_SCRIPT_DIR .. "/build/bin/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}")
-        objdir    (_MAIN_SCRIPT_DIR .. "/build/obj/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}")
+        targetdir (_MAIN_SCRIPT_DIR .. BUILD_BINARY_DIRECTORY_GENERIC)
+        objdir    (_MAIN_SCRIPT_DIR .. BUILD_OBJECT_DIRECTORY_GENERIC)
     filter ""
+    filter {}
+end
+
+
+
+-- -- The reason for this hideous mess: https://groups.google.com/g/llvm-dev/c/WA1vKn9zDtM
+-- -- Also, clang doesn't pass either '-nodefaultlibs' nor '-fms-runtime-lib',
+-- -- (atleast when using -fuse-ld=lld-link) so It so happens that I ALWAYS link against static libraries of the CRT
+-- LinkToStandardLibraries = function()
+--     filter { "system:windows", "action:vs2022", "configurations:*Lib" }
+--         staticruntime "on"
+--     filter { "system:windows", "action:gmake2", "configurations:*Lib" }
+--         buildoptions { "-static-libgcc",  "-static-libstdc++" }
+
+
+--     filter { "system:windows", "action:vs2022", "configurations:*Dll" }
+--         staticruntime "Off"
+--     filter { "system:windows", "action:gmake2", "configurations:DebugDll" }
+--         linkoptions { "-Wl,/nodefaultlib,kernel32.lib,ucrtd.lib,vcruntimed.lib,msvcrtd.lib,msvcprtd.lib" }
+--     filter { "system:windows", "action:gmake2", "configurations:ReleaseDll" }
+--         linkoptions { "-Wl,/nodefaultlib,kernel32.lib,ucrt.lib,vcruntime.lib,msvcrt.lib,msvcprt.lib" }
+--     filter {}
+-- end
+
+
+LinkToStandardLibraries = function()
+    -- Directly Taken from: https://learn.microsoft.com/en-us/cpp/c-runtime-library/crt-library-features?view=msvc-170
+    -- Static Debug:
+    -- Libraries: libucrtd.lib libvcruntimed.lib libcmtd.lib libcpmtd.lib
+    -- Macros: _DEBUG, _MT
+    filter { "system:windows", "action:gmake2", "configurations:DebugLib" }
+        buildoptions { "-fms-runtime-lib=static_dbg" }
+        defines { "_MT", "_DEBUG" }
+        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,libucrtd.lib,libvcruntimed.lib,libcmtd.lib,libcpmtd.lib" }
+
+    -- Static Release: 
+    -- Libraries: libucrt.lib libvcruntime.lib libcmt.lib libcpmt.lib
+    -- Macros: _MT
+    filter { "system:windows", "action:gmake2", "configurations:ReleaseLib" }
+        buildoptions { "-fms-runtime-lib=static" }
+        defines { "_MT" }
+        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,libucrt.lib,libvcruntime.lib,libcmt.lib,libcpmt.lib" }
+
+
+    -- Dll Debug: 
+    -- Libraries: ucrtd.lib vcruntimed.lib msvcrtd.lib msvcprtd.lib 
+    -- Macros: _DEBUG, _MT, _DLL
+    filter { "system:windows", "action:gmake2", "configurations:DebugDll" }
+        buildoptions { "-fms-runtime-lib=dll_dbg" }
+        defines { "_MT", "_DEBUG", "_DLL" }
+        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,ucrtd.lib,vcruntimed.lib,msvcrtd.lib,msvcprtd.lib" }
+
+    -- Dll Release: 
+    -- Libraries: ucrt.lib vcruntime.lib msvcrt.lib msvcprt.lib
+    -- Macros: _MT, _DLL
+    filter { "system:windows", "action:gmake2", "configurations:ReleaseDll" }
+        buildoptions { "-fms-runtime-lib=dll" }
+        defines { "_MT", "_DLL" }
+        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,ucrt.lib,vcruntime.lib,msvcrt.lib,msvcprt.lib" }
+
     filter {}
 end
 
@@ -63,13 +152,17 @@ IncludeGLFWDirectory = function()
     includedirs { DEPENDENCY_DIR .. "/GLFW/include" }
 end
 
+GetGLFWLibraryPath = function()
+    return DEPENDENCY_DIR .. "/GLFW/windows/%{cfg.architecture}/lib-vc2022"
+end
 
 LinkGLFWLibrary = function()
     filter "system:windows"
-        libdirs { DEPENDENCY_DIR .. "/GLFW/windows/%{cfg.architecture}/lib-vc2022" }
+        libdirs { GetGLFWLibraryPath() }
     filter ""
     filter { "system:windows", "configurations:*Lib" }
         links { "glfw3_mt" }
+        links { "user32" }
     filter { "system:windows", "configurations:*Dll" }
         links { "glfw3dll" }
         defines { "GLFW_DLL" }
@@ -77,7 +170,10 @@ LinkGLFWLibrary = function()
     filter "system:linux" -- requires the following packages [debian]: apt-get install libglfw3 libglfw3-dev libgl-dev 
         links { "glfw" }
     filter ""
+    filter {}
 end
+
+
 
 
 -- try to use these generic functions to include & link every project, right now the only ones popping up on program is glfw (also for awc2 ...)
@@ -86,10 +182,7 @@ IncludeProjectHeaders = function(ProjectName)
 end
 
 LinkProjectLibrary = function(ProjectName)
-    filter { "configurations:*Lib" }
-        links { ProjectName }
-    filter { "configurations:*Dll" }
-        links { ProjectName }
+    links { ProjectName }
     filter {}
 end
 
@@ -112,9 +205,28 @@ LinkGLBindingLibraries = function()
     filter {}
 end
 
+LinkImGuiLibrary = function()
+    LinkProjectLibrary("imgui")
+    filter { "system:windows", "configurations:*Lib" }
+        defines { "IMGUI_STATIC_DEFINE" }
+        links { "imm32" }
+    filter { "system:not windows", "configurations:*Lib" }
+        defines { "IMGUI_STATIC_DEFINE" }
+    filter {}
+end
+
+LinkAWC2Library = function()
+    LinkProjectLibrary("awc2")
+    filter { "configurations:*Lib" }
+        defines { "AWC2_STATIC_DEFINE" }
+    filter {}
+end
 
 
 
+
+-- VERY IMPORTANT! IT MIGHT NOT LOOK LIKE MUCH
+-- BUT ITS DOING LITERALLY EVERYTHING IN THIS WORKSPACE
 include "workspace.lua"
 include "projects.lua"
 for _, path in ipairs(PROJECTS) do
@@ -148,7 +260,7 @@ end
 
 -- Rebuild Project Solutions' Function --
 newaction {
-    trigger     = "CleanProjectConfigs",
+    trigger     = "cleanprojectconfigs",
     description = "Remove all Project Solutions, Makefiles, Ninja build files, etc...",
     execute     = function ()
         local build_extensions = { "/Makefile", "/**.sln", "/**.vcxproj", "/**.vcxproj.filters", "/**.vcxproj.user", "/**.ninja", "/.ninja_deps", "/.ninja_log", "/.ninja_lock" }
@@ -176,7 +288,7 @@ newaction {
 
 -- Wipe Function --
 newaction {
-    trigger     = "CleanAllBuild",
+    trigger     = "cleanbuild",
     description = "Delete All Object Files & Executables created during the build process",
     execute     = function ()
         local dirs_to_delete = { "./build", "./.vs" }
@@ -198,12 +310,12 @@ newaction {
 
 -- Delete whatever was generated using export-compile-commands
 newaction {
-    trigger     = "CleanClangd",
+    trigger     = "cleanclangd",
     description = "Delete the compile_commands/* Directory",
     execute     = function ()
         local ok, err, path
         printf("----------------------------------------")
-        path = "./compile_commands"
+        path = "./.vscode/compile_commands"
         ok, err = os.rmdir(path)
         if ok then
             printf("%-30s: %s", "Removed Directory", path)

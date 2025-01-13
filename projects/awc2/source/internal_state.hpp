@@ -1,11 +1,11 @@
 #ifndef __AWC2_INTERNAL_STATE_DEFINITION_HEADER__
 #define __AWC2_INTERNAL_STATE_DEFINITION_HEADER__
+#include "awc2/context.hpp"
 #include "internal_event.hpp"
 #include "internal_window.hpp"
 #include "internal_input.hpp"
 #include <util/pool.hpp>
 #include <util/bufferptr.hpp>
-#include <vector>
 
 
 namespace AWC2::internal {
@@ -50,15 +50,23 @@ struct alignsz(32) AWC2ContextData
 // };
 
 
-struct AWC2Data
-{
+// struct AWC2Data
+// {
+//     util::BufferPointer<AWC2ContextData> poolmem;
+//     u8    activeid = DEFAULT8;
+//     bool  init     = false;
+//     u8    reserved[6]{0};
+//     Pool<sizeof(AWC2ContextData), true> ctxpool;
+//     // AWC2::ContextBitmap contextStatus;
+//     // AWC2::ContextVector initializedContexts;
+//     // AWC2::ContextVector inactiveContexts;
+// };
+
+
+struct AWC2Data {
+    Pool<sizeof(AWC2ContextData), true>  ctxpool;
     util::BufferPointer<AWC2ContextData> poolmem;
-    u8    activeid = DEFAULT8;
-    bool  init     = false;
-    u8    reserved[6]{0};
-    Pool<sizeof(AWC2ContextData), true> ctxpool;
-    std::vector<u8>  initializedContexts;
-    std::vector<u8>  inactiveContexts;
+    AWC2::ContextBitmap                  ctxmap;
 };
 
 

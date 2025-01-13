@@ -5,6 +5,7 @@
 #include "aligned_malloc.hpp"
 #include <utility>
 #include <vector>
+#include <array>
 #include <functional>
 #include <string>
 

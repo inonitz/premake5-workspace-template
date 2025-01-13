@@ -1,8 +1,10 @@
 #ifndef __UTIL_VECTOR_MATH_LIBRARY2__
 #define __UTIL_VECTOR_MATH_LIBRARY2__
+#include "util_api.h"
 #include "util.hpp"
 #include "ifcrash.hpp"
 #include <xmmintrin.h>
+#include <emmintrin.h>
 #include <array>
 
 
@@ -55,7 +57,7 @@ public:
 
 
 #define DEFINE_VECTOR_STRUCTURE(len, type_t, fmt, declare_union_structs, declare_n_args_ctor, ...) \
-struct vec##fmt \
+struct UTIL_API vec##fmt \
 { \
     using __Mem = Vector<type_t, len>; \
     using ArrayType = std::array<type_t, len>; \
@@ -237,7 +239,7 @@ DEFINE_VECTOR_STRUCTURE( \
 	4,
 	u32,
 	4u,
-	__m128i_u xmm;
+	__m128i xmm;
 	struct { u32 x;   u32 y;     u32 z;    u32 w;     }; 
 	struct { u32 r;   u32 g;     u32 b;    u32 a;     };
 	struct { u32 i;   u32 j;     u32 k;	   u32 l;     };
@@ -305,7 +307,7 @@ DEFINE_VECTOR_STRUCTURE( \
 	3,
 	u32,
 	3u,
-	__m128i_u xmm;
+	__m128i xmm;
 	struct { u32 x;   u32 y;     u32 z;    };
 	struct { u32 u;   u32 v;     u32 w;    };
 	struct { u32 r;   u32 g;     u32 b;    };

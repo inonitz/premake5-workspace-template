@@ -1,7 +1,7 @@
 #ifndef __AWC2_WINDOW_TYPES_HEADER__
 #define __AWC2_WINDOW_TYPES_HEADER__
-#include <util/macro.hpp>
-#include <util/types.hpp>
+#include <util/macro.h>
+#include <util/base_type.h>
 
 
 namespace AWC2 {
@@ -109,6 +109,7 @@ struct alignsz(8) WindowDescriptor {
         return *this;
     }
 };
+UTIL_STATIC_ASSERT(sizeof(WindowDescriptor) == 8, WindowDescriptor, "Conforming Size Types Across Compilers")
 
 
 } // namespace AWC2

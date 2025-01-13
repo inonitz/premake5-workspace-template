@@ -1,20 +1,32 @@
 project "imgui"
-    SpecifyGlobalProjectCXXVersion()
     systemversion "latest"
     warnings      "extra"
+    rtti          "On"
+    SpecifyGlobalProjectCXXVersion()
+    -- Project Structure
     files { 
+        "include/**.h",
+        "source/**.c",
         "include/**.hpp",
         "source/**.cpp"
     }
+    -- Specify Include Headers
     includedirs { 
         "include"
     }
     IncludeGLFWDirectory()
-    
 
+    -- Build Directories &// Structure
     SetupBuildDirectoriesForLibrary()
+
+    -- Build Options
+
+    -- Linking Options
+    LinkToStandardLibraries()
+    LinkGLFWLibrary()
     filter "system:windows"
         links { 
+            "imm32",
             "gdi32",
             "user32"
         }
@@ -25,6 +37,14 @@ project "imgui"
             "X11", 
             "Xrandr"
         }
-    filter ""
-    LinkGLFWLibrary()
-    defines {}
+    filter {}
+
+    -- Macros
+    filter { "configurations:*Lib" }
+        defines { "IMGUI_STATIC_DEFINE" }
+    filter { "configurations:*Dll" }
+        defines { "IMGUI_EXPORTS" }
+    filter {}
+
+
+    -- Custom Pre &// Post build Actions

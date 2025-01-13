@@ -1,6 +1,6 @@
 #ifndef __UTIL_IF_CRASH_MACRO__
 #define __UTIL_IF_CRASH_MACRO__
-#include "macro.hpp"
+#include "macro.h"
 
 
 namespace detail::ifcrash_macro {

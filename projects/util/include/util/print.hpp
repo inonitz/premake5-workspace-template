@@ -13,9 +13,9 @@ namespace util {
         CUSTOM          = 0x02,
         OUTPUT_STREAM_TYPE_MAX = 0x03
     };
-    void selectOutputStream(OutputStreamType stype, void* custom_stream = nullptr);
-    void print(const char* str);
-    void printfmt(const char* fmt, ...);
+    void UTIL_API selectOutputStream(OutputStreamType stype, void* custom_stream = nullptr);
+    void UTIL_API print(const char* str);
+    void UTIL_API printfmt(const char* fmt, ...);
 
 
 #if __UTIL_PRINT_USING_COLORED_CONSOLE__ == 1

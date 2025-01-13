@@ -1,21 +1,19 @@
-#include "gem38.hpp"
-#include <awc2/awc2.hpp>
+#include "simplec.hpp"
+#include <awc2/C/awc2.h>
 #include <util/random.hpp>
 #include <util/marker2.hpp>
 #include <glbinding/gl/gl.h>
 #include <imgui/imgui.h>
 #include <algorithm>
-#include <chrono>
-#include <thread>
-#include <filesystem>
+#include <string>
+#include <time.h>
+#include <threads.h>
 
 
 using namespace util::math;
-namespace AIN = AWC2::Input;
-namespace fs = std::filesystem;
 
 
-void GenericNamespaceName2::ParticleBufferManager::set()
+void GenericNamespaceNameC::ParticleBufferManager::set()
 {
     /* Set Default Values */
     static vec4f color{0.0f};
@@ -49,61 +47,85 @@ void GenericNamespaceName2::ParticleBufferManager::set()
 
 
 inline void render(
-    GenericNamespaceName2::OpenGLDataV2& gfxdata,
-    GenericNamespaceName2::frameTimeData& framedata,
+    GenericNamespaceNameC::OpenGLDataV2& gfxdata,
+    GenericNamespaceNameC::frameTimeData& framedata,
     vec2i const& simDims
 );
 
 
 
 
-inline void custom_mousebutton_callback(AWC2::user_callback_mousebutton_struct const* data)
+inline void custom_mousebutton_callback(AWC2User_callback_mousebutton_struct const* data)
 {
     u8 state = (
-        AIN::mouseButton::RIGHT == data->button &&
-        AIN::inputState::PRESS  == data->action
+        AWC2_MOUSEBUTTON_RIGHT == data->button &&
+        AWC2_INPUTSTATE_PRESS  == data->action
     );
     if(state)
-        AIN::setCursorMode(AIN::cursorMode::SCREEN_BOUND);
+        awc2setCursorMode(AWC2_CURSORMODE_SCREEN_BOUND);
     else
-        AIN::setCursorMode(AIN::cursorMode::NORMAL);
+        awc2setCursorMode(AWC2_CURSORMODE_NORMAL);
 
 
     return;
 }
 
 
-i32 render_gpugems38()
+i32 render_fluid_awc2_c()
 {
     bool alive{true}, paused{false};
     constexpr bool slowRender{false};
-    AWC2::ContextID   g_awc2id;
+    AWC2ContextID   g_awc2id;
     __unused bool     g_shouldRestartSimulation;
     __unused bool     g_shouldRestartUserInputTexture;
     util::math::vec2i g_simDims;
-    __unused GenericNamespaceName2::frameTimeData g_timing;
-    GenericNamespaceName2::OpenGLDataV2 gfx;
+    __unused GenericNamespaceNameC::frameTimeData g_timing;
+    GenericNamespaceNameC::OpenGLDataV2 gfx;
+
+    const struct timespec pause_sleep_duration{
+        .tv_sec = 0,
+        .tv_nsec = 6944444
+    };
+    const struct timespec slow_render_sleep_duration{
+        .tv_sec = 0,
+        .tv_nsec = 300 * 1000000
+    };
 
 
     /* Init AWC2 */
     {
         markstr("AWC2 init begin");
-        AWC2::init();
-        g_awc2id = AWC2::createContext();
-        g_simDims = { 1024, 1024 };
-        AWC2::initializeContext(g_awc2id, 1024, 1024, AWC2::WindowDescriptor{});
-        AWC2::setContextUserCallback(g_awc2id, &custom_mousebutton_callback);
+        awc2init();
+        g_awc2id = awc2createContext();
+        // g_simDims = { 1280, 720 };
+        g_simDims = { 720, 480 };
+        AWC2ContextDescriptor ctxtinfo = {
+            g_awc2id,
+            {0},
+            __scast(u16, g_simDims.x),
+            __scast(u16, g_simDims.y),
+            AWC2WindowDescriptor{}
+        };
+        awc2initializeContext(&ctxtinfo);
+        awc2setContextUserCallbackMouseButton(g_awc2id, &custom_mousebutton_callback);
         markstr("AWC2 init end");
     }
     /* OpenGL Data Initialization */
     {
         markstr("Opengl Data init begin");
-        static constexpr const char* shaderName[2] = { "old_sim.comp", "old_visual.comp" };
-        static constexpr const char* dirName       = "src/main/awc2fluid/";
-        static const std::string shaderPath[2] = {
-            ( fs::current_path()/fs::path{dirName}/fs::path{shaderName[0]} ).generic_u8string(),
-            ( fs::current_path()/fs::path{dirName}/fs::path{shaderName[1]} ).generic_u8string()
+        /* This is Not Portable on Unix-like OS's. Problem is std::current_file::path()*/
+        static constexpr const char* shaderName[2] = { "/old_sim.comp", "/old_visual.comp" };
+#if defined __linux__
+        static constexpr const char* dirName   = "projects/program/source/main/awc2fcluid";
+#elif defined _WIN32
+    static constexpr const char* dirName       = "C:/CTools/Projects/main/projects/program/source/main/awc2cfluid";
+#endif
+
+        static const std::string shaderPath[2] = { 
+            std::string{dirName} + std::string{shaderName[0]},
+            std::string{dirName} + std::string{shaderName[1]}, 
         };
+
 
         gfx.m_simulation.createFrom({
             ShaderData{ shaderPath[0].data(), __scast(u32, gl::GL_COMPUTE_SHADER) }
@@ -187,24 +209,25 @@ i32 render_gpugems38()
 
     /* Main App Loop */
     markstr("Main App Loop Begin");
-    AWC2::setCurrentContext(g_awc2id);
+    awc2setCurrentContext(g_awc2id);
     while(alive)
     {
-        AWC2::newFrame();
-        AWC2::begin();
+        awc2newframe();
+        awc2begin();
         if(paused) {
-            std::this_thread::sleep_for(std::chrono::nanoseconds(6944444));
+            thrd_sleep(&pause_sleep_duration, NULL);
         } else {
             if constexpr (slowRender) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                thrd_sleep(&slow_render_sleep_duration, NULL);
             }
-            gfx.m_refreshComputeSim    ^= AWC2::Input::isKeyPressed(AWC2::Input::keyCode::NUM1);
-            gfx.m_refreshComputeVisual ^= AWC2::Input::isKeyPressed(AWC2::Input::keyCode::NUM2);
+            gfx.m_refreshComputeSim    ^= awc2isKeyPressed(AWC2_KEYCODE_NUM1);
+            gfx.m_refreshComputeVisual ^= awc2isKeyPressed(AWC2_KEYCODE_NUM2);
             render(gfx, g_timing, g_simDims);
         }
-        alive   = !AWC2::getContextStatus(g_awc2id) && !AWC2::Input::isKeyPressed(AWC2::Input::keyCode::ESCAPE);
-        paused ^= AWC2::Input::isKeyPressed(AWC2::Input::keyCode::P);
-        AWC2::end();
+        alive   = !awc2getContextStatus(g_awc2id) && !awc2isKeyPressed(AWC2_KEYCODE_ESCAPE);
+        paused ^= awc2isKeyPressed(AWC2_KEYCODE_P);
+        awc2end();
+        ++g_timing.m_frameCount;
     }
     markstr("Main App Loop End");
 
@@ -229,8 +252,8 @@ i32 render_gpugems38()
         g_simDims = { DEFAULT32, DEFAULT32 };
         g_shouldRestartUserInputTexture = false;
         g_shouldRestartSimulation = false;
-        AWC2::destroyContext(g_awc2id);
-        AWC2::destroy();
+        awc2destroyContext(g_awc2id);
+        awc2destroy();
         g_awc2id = DEFAULT8;
         markstr("Destroy AWC2 Context End");
     }
@@ -241,12 +264,12 @@ i32 render_gpugems38()
 
 
 inline void render(
-    GenericNamespaceName2::OpenGLDataV2& gfxdata,
-    GenericNamespaceName2::frameTimeData& framedata,
+    GenericNamespaceNameC::OpenGLDataV2& gfxdata,
+    GenericNamespaceNameC::frameTimeData& framedata,
     vec2i const& simDims
 ) {
     auto& gfx = gfxdata;
-    auto winSize = AWC2::getCurrentContextViewport();
+    auto winSize = awc2getCurrentContextViewport();
     const vec4f rgba{0.0f, 0.0f, 0.0f, 1.0f};
     u8 recompiling{0};
     u8 status{1};

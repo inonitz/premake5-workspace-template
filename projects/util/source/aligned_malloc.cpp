@@ -1,5 +1,5 @@
 #include "util/aligned_malloc.hpp"
-#include "util/macro.hpp"
+#include "util/macro.h"
 #include <cstdlib>
 
 

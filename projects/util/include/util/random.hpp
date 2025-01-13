@@ -1,6 +1,6 @@
 #pragma once
-#include "util_api.hpp"
-#include "types.hpp"
+#include "util_api.h"
+#include "base_type.h"
 
 
 UTIL_API u32 random32u();

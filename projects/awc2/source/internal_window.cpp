@@ -2,7 +2,7 @@
 #include "internal_callback.hpp"
 #include <GLFW/glfw3.h>
 #include "util/aligned_malloc.hpp"
-#include <util/macro.hpp>
+#include <util/macro.h>
 #include <util/util.hpp>
 #include <cstdio>
 

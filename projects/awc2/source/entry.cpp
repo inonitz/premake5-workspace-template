@@ -1,6 +1,7 @@
 #include "awc2/entry.hpp"
 #include "internal_instance.hpp"
 #include "internal_state.hpp"
+#include "util/macro.h"
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 #include <util/marker2.hpp>
@@ -39,8 +40,10 @@ void init()
 
     /* Init memory-manager (pool-alloc) */
     __libdata.ctxpool.create(__libdata.poolmem.data(), AWC2::k_maximumContexts);
-    /* Init book-keeping vectors */
-    __libdata.init = true;
+    /* Init book-keeping of contexts */
+    __libdata.ctxmap.libInit         = true;
+    __libdata.ctxmap.activeId        = 0xFF;
+    __libdata.ctxmap.initializedBits = 0;
     return;
 }
 
@@ -48,11 +51,12 @@ void init()
 void destroy()
 {
     auto& __libdata = *internal::__awc2_lib_get_instance();
-    __libdata.init = false;
-    __libdata.activeid = DEFAULT8;
+    util::__memset(
+        __rcast(u8*, &__libdata.ctxmap), 
+        sizeof(__libdata.ctxmap), 
+        __scast(u8, DEFAULT8)
+    );
     __libdata.ctxpool.destroy();
-    __libdata.initializedContexts.resize(0);
-    __libdata.inactiveContexts.resize(0);
 
 
     for(auto& context_obj : __libdata.poolmem) {
@@ -66,7 +70,7 @@ void destroy()
 }
 
 
-__attribute__((hot)) void newFrame()
+__hot void newFrame()
 {
     glfwPollEvents();
     return;

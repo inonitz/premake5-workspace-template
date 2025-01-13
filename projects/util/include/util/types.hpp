@@ -1,22 +1,6 @@
 #ifndef __UTIL_BASE_TYPE_DEFINITIONS__
 #define __UTIL_BASE_TYPE_DEFINITIONS__
-#include <cstdint>
-
-
-typedef unsigned char byte;
-typedef signed char   char_t;
-typedef uint64_t u64;
-typedef uint32_t u32;
-typedef uint16_t u16;
-typedef uint8_t  u8;
-typedef int64_t  i64;
-typedef int32_t  i32;
-typedef int16_t  i16;
-typedef int8_t   i8;
-typedef float    f32;
-typedef double   f64;
-typedef uintptr_t up64;
-typedef intptr_t  ip64;
+#include "base_type.h"
 
 
 namespace type_trait {

@@ -1,18 +1,17 @@
 #include "simple.hpp"
 #include <awc2/awc2.hpp>
+#include <time.h>
 #include <util/random.hpp>
 #include <util/marker2.hpp>
 #include <glbinding/gl/gl.h>
 #include <imgui/imgui.h>
 #include <algorithm>
-#include <chrono>
-#include <thread>
-#include <filesystem>
+#include <time.h>
+#include <threads.h>
 
 
 using namespace util::math;
 namespace AIN = AWC2::Input;
-namespace fs = std::filesystem;
 
 
 void GenericNamespaceName::ParticleBufferManager::set()
@@ -107,9 +106,8 @@ i32 render_fluid_awc2_fuckyou()
     static constexpr const char* dirName       = "C:/CTools/Projects/premake-mdk-wip/projects/program/source/main/awc2fluid";
 #endif
         static const std::string shaderPath[2] = {
-            
-            ( fs::path{dirName}/fs::path{shaderName[0]} ).generic_u8string(),
-            ( fs::path{dirName}/fs::path{shaderName[1]} ).generic_u8string()
+            std::string(dirName) + "/" + std::string(shaderName[0]),
+            std::string(dirName) + "/" + std::string(shaderName[1]),
         };
 
         gfx.m_simulation.createFrom({
@@ -200,10 +198,18 @@ i32 render_fluid_awc2_fuckyou()
         AWC2::newFrame();
         AWC2::begin();
         if(paused) {
-            std::this_thread::sleep_for(std::chrono::nanoseconds(6944444));
+            const struct timespec sleep_dur{
+                .tv_sec = 0,
+                .tv_nsec = 6944444
+            };
+            thrd_sleep(&sleep_dur, NULL);
         } else {
+            const struct timespec sleep_durslowrender = {
+                .tv_sec = 0,
+                .tv_nsec = 1000000 * 300
+            };
             if constexpr (slowRender) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                thrd_sleep(&sleep_durslowrender, NULL);
             }
             gfx.m_refreshComputeSim    ^= AWC2::Input::isKeyPressed(AWC2::Input::keyCode::NUM1);
             gfx.m_refreshComputeVisual ^= AWC2::Input::isKeyPressed(AWC2::Input::keyCode::NUM2);

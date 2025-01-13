@@ -1,6 +1,6 @@
 #ifndef __AWC2_INPUT_TYPES_HEADER__
 #define __AWC2_INPUT_TYPES_HEADER__
-#include <util/macro.hpp>
+#include <util/macro.h>
 #include <util/types.hpp>
 
 

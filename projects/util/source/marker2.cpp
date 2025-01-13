@@ -1,31 +1,53 @@
 #include "util/marker2.hpp"
-#include <cstdarg>
-
+#include <cstdint>
 
 #if MARKER_FLAG_DEFINE_IMPLEMENTATION == 1
-#include <atomic>
-#include <mutex>
+#include <cstdarg>
 #include <cstdio>
+
+/* 
+    The only reason I'm not using C++11 atomics 
+    is because msvc keeps giving me compiling errors (their <memory>, <mutex> headers are broken...)
+    ( for std=C++17 )
+*/
+#include <threads.h>
+#include <stdatomic.h>
 
 
 namespace detail::marker {
-    using write_to_file_one_at_a_time = std::mutex;
+    using write_to_file_one_at_a_time = mtx_t;
     using write_lock_type = write_to_file_one_at_a_time;
     
-    static std::atomic<uint64_t> __markflag{0};
-    static write_lock_type __write_lock;
 
+    static atomic_uint_least64_t __markflag = 0;
+    static write_lock_type __write_lock;
     static FILE* __output_buf = (MARKER_FLAG_LOG_TO_FILE) ? fopen("__debug_output.txt", "w") : stdout;
 
-    void __begin_exclusion() { __write_lock.lock();   }
-    void __end_exclusion()   { __write_lock.unlock(); }
-    unsigned long long __load_atomic_counter() { 
-        return __markflag.load(); 
-    }
-    void __increment_atomic_counter() { 
-        ++__markflag; 
+
+    void __begin_exclusion() {
+        /* init mutex on first call of __begin_exclusion */
+        uint_least64_t expected = 0;
+        if(atomic_compare_exchange_strong(&__markflag, &expected, 1))
+            mtx_init(&__write_lock, memory_order_acq_rel);
+        
+        /* Wait if other thread is already printing to __output_buf */
+        while(thrd_success != mtx_trylock(&__write_lock)) {}
         return;
     }
+    void __end_exclusion() {
+        mtx_unlock(&__write_lock);
+        return;
+    }
+
+    unsigned long long __load_atomic_counter() { 
+        return atomic_load(&__markflag);
+    }
+
+    void __increment_atomic_counter() { 
+        atomic_fetch_add_explicit(&__markflag, 1, memory_order_seq_cst);
+        return;
+    }
+
 
     void __common_print_function_nofmt(const char* stri)
     {
@@ -77,6 +99,7 @@ namespace marker
 {
     void marker_flag_close_logfile_handle() {
         std::fclose(detail::marker::__output_buf);
+        mtx_destroy(&__write_lock);
         return;
     }
 }

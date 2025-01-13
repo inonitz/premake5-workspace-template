@@ -9,19 +9,19 @@
 #	ifndef UTIL_API
 #		ifdef UTIL_EXPORTS /* We are building this library */
 #			if defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW64__
-#				ifdef __GNUC__
+#				if defined __GNUC__ || defined __clang__
 #					define UTIL_API __attribute__ ((dllexport))
 #				else
 #					define UTIL_API __declspec(dllexport)
 #				endif
 #			else 
-#				if defined __GNUC__ && __GNUC__ >= 4
+#				if (defined __GNUC__ && __GNUC__ >= 4) || defined __clang__
 #					define UTIL_API __attribute__ ((visibility ("default")))
 #				endif
 #			endif
 #    	else /* We are using this library */
 #			if defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW64__
-#				ifdef __GNUC__
+#				if defined __GNUC__ || defined __clang__
 #					define UTIL_API __attribute__ ((dllimport))
 #				else
 #					define UTIL_API __declspec(dllimport)
@@ -33,6 +33,7 @@
 #			endif
 #       endif
 #	else /* Should Only reach here for non-*nix, un-supported platforms */
+#       warning "Platform Unsupported - Either Not a derivative of Unix // Not Windows"
 #		define UTIL_API
 #   endif
 #	ifndef UTIL_NO_EXPORT

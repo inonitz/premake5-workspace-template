@@ -1,5 +1,6 @@
 #include "internal_instance.hpp"
 #include "internal_state.hpp"
+#include "util/util.hpp"
 
 
 namespace AWC2::internal {
@@ -19,12 +20,12 @@ AWC2ContextData& __awc2_lib_get_context(unsigned char id) {
 
 AWC2ContextData& __awc2_lib_get_active_context()
 {
-    return __awc2_lib_get_context(__library_local_data.activeid);
+    return __awc2_lib_get_context(__awc2_lib_get_active_context_id());
 }
 
 unsigned char __awc2_lib_get_active_context_id()
 {
-    return __library_local_data.activeid;
+    return __library_local_data.ctxmap.activeId; /* 0xFF = no context active; will be easily seen in debugger */
 }
 
 

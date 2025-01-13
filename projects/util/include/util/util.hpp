@@ -1,6 +1,6 @@
 #ifndef __UTIL_HEADER__
 #define __UTIL_HEADER__
-#include "macro.hpp"
+#include "macro.h"
 #include "types.hpp"
 
 
@@ -20,11 +20,11 @@
 	var *= !boolean(cond); \
 	var += boolean(cond) * (val); \
 
-inline std::uintptr_t __outv = 0;
+inline uintptr_t __outv = 0;
 #define CONDITIONAL_SET_PTR(ptr, ptr_val, cond) \
-	__outv = __rcast(std::uintptr_t, ptr); \
+	__outv = __rcast(uintptr_t, ptr); \
 	__outv *= !boolean(cond); \
-	__outv += boolean(cond) * __rcast(std::uintptr_t, ptr_val); \
+	__outv += boolean(cond) * __rcast(uintptr_t, ptr_val); \
 	ptr = __rcast(decltype(ptr), __outv); \
 
 #define SET_BIT_AT(to_set, bit_index, bool_val) \
@@ -41,11 +41,38 @@ namespace util {
 /* 
 	for whatever reason you may need this 
 */
-__force_inline UTIL_API u64 __readtsc() {
+__force_inline inline u64 __readtsc() {
     u32 lo, hi;
     __asm__ volatile("rdtsc" : "=a" (lo), "=d" (hi));
     return ((u64)hi << 32) | lo;
 }
+
+
+__force_inline inline u64 __count_trailing_zeros(u64 ll)
+{
+#if defined(__cplusplus) && __cplusplus > 202002L
+#include <bit>
+return std::countr_zero(ll);
+
+#elif defined(__GNUC__) || defined(__clang__)
+	return ll == 0 ? 0 : __builtin_ctzll(ll);
+
+#elif defined(_MSC_VER)
+	u64 out;
+	_BitScanReverse64(&out, ll);
+	return out;
+
+#else
+	#warning "Unknown Compiler Used! __count_trailing_zeros() will fallback to default implementation
+	u64 cpy = ll;
+	u8 bit, notfound = 1;
+	for (bit = 0; bit < 63 && notfound; ++bit) {
+		notfound = !boolean( (cpy >> bit) & 1 );
+	}
+	return bit;
+#endif
+}
+
 
 
 template<typename T> constexpr UTIL_API T round2(T v)
@@ -74,7 +101,7 @@ template<typename T> constexpr UTIL_API T roundN(T powof2, T v)
 }
 
 
-inline void internal_memset(byte* dest, byte* src, u64 src_obj_size, u64 obj_to_set)
+__force_inline inline void internal_memset(byte* dest, byte* src, u64 src_obj_size, u64 obj_to_set)
 {
 	for(u64 i = 0; i < obj_to_set; ++i) {
 		byte* tmp = src;
@@ -88,7 +115,7 @@ inline void internal_memset(byte* dest, byte* src, u64 src_obj_size, u64 obj_to_
 }
 
 
-template<typename T> __force_inline UTIL_API void __memset(T* p, u64 count, T val = T())
+template<typename T> __force_inline inline UTIL_API void __memset(T* p, u64 count, T val = T())
 {
 	for(u64 i = 0; i < count; ++i) {
 		*p = val;
@@ -104,7 +131,7 @@ template<typename T> __force_inline UTIL_API void __memset(T* p, u64 count, T va
 }
 
 
-template<typename T> __force_inline UTIL_API void __memcpy(T* pdest, T const* psrc, u64 count)
+template<typename T> __force_inline inline UTIL_API void __memcpy(T* pdest, T const* psrc, u64 count)
 {
 	while(count) {
 		*pdest = *psrc;
@@ -116,7 +143,7 @@ template<typename T> __force_inline UTIL_API void __memcpy(T* pdest, T const* ps
 }
 
 
-template<> __force_inline UTIL_API void __memcpy<void>(void* pdest, void const* psrc, u64 bytes) {
+template<> __force_inline inline UTIL_API void __memcpy<void>(void* pdest, void const* psrc, u64 bytes) {
 	byte* 		dest = __rcast(byte *, 		pdest);
 	byte const* src  = __rcast(byte const*, psrc );
 	while(bytes) {

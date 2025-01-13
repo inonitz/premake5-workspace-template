@@ -30,20 +30,21 @@ namespace util {
 
     void printfmt(const char* format, ...) 
     {
+#define __FMT_BUF_MAX_SIZE 32768
         static struct __generic_format_buffer {
-            char mem[2048];
+            char mem[__FMT_BUF_MAX_SIZE];
         } __format_buffer;
         va_list arg, argcopy;
         int size, done = 1;
         bool invalid_state = false;    
 
 
-        __format_buffer.mem[2047] = '\0'; /* incase of overflow */
+        __format_buffer.mem[__FMT_BUF_MAX_SIZE - 1] = '\0'; /* incase of overflow */
         va_start(arg, format);
         va_copy(argcopy, arg);
         size = 1 + vsnprintf(NULL, 0, format, arg);
         va_end(arg);
-        if(size > 2048) {
+        if(size > __FMT_BUF_MAX_SIZE) {
             print("\nprint.cpp] => printfmt(...) __VA_ARGS__ too large\n");
             invalid_state = true;
         }

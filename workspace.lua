@@ -18,16 +18,23 @@ workspace (WORKSPACE_NAME)
             llvmversion = os.getenv("LLVMToolsVersion")
             -- flags { "LinkTimeOptimization" } -- easy fix to switch from 'ar' to 'llvm-ar' 
             makesettings {
-                "CC = " .. llvmdir .. "/bin/clang.exe --verbose",
-                "CXX = " .. llvmdir .. "/bin/clang++.exe -ferror-limit=0 --verbose -fuse-ld=lld-link.exe",
-                "LD = " .. llvmdir .. "/bin/ld.lld.exe --verbose",
-                "AR = " .. llvmdir .. "/bin/llvm-ar.exe --verbose"
+                "CC = "  .. '"' .. llvmdir .. "/bin/clang.exe"   .. '"' .. " --verbose",
+                "CXX = " .. '"' .. llvmdir .. "/bin/clang++.exe" .. '"' .. " --verbose -ferror-limit=0 -fuse-ld=lld-link.exe",
+                "LD = "  .. '"' .. llvmdir .. "/bin/ld.lld.exe"  .. '"' .. " --verbose",
+                "AR = "  .. '"' .. llvmdir .. "/bin/llvm-ar.exe" .. '"' .. " v"
             }
+            -- makesettings {
+            --     "CC = "  .. '"' .. llvmdir .. "/bin/clang.exe"   .. '"' .. "",
+            --     "CXX = " .. '"' .. llvmdir .. "/bin/clang++.exe" .. '"' .. " -ferror-limit=0 -fuse-ld=lld-link.exe",
+            --     "LD = "  .. '"' .. llvmdir .. "/bin/ld.lld.exe"  .. '"' .. "",
+            --     "AR = "  .. '"' .. llvmdir .. "/bin/llvm-ar.exe" .. '"' .. " v"
+            -- }
         end
     filter {}
     -- #1 Link: https://askubuntu.com/questions/1508260/how-do-i-install-clang-18-on-ubuntu
     -- #2 Link: https://unix.stackexchange.com/questions/596226/how-to-change-clang-10-llvm-10-etc-to-clang-llvm-etc
     -- #3 I expect clang to be installed and symlinked on your machine, basically.
+    -- #4 Why is everything easier on linux?!?
     filter "system:linux"
         toolset "clang"
         debugformat "Dwarf"
@@ -60,7 +67,7 @@ workspace (WORKSPACE_NAME)
     filter {}
 
     filter "configurations:Debug*"
-        defines { "_DEBUG", "DEBUG" }
+        defines { "DEBUG" }
         runtime  "Debug"
         symbols  "on"
         optimize "off"
