@@ -339,3 +339,15 @@ newaction {
     end
 }
 
+
+newaction {
+    trigger     = "cleanall",
+    description = "Trigger the following actions: cleanprojectconfigs, cleanclangd, cleanbuild",
+    execute = function()
+        print("[ACTION] = [cleanll] Begin\n")
+        os.execute("premake5 cleanprojectconfigs")
+        os.execute("premake5 cleanclangd")
+        os.execute("premake5 cleanbuild")
+        print("[ACTION] = [cleanll] End\n")
+    end
+}

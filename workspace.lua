@@ -17,18 +17,18 @@ workspace (WORKSPACE_NAME)
             llvmdir     = os.getenv("LLVMInstallDir")
             llvmversion = os.getenv("LLVMToolsVersion")
             -- flags { "LinkTimeOptimization" } -- easy fix to switch from 'ar' to 'llvm-ar' 
-            makesettings {
-                "CC = "  .. '"' .. llvmdir .. "/bin/clang.exe"   .. '"' .. " --verbose",
-                "CXX = " .. '"' .. llvmdir .. "/bin/clang++.exe" .. '"' .. " --verbose -ferror-limit=0 -fuse-ld=lld-link.exe",
-                "LD = "  .. '"' .. llvmdir .. "/bin/ld.lld.exe"  .. '"' .. " --verbose",
-                "AR = "  .. '"' .. llvmdir .. "/bin/llvm-ar.exe" .. '"' .. " v"
-            }
             -- makesettings {
-            --     "CC = "  .. '"' .. llvmdir .. "/bin/clang.exe"   .. '"' .. "",
-            --     "CXX = " .. '"' .. llvmdir .. "/bin/clang++.exe" .. '"' .. " -ferror-limit=0 -fuse-ld=lld-link.exe",
-            --     "LD = "  .. '"' .. llvmdir .. "/bin/ld.lld.exe"  .. '"' .. "",
+            --     "CC = "  .. '"' .. llvmdir .. "/bin/clang.exe"   .. '"' .. " --verbose",
+            --     "CXX = " .. '"' .. llvmdir .. "/bin/clang++.exe" .. '"' .. " --verbose -ferror-limit=0 -fuse-ld=lld-link.exe",
+            --     "LD = "  .. '"' .. llvmdir .. "/bin/ld.lld.exe"  .. '"' .. " --verbose",
             --     "AR = "  .. '"' .. llvmdir .. "/bin/llvm-ar.exe" .. '"' .. " v"
             -- }
+            makesettings {
+                "CC = "  .. '"' .. llvmdir .. "/bin/clang.exe"   .. '"' .. "",
+                "CXX = " .. '"' .. llvmdir .. "/bin/clang++.exe" .. '"' .. " -ferror-limit=0 -fuse-ld=lld-link.exe",
+                "LD = "  .. '"' .. llvmdir .. "/bin/ld.lld.exe"  .. '"' .. "",
+                "AR = "  .. '"' .. llvmdir .. "/bin/llvm-ar.exe" .. '"' .. " v"
+            }
         end
     filter {}
     -- #1 Link: https://askubuntu.com/questions/1508260/how-do-i-install-clang-18-on-ubuntu

@@ -1,8 +1,8 @@
-TODO:
+Old TODO:
 A. Add Fullscreen Mode to AWC2
 B. Separate Window Space from Fluid Space 
 
-REST:
+Old REST:
 C. gpu-gems-38
 D. Test proper memory release for AWC2 & main files
 E. Add User Input/Obstacles to the simulation
@@ -24,3 +24,28 @@ G. splitting Development into native-linux and native-windows,
 	Related To => G.
 H. There are some config's in the makefile that NEED to be read from settings.json/other external file to work properly
 	> find a solution to that
+
+
+New TODO (Old notes might be relevant so they're gonna stay for now):
+* G & H - Already Finished, integrated premake5 into the project 
+* F - Still TODO
+* D, E - After C
+
+A. gpu-gems38
+B. Cross-platform Memory Allocator (will start impl here, will move to separate project later on)
+	1. Windows -
+		.lib: override malloc by rewriting instructions of the function prologue, literally code injection (platform dependant) (also needs a trampoline)
+			--> 
+				* There are differences between x86 & x86-64 prologues
+				* calling conventions between different version of windows (x86, x86_64)
+				* also ARM is an architecture that exists that needs to be accounted for.
+		.dll: already solved on different project 'premake-sandbox' with an IAT function hook, works for literally everything (heapAlloc, virtualAlloc...)
+	2. Linux - 
+		.a - malloc & free are weak symbols on linux, meaning we can easily link to our own functions and the override will work
+		.so - same as above, only that the library of the allocator must be linked first, meaning '-nodefaultlibs -lmemalloc.so,rest_of_the_stdlibs_and_shit'
+			the first symbol (for any stdlib function) found is the symbol that will be used for everything in the program, including other shared libraries (unless they don't use malloc ...) 
+	3. Implement Hooking Interface cross-platform (Also new & delete, malloc & free )
+		[Note]: use [link][https://microsoft.github.io/mimalloc/overrides.html][/link]
+			for list of funcs to override
+C. Catch2 Unit Tests
+D. CI/CD - Github Actions/Gitlab & Docker
