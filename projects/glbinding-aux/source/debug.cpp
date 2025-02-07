@@ -55,7 +55,9 @@ void registerGetErrorCallback()
             return;
         }
 
-        std::cerr << functionCall.function->name() << " generated " << readableErrorCode(errorCode);
+        /* Patched Here because this shit wouldn't link properly. now it does >:) */
+        std::fprintf(stderr, "%s generated %s\n", functionCall.function->name(), readableErrorCode(errorCode).c_str());
+        // std::cerr << functionCall.function->name() << " generated " << readableErrorCode(errorCode);
     });
 
     getErrorCallbackRegistered = true;

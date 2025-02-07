@@ -1,0 +1,80 @@
+#version 450 core
+layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
+layout (binding = 0)                    uniform sampler2D sim_velocity_pressure;
+layout (binding = 1, rgba32f) writeonly uniform image2D   sim_output;
+
+
+bvec4 isBoundary(ivec2 coords);
+
+
+vec4 modified_jacobi_solver_velocity(
+    in ivec2 ij,
+    in float alpha,
+    in float inverseBeta,
+    in sampler2D x,
+    in vec2      b
+);
+
+
+uniform float ku_dt;
+uniform float ku_viscosity;
+uniform ivec2 ku_simdims;
+vec2 k_unitCoord = vec2(1) / vec2(ku_simdims); 
+
+
+void main()
+{
+    ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+    if(any(isBoundary(texelCoord)))
+        return;
+
+
+    vec2  norm_texcoord = vec2(texelCoord) * k_unitCoord;
+    float u_alpha_param = 1.0f / (ku_viscosity * ku_dt);
+    float u_beta_param  = u_alpha_param + 4;
+    vec4  result = modified_jacobi_solver_velocity(texelCoord,
+        u_alpha_param, 
+        1.0f / u_beta_param, 
+        sim_velocity_pressure,
+        texelFetch(sim_velocity_pressure, texelCoord, 0).xy
+    );
+    imageStore(sim_output, texelCoord, result);
+    return;
+}
+
+
+bvec4 isBoundary(ivec2 coords) {
+    return bvec4(
+        coords.x == 0, 
+        coords.y == 0,
+        coords.x == (ku_simdims.x - 1),
+        coords.y == (ku_simdims.y - 1)
+    );
+}
+
+
+vec4 modified_jacobi_solver_velocity(
+    in ivec2 ij,
+    in float alpha,
+    in float inverseBeta,
+    in sampler2D x,
+    in vec2      b
+) {
+    /* 
+        single iteration of the jacobi solver.
+        this needs to run 40-80 times for accurate results 
+        (i'm not using error estimation for exiting the function anytime soon) 
+    */
+    vec4 neighbourValues[4] = vec4[4](
+        texelFetch(x, ij + ivec2(1, 0), 0),
+        texelFetch(x, ij - ivec2(1, 0), 0),
+        texelFetch(x, ij + ivec2(0, 1), 0),
+        texelFetch(x, ij - ivec2(0, 1), 0)
+    );
+    vec4 result = vec4(0.0f);
+    result += neighbourValues[0] + neighbourValues[1] + neighbourValues[2] + neighbourValues[3];
+    result.xy += alpha * b; /* .zw components are [pressure, reserved_space], so no need to track them */
+    result *= inverseBeta;
+    result.zw = vec2(0.0f); /* we're only interested in the x-y components (see note top-of-file) */
+    return result;
+}

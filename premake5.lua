@@ -117,7 +117,7 @@ LinkToStandardLibraries = function()
     filter { "system:windows", "action:gmake2", "configurations:DebugLib" }
         buildoptions { "-fms-runtime-lib=static_dbg" }
         defines { "_MT", "_DEBUG" }
-        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,libucrtd.lib,libvcruntimed.lib,libcmtd.lib,libcpmtd.lib" }
+        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,libcmtd.lib,msvcprt.lib,libvcruntimed.lib,libucrtd.lib" }
 
     -- Static Release: 
     -- Libraries: libucrt.lib libvcruntime.lib libcmt.lib libcpmt.lib
@@ -125,7 +125,7 @@ LinkToStandardLibraries = function()
     filter { "system:windows", "action:gmake2", "configurations:ReleaseLib" }
         buildoptions { "-fms-runtime-lib=static" }
         defines { "_MT" }
-        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,libucrt.lib,libvcruntime.lib,libcmt.lib,libcpmt.lib" }
+        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,libcmt.lib,libcpmt.lib,libvcruntime.lib,libucrt.lib" }
 
 
     -- Dll Debug: 
@@ -134,7 +134,7 @@ LinkToStandardLibraries = function()
     filter { "system:windows", "action:gmake2", "configurations:DebugDll" }
         buildoptions { "-fms-runtime-lib=dll_dbg" }
         defines { "_MT", "_DEBUG", "_DLL" }
-        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,ucrtd.lib,vcruntimed.lib,msvcrtd.lib,msvcprtd.lib" }
+        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,msvcrtd.lib,msvcprtd.lib,vcruntimed.lib,ucrtd.lib" }
 
     -- Dll Release: 
     -- Libraries: ucrt.lib vcruntime.lib msvcrt.lib msvcprt.lib
@@ -142,7 +142,7 @@ LinkToStandardLibraries = function()
     filter { "system:windows", "action:gmake2", "configurations:ReleaseDll" }
         buildoptions { "-fms-runtime-lib=dll" }
         defines { "_MT", "_DLL" }
-        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,ucrt.lib,vcruntime.lib,msvcrt.lib,msvcprt.lib" }
+        linkoptions { "-Wl,/nodefaultlib,kernel32.lib,msvcrt.lib,libcpmtd.lib,vcruntime.lib,ucrt.lib" }
 
     filter {}
 end
@@ -349,5 +349,18 @@ newaction {
         os.execute("premake5 cleanclangd")
         os.execute("premake5 cleanbuild")
         print("[ACTION] = [cleanll] End\n")
+    end
+}
+
+
+newaction {
+    trigger     = "buildall",
+    description = "Trigger the following actions: export-compile-commands, gmake2",
+    execute = function()
+        print("[ACTION] = [buildall] Begin\n")
+        os.execute("premake5 export-compile-commands")
+        os.execute("premake5 gmake2")
+        os.execute("make config=debuglib_amd64 -j 16")
+        print("[ACTION] = [buildall] End\n")
     end
 }

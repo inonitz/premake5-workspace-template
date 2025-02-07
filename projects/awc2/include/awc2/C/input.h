@@ -54,7 +54,7 @@ typedef u8 AWC2MouseButton;
 #define AWC2_MOUSEBUTTON_LEFT   (0)
 #define AWC2_MOUSEBUTTON_RIGHT  (1)
 #define AWC2_MOUSEBUTTON_MIDDLE (2)
-#define AWC2_MOUSEBUTTON__MAX   (3)
+#define AWC2_MOUSEBUTTON_MAX    (3)
 
 
 typedef u8 AWC2InputState;

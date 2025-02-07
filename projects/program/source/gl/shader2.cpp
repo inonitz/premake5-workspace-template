@@ -84,7 +84,11 @@ bool Program::loadShader(ShaderData& init, BufferData const& loadedShader)
     gl::glGetShaderiv(init.id, gl::GL_COMPILE_STATUS, &successStatus);
     if(!successStatus) {
         gl::glGetShaderInfoLog(init.id, genericErrorLogBuffer.size(), &length, genericErrorLogBuffer.data());
-        markfmt("Failed to Compile Shader [type %s] Error Log: \n%s\n", shaderTypeToString(init.type), genericErrorLogBuffer.data());
+        markfmt("Shader [%s][Path='%s'] Compilation Failed -> Error Log:\n%s\n", 
+            shaderTypeToString(init.type),
+            init.filepath,
+            genericErrorLogBuffer.data()
+        );
 
         gl::glDeleteShader(init.id);
         init.id = DEFAULT32;

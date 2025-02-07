@@ -1,4 +1,5 @@
 #pragma once
+#include <util/marker2.hpp>
 #include <util/vec2.hpp>
 #include <string_view>
 #include <vector>
@@ -61,8 +62,8 @@ private:
 
 
 	template<bool typeIsShaderMeta> void createFromCommon(shaderMetaOrBufferMetaType<typeIsShaderMeta> const& meta) {
-		m_shaders.resize(meta.size());
-		m_sources.resize(meta.size());
+		mark(); m_shaders.resize(meta.size());
+		mark(); m_sources.resize(meta.size());
 		if constexpr (typeIsShaderMeta) /* simple copy */ { 
 			m_shaders = meta;
 		} 

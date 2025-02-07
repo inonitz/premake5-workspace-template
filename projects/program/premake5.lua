@@ -5,8 +5,8 @@ project "program-test"
     SpecifyGlobalProjectCXXVersion()
     -- Project Structure
     files {
-    "include/**.hpp",
-    "source/**.hpp",
+        "include/**.hpp",
+        "source/**.hpp",
         "source/**.cpp"
     }
     -- Specify Include Headers

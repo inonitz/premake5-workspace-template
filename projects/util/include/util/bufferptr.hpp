@@ -1,6 +1,6 @@
 #ifndef __UTIL_BUFFER_POINTER_MANAGER__
 #define __UTIL_BUFFER_POINTER_MANAGER__
-#include "types.hpp"
+#include "base_type.h"
 #include "ifcrash.hpp"
 
 

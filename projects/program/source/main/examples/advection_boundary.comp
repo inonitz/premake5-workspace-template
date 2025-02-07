@@ -1,0 +1,106 @@
+#version 450 core
+/* 
+    more info on why this ext is needed:
+    https://github.com/KhronosGroup/GLSL/issues/57
+    https://stackoverflow.com/questions/27983936/opengl-layout-informations
+    https://registry.khronos.org/OpenGL/extensions/EXT/EXT_shader_image_load_formatted.txt
+    Needed for apply_boundaries()
+*/
+#extension GL_EXT_shader_image_load_formatted : require
+layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
+layout (binding = 1, rgba32f) writeonly uniform image2D   renderto;
+layout (binding = 2)                    uniform sampler2D sim_step_u0;
+layout (binding = 3)                    uniform image2D   sim_step_u1;
+
+// layout (binding = 4)                    uniform sampler2D sim_step_x0;
+// layout (binding = 5, rgba32f) writeonly uniform image2D   sim_step_x1;
+
+/* 
+    The expected format of the field is:
+    field[i].x = u-component of the velocity field
+    field[i].y = v-component of the velocity field (this is a 2d simulation)
+    field[i].z = scalar-component of the pressure field
+    field[i].w = 0;
+*/
+
+
+uniform float ku_dt;
+uniform ivec2 ku_simdims;
+
+
+vec2 k_unitCoord = vec2(1) / vec2(ku_simdims); 
+
+
+/* pixel space = screen space [0 -> ku_simdims] */
+bvec4 isBoundary(ivec2 coords) {
+    return bvec4(
+        coords.x == 0, 
+        coords.y == 0,
+        coords.x == (ku_simdims.x - 1),
+        coords.y == (ku_simdims.y - 1)
+    );
+}
+
+
+vec4 textureBilerp(in sampler2D tex, vec2 uv)
+{
+    vec2 weight = fract(uv);
+    vec4 bottom = mix(
+        texture(tex, uv + vec2(0,             0)), 
+        texture(tex, uv + vec2(k_unitCoord.x, 0)),
+        weight.x
+    );
+    vec4 top    = mix(
+        texture(tex, uv + vec2(0,             k_unitCoord.y)), 
+        texture(tex, uv + vec2(k_unitCoord.x, k_unitCoord.y)),
+        weight.x
+    );
+    return mix(bottom, top, weight.y);
+}
+
+
+void advection_step(
+    in ivec2     coord,
+    in vec2      normcoord, 
+    in sampler2D ufield, 
+    in sampler2D quantity_read, 
+    in image2D quantity_write
+) {
+    vec2 newcoord = normcoord - ku_dt * texture(ufield, normcoord).xy;
+
+    imageStore(quantity_write, coord, textureBilerp(quantity_read, newcoord));
+    return;
+}
+
+
+/* 
+    specifically velocity boundaries
+*/
+bool apply_boundaries(
+    in ivec2   texCoord,
+    in image2D field 
+) {
+    vec4  boundaryMultipliers = vec4(-1.0f, -1.0f, 1.0f, 1.0f);
+    bvec4 boundbits = isBoundary(texCoord);
+    ivec2 texelToFetch = texCoord;
+
+    texelToFetch += ivec2(boundbits.xy);
+    texelToFetch -= ivec2(boundbits.zw);
+    imageStore(field, texCoord, boundaryMultipliers * imageLoad(field, texelToFetch));
+    return any(boundbits);
+}
+
+
+
+void main()
+{
+    ivec2 texelCoord    = ivec2(gl_GlobalInvocationID.xy);
+    vec2  norm_texcoord = vec2(texelCoord) * k_unitCoord;
+
+    if(!apply_boundaries(texelCoord, sim_step_u1))
+        advection_step(texelCoord, norm_texcoord, sim_step_u0, sim_step_u0, sim_step_u1);
+
+
+    imageStore(renderto, texelCoord, imageLoad(sim_step_u1, texelCoord));
+    return;
+}

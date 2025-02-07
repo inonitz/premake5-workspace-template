@@ -51,8 +51,7 @@ void init()
 void destroy()
 {
     auto& __libdata = *internal::__awc2_lib_get_instance();
-    util::__memset(
-        __rcast(u8*, &__libdata.ctxmap), 
+    util::__memset(__rcast(u8*, &__libdata.ctxmap), 
         sizeof(__libdata.ctxmap), 
         __scast(u8, DEFAULT8)
     );
