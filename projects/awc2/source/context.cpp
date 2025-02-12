@@ -153,6 +153,12 @@ __hot ViewportSize getCurrentContextViewport()
 }
 
 
+AWC2_API WindowStateFlag getCurrentContextWindowState()
+{
+    return internal::__awc2_lib_get_active_context().m_window.getFlags();
+}
+
+
 __hot void begin() { internal::__awc2_lib_get_active_context().begin(); return; }
 __hot void end()   { internal::__awc2_lib_get_active_context().end();   return; }
 

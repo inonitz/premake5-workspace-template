@@ -144,25 +144,25 @@ i32 gpugems38_main()
 
 #if defined __linux__
     static constexpr const char* computeShaderFilename[8] = {
-        "projects/program/source/main/gem38/shader/boundary.comp",
-        "projects/program/source/main/gem38/shader/0advect_extern_force.comp",
-        "projects/program/source/main/gem38/shader/1diffusion.comp",
-        "projects/program/source/main/gem38/shader/2calculatew.comp",
-        "projects/program/source/main/gem38/shader/3calculatep.comp",
-        "projects/program/source/main/gem38/shader/4calculatep.comp",
-        "projects/program/source/main/gem38/shader/5calculateu.comp",
-        "projects/program/source/main/gem38/shader/draw.comp"
+        "projects/program/source/gem38/shader/boundary.comp",
+        "projects/program/source/gem38/shader/0advect_extern_force.comp",
+        "projects/program/source/gem38/shader/1diffusion.comp",
+        "projects/program/source/gem38/shader/2calculatew.comp",
+        "projects/program/source/gem38/shader/3calculatep.comp",
+        "projects/program/source/gem38/shader/4calculatep.comp",
+        "projects/program/source/gem38/shader/5calculateu.comp",
+        "projects/program/source/gem38/shader/draw.comp"
     };
 #elif defined _WIN32
     static constexpr const char* computeShaderFilename[8] = {
-        "C:/CTools/Projects/main/projects/program/source/main/gem38/shader/boundary.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/gem38/shader/0advect_extern_force.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/gem38/shader/1diffusion.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/gem38/shader/2calculatew.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/gem38/shader/3divw.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/gem38/shader/4calculatep.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/gem38/shader/5calculateu.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/gem38/shader/draw.comp"
+        "C:/CTools/Projects/main/projects/program/source/gem38/shader/boundary.comp",
+        "C:/CTools/Projects/main/projects/program/source/gem38/shader/0advect_extern_force.comp",
+        "C:/CTools/Projects/main/projects/program/source/gem38/shader/1diffusion.comp",
+        "C:/CTools/Projects/main/projects/program/source/gem38/shader/2calculatew.comp",
+        "C:/CTools/Projects/main/projects/program/source/gem38/shader/3divw.comp",
+        "C:/CTools/Projects/main/projects/program/source/gem38/shader/4calculatep.comp",
+        "C:/CTools/Projects/main/projects/program/source/gem38/shader/5calculateu.comp",
+        "C:/CTools/Projects/main/projects/program/source/gem38/shader/draw.comp"
     };
 #endif
 

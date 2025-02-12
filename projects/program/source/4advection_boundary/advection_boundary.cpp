@@ -143,9 +143,9 @@ i32 advection_and_boundary_conditions()
     u8 contextid;
 
 #if defined __linux__
-    static constexpr const char* computeShaderFilename = "projects/program/source/main/examples/advection_boundary.comp";
+    static constexpr const char* computeShaderFilename = "projects/program/source/4advection_boundary/advection_boundary.comp";
 #elif defined _WIN32
-    static constexpr const char* computeShaderFilename = "C:/CTools/Projects/main/projects/program/source/main/examples/advection_boundary.comp";
+    static constexpr const char* computeShaderFilename = "C:/CTools/Projects/main/projects/program/source/4advection_boundary/advection_boundary.comp";
 #endif
 
 

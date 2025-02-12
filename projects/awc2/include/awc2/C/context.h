@@ -86,10 +86,10 @@ typedef struct alignsz(16) __awc2_ContextDescriptorStructure
 } AWC2ContextDescriptor;
 
 
-UTIL_STATIC_ASSERT(sizeof(AWC2ContextID)         == 1,  AWC2ContextID,         "Conforming Size Types Across Compilers")
-UTIL_STATIC_ASSERT(sizeof(AWC2ContextVector)     == 40, AWC2ContextVector,     "Conforming Size Types Across Compilers")
-UTIL_STATIC_ASSERT(sizeof(AWC2ViewportSize)      == 8,  AWC2ViewportSize,      "Conforming Size Types Across Compilers")
-UTIL_STATIC_ASSERT(sizeof(AWC2ContextDescriptor) == 16, AWC2ContextDescriptor, "Conforming Size Types Across Compilers")
+UTIL_STATIC_ASSERT(sizeof(AWC2ContextID)          == 1,  AWC2ContextID,          "Conforming Size Types Across Compilers")
+UTIL_STATIC_ASSERT(sizeof(AWC2ContextVector)      == 40, AWC2ContextVector,      "Conforming Size Types Across Compilers")
+UTIL_STATIC_ASSERT(sizeof(AWC2ViewportSize)       == 8,  AWC2ViewportSize,       "Conforming Size Types Across Compilers")
+UTIL_STATIC_ASSERT(sizeof(AWC2ContextDescriptor)  == 16, AWC2ContextDescriptor,  "Conforming Size Types Across Compilers")
 
 
 } /* extern "C" */

@@ -51,6 +51,7 @@ AWC2_API __hot bool              awc2getContextStatus(AWC2ContextID id); /* If c
 AWC2_API __hot void              awc2setCurrentContext(AWC2ContextID id);
 AWC2_API __hot AWC2ContextID     awc2getCurrentContext();
 AWC2_API __hot AWC2ViewportSize  awc2getCurrentContextViewport();
+AWC2_API    AWC2WindowStateFlag  awc2getCurrentContextWindowState();
 AWC2_API __hot void              awc2begin();
 AWC2_API __hot void              awc2end();
 /* } */

@@ -129,7 +129,7 @@ DISABLE_WARNING_POP
 #      endif
 #   endif
 
-#   if defined __notused /* more appropriate for functions	*/
+#   if defined __unused /* more appropriate for functions	*/
 #      warning "Macro __notused Already defined
 #   else
 #      define __unused __util_attribute_unused

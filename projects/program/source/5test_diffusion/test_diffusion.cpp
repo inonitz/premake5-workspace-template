@@ -71,17 +71,17 @@ static void initializeExternForces(vec2u const& dims, std::vector<vec4f>& field)
 
 #if defined __linux__
     static constexpr const char* gk_computeShaderFilename[4] = {
-        "projects/program/source/main/examples/test_diffusion/0boundary.comp",
-        "projects/program/source/main/examples/test_diffusion/1advect_extern_force.comp",
-        "projects/program/source/main/examples/test_diffusion/2diffusion.comp",
-        "projects/program/source/main/examples/test_diffusion/3draw.comp"
+        "projects/program/source/5test_diffusion/0boundary.comp",
+        "projects/program/source/5test_diffusion/1advect_extern_force.comp",
+        "projects/program/source/5test_diffusion/2diffusion.comp",
+        "projects/program/source/5test_diffusion/3draw.comp"
     };
 #elif defined _WIN32
     static constexpr const char* gk_computeShaderFilename[4] = {
-        "C:/CTools/Projects/main/projects/program/source/main/examples/test_diffusion/0boundary.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/examples/test_diffusion/1advect_extern_force.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/examples/test_diffusion/2diffusion.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/examples/test_diffusion/3draw.comp"
+        "C:/CTools/Projects/main/projects/program/source/5test_diffusion/0boundary.comp",
+        "C:/CTools/Projects/main/projects/program/source/5test_diffusion/1advect_extern_force.comp",
+        "C:/CTools/Projects/main/projects/program/source/5test_diffusion/2diffusion.comp",
+        "C:/CTools/Projects/main/projects/program/source/5test_diffusion/3draw.comp"
     };
 #endif
 

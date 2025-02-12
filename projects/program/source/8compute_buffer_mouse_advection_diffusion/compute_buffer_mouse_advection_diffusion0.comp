@@ -1,0 +1,72 @@
+#version 450 core
+layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
+layout(binding = 0)                    uniform sampler2D ping;
+layout(binding = 1, rgba32f) writeonly uniform image2D   pong;
+
+
+bool drawPointAt(
+    in vec2  currPoint, 
+    in vec2  desiredPoint, 
+    in float radius,
+    in vec4  initialColor,
+    out vec4 resultColor 
+);
+
+
+
+uniform ivec2 ku_simdims;
+uniform vec2  ku_mouseDragForce; /* in pixels (screen space) */
+uniform vec2  ku_mouseDragPos;   /* in pixels (screen space) */
+uniform float ku_splatterRadius; /* in pixels */
+uniform vec4  ku_splatterColor;
+uniform uint  ku_mousePressed;
+vec2 k_unitCoord = vec2(1) / vec2(ku_simdims);
+
+
+void main()
+{
+    ivec2 texelCoord;
+    vec2 norm_texcoord, norm_mousepos;
+    vec4 oldColour, newColour;
+    bool toUpdatePixel = false;
+
+    texelCoord = ivec2(gl_GlobalInvocationID.xy);
+    norm_texcoord = vec2(texelCoord) / vec2(ku_simdims);
+    norm_mousepos = ku_mouseDragPos * k_unitCoord;
+    norm_mousepos.y = 1.0f - norm_mousepos.y;
+    oldColour = texelFetch(ping, texelCoord, 0);
+
+
+    toUpdatePixel = drawPointAt(
+        norm_texcoord,
+        norm_mousepos,
+        ku_splatterRadius,
+        ku_splatterColor,
+        newColour
+    );
+    if(!toUpdatePixel) {
+        newColour = oldColour;
+    }
+
+    imageStore(pong, texelCoord, newColour);
+    return;
+}
+
+
+bool drawPointAt(
+    in vec2  currPoint, 
+    in vec2  desiredPoint, 
+    in float radius,
+    in vec4  initialColor,
+    out vec4 resultColor 
+) {
+    float dist = length(currPoint - desiredPoint) / radius;
+
+    
+    resultColor = initialColor;
+    if(dist >= 1) {
+        return false;
+    }
+    resultColor = exp(-dist) * resultColor;
+    return true;
+}

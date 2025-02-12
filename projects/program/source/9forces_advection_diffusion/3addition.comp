@@ -1,0 +1,17 @@
+#version 450 core
+layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
+layout(binding = 0)                    uniform sampler2D externuserField;
+layout(binding = 1)                    uniform sampler2D advectedField;
+layout(binding = 2)                    uniform sampler2D diffusedField;
+layout(binding = 3, rgba32f) writeonly uniform image2D   outputField;
+
+void main()
+{
+    ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+    vec2 result = 
+        texelFetch(externuserField, texelCoord, 0).xy +
+        texelFetch(advectedField, texelCoord, 0).xy + 
+        texelFetch(diffusedField, texelCoord, 0).xy;
+    imageStore(outputField, texelCoord, vec4(result, 0.0f, 1.0f));
+    return;
+}

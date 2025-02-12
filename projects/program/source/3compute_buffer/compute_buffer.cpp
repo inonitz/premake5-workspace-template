@@ -118,9 +118,9 @@ i32 compute_shader_render_buffer_to_screen()
     u8 contextid;
 
 #if defined __linux__
-    static constexpr const char* computeShaderFilename = "projects/program/source/main/examples/compute_buffer.comp";
+    static constexpr const char* computeShaderFilename = "projects/program/source/3compute_buffer/compute_buffer.comp";
 #elif defined _WIN32
-    static constexpr const char* computeShaderFilename = "C:/CTools/Projects/main/projects/program/source/main/examples/compute_buffer.comp";
+    static constexpr const char* computeShaderFilename = "C:/CTools/Projects/main/projects/program/source/3compute_buffer/compute_buffer.comp";
 #endif
 
 

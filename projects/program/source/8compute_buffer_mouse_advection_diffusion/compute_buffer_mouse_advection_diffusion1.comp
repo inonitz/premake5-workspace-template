@@ -1,0 +1,67 @@
+#version 450 core
+layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
+layout (binding = 0)                    uniform sampler2D initialField;
+layout (binding = 1, rgba32f) writeonly uniform image2D   outputField;
+
+
+vec4 textureBilerp(in sampler2D tex, vec2 uv);
+vec4 advection_step(
+    in ivec2     coord,
+    in vec2      normcoord, 
+    in sampler2D ufield, 
+    in sampler2D quantity_read
+);
+
+
+uniform float ku_dt;
+uniform ivec2 ku_simdims;
+vec2 k_unitCoord = vec2(1) / vec2(ku_simdims); 
+
+
+void main()
+{
+    ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+    vec4  result = advection_step(
+        texelCoord,
+        k_unitCoord * vec2(texelCoord),
+        initialField,
+        initialField
+    );
+    imageStore(outputField, texelCoord, result);
+    return;
+}
+
+
+
+
+vec4 advection_step(
+    in ivec2     coord,
+    in vec2      normcoord, 
+    in sampler2D ufield, 
+    in sampler2D quantity_read
+) {
+    vec2 newcoord = normcoord - ku_dt * texelFetch(ufield, coord, 0).xy;
+    return textureBilerp(quantity_read, newcoord);
+}
+
+
+/* 
+    Might be problematic because of texture(),
+    might need to turn coords back to integer pixels (texelFetch),
+    and then mix.
+*/
+vec4 textureBilerp(in sampler2D tex, vec2 uv)
+{
+    vec2 weight = fract(uv);
+    vec4 bottom = mix(
+        texture(tex, uv + vec2(0,             0)), 
+        texture(tex, uv + vec2(k_unitCoord.x, 0)),
+        weight.x
+    );
+    vec4 top    = mix(
+        texture(tex, uv + vec2(0,             k_unitCoord.y)), 
+        texture(tex, uv + vec2(k_unitCoord.x, k_unitCoord.y)),
+        weight.x
+    );
+    return mix(bottom, top, weight.y);
+}

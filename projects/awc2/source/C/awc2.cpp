@@ -3,6 +3,7 @@
 #include "../internal_event.hpp"
 #include "../internal_instance.hpp"
 #include "../internal_state.hpp"
+#include "awc2/context.hpp"
 #include "util/util.hpp"
 #include <util/static_assert.h>
 #ifdef __cplusplus
@@ -190,6 +191,14 @@ AWC2_EXTERNC __hot AWC2ViewportSize awc2getCurrentContextViewport()
     return AWC2ViewportSize{ cpp_viewportsize.x, cpp_viewportsize.y };
 
 }
+
+AWC2_EXTERNC u8 awc2getCurrentContextWindowState()
+{
+    return AWC2WindowStateFlag{
+        __scast(u8, AWC2::getCurrentContextWindowState())
+    };
+}
+
 
 AWC2_EXTERNC __hot void awc2begin() {
     AWC2::begin();

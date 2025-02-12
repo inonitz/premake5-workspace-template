@@ -1,4 +1,4 @@
-project "program-test"
+project "program"
     kind          "ConsoleApp"
     systemversion "latest"
     warnings      "extra"

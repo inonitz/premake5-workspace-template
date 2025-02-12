@@ -47,13 +47,13 @@ static inline void initializeVectorFields(vec2u const& dims, std::vector<vec4f>&
 
 #if defined __linux__
     static constexpr const char* computeShaderFilename[2] = {
-        "projects/program/source/main/examples/compute_buffer_mouse0.comp",
-        "projects/program/source/main/examples/compute_buffer_mouse1.comp"
+        "projects/program/source/6compute_buffer_mouse/compute_buffer_mouse0.comp",
+        "projects/program/source/6compute_buffer_mouse/compute_buffer_mouse1.comp"
     };
 #elif defined _WIN32
     static constexpr const char* computeShaderFilename[2] = {
-        "C:/CTools/Projects/main/projects/program/source/main/examples/compute_buffer_mouse0.comp",
-        "C:/CTools/Projects/main/projects/program/source/main/examples/compute_buffer_mouse1.comp"
+        "C:/CTools/Projects/main/projects/program/source/6compute_buffer_mouse/compute_buffer_mouse0.comp",
+        "C:/CTools/Projects/main/projects/program/source/6compute_buffer_mouse/compute_buffer_mouse1.comp"
     };
 #endif
 static std::vector<vec4f> g_initialField;
@@ -73,7 +73,7 @@ static ShaderProgramV2& gr_computeInteractive = g_compute[0];
 static ShaderProgramV2& gr_computeRenderToTex = g_compute[1];
 
 
-void render_imgui_interface()
+static void render_imgui_interface()
 {
     // if(awc2isMouseMoving() && awc2isMouseButtonPressed(AWC2_MOUSEBUTTON_LEFT)) {
     if(awc2isMouseButtonPressed(AWC2_MOUSEBUTTON_LEFT)) {

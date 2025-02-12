@@ -41,6 +41,7 @@ public:
         return (m_data.description.stateFlags & WindowStateFlag::FOCUSED)
             == WindowStateFlag::FOCUSED; 
     }
+    WindowStateFlag getFlags() const { return m_data.description.stateFlags; }
     u32  getWidth()  const { return m_data.width;  }
     u32  getHeight() const { return m_data.height; }
     GLFWwindow* underlying_handle()        const { return m_data.handle;        }

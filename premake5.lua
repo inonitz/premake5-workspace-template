@@ -257,10 +257,27 @@ end
 --     default = "x86_64"
 -- }
 
+getProjectNames = function()
+    folders = {}
+    for _, projpath in ipairs(PROJECTS) do
+        local i, j = string.find(projpath, '/')
+        local projname = string.sub(projpath, i + 1) 
+        table.insert(folders, { projname, projpath })
+    end
+    return folders
+end
+
+newoption {
+    trigger     = "proj",
+    description = "Set this when using cleanproj",
+    allowed = getProjectNames()
+}
+
+
 
 -- Rebuild Project Solutions' Function --
 newaction {
-    trigger     = "cleanprojectconfigs",
+    trigger     = "cleanprojectcfg",
     description = "Remove all Project Solutions, Makefiles, Ninja build files, etc...",
     execute     = function ()
         local build_extensions = { "/Makefile", "/**.sln", "/**.vcxproj", "/**.vcxproj.filters", "/**.vcxproj.user", "/**.ninja", "/.ninja_deps", "/.ninja_log", "/.ninja_lock" }
@@ -338,6 +355,43 @@ newaction {
         print("Done")
     end
 }
+
+
+newaction {
+    trigger     = "cleanproj",
+    description = "Delete All Files Generated for a specific project",
+    allowed = getProjectNames(),
+    execute = function()
+        if _OPTIONS["proj"] then
+            local specific_bin_dirs = os.matchdirs( "build/bin/*" .. _OPTIONS["proj"] .. "*" )
+            local specific_obj_dirs = os.matchdirs( "build/obj/*" .. _OPTIONS["proj"] .. "*" )
+            local status, maybeError
+            for key, value in pairs(specific_bin_dirs) do
+                printf("----------------------------------------")
+                status, maybeError = os.rmdir(value)
+                if status then
+                    printf("%-30s: %s", "Removed Directory", value)
+                else
+                    printf("%-30s: %s", "Got Error", maybeError)
+                end
+                printf("----------------------------------------")
+            end
+            for key, value in pairs(specific_obj_dirs) do
+                printf("----------------------------------------")
+                status, maybeError = os.rmdir(value)
+                if status then
+                    printf("%-30s: %s", "Removed Directory", value)
+                else
+                    printf("%-30s: %s", "Got Error", maybeError)
+                end
+                printf("----------------------------------------")
+            end
+        else
+            printf("--proj option wasn't specified - Can't Continue!")
+        end
+    end
+}
+
 
 
 newaction {

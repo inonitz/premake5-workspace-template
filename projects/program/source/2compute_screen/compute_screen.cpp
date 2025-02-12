@@ -96,9 +96,9 @@ i32 compute_shader_render_to_screen()
     vec2u simulationDimensions{1920, 1080};
 
 #if defined __linux__
-    static constexpr const char* computeShaderFilename = "projects/program/source/main/examples/new_visual.comp";
+    static constexpr const char* computeShaderFilename = "projects/program/source/2compute_screen/new_visual.comp";
 #elif defined _WIN32
-    static constexpr const char* computeShaderFilename = "C:/CTools/Projects/main/projects/program/source/main/examples/compute_screen.comp";
+    static constexpr const char* computeShaderFilename = "C:/CTools/Projects/main/projects/program/source/2compute_screen/compute_screen.comp";
 #endif
 
 
