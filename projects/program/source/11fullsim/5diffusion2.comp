@@ -1,0 +1,82 @@
+#version 450 core
+layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
+layout (binding = 0)                    uniform sampler2D oldPressureField;
+layout (binding = 1, rgba32f) writeonly uniform image2D   newPressureField;
+
+
+bool applyBoundary(ivec2 coords);
+
+
+/* 
+    Single iteration of a jacobi solver
+*/
+float modified_jacobi_solver_pressure(
+    in ivec2 ij,
+    in float alpha,
+    in float inverseBeta,
+    in sampler2D x,
+    in float     b
+);
+
+
+uniform ivec2 ku_simdims;
+vec2 k_unitCoord = vec2(1) / vec2(ku_simdims); 
+
+
+void main()
+{
+    ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+    if(applyBoundary(texelCoord))
+        return;
+
+
+    vec4 oldFieldValue = texelFetch(oldPressureField, texelCoord, 0);
+    const float alpha = -1.0f;
+    const float invBeta  = 1.0f / 4.0f;
+    float newPressure = modified_jacobi_solver_pressure(texelCoord,
+        alpha,
+        invBeta,
+        oldPressureField,
+        oldFieldValue.w
+    );
+    oldFieldValue.z = newPressure;
+    imageStore(newPressureField, texelCoord, oldFieldValue);
+    return;
+}
+
+
+bvec4 isBoundary(ivec2 coords) {
+    return bvec4(
+        coords.x == 0, 
+        coords.y == 0,
+        coords.x == (ku_simdims.x - 1),
+        coords.y == (ku_simdims.y - 1)
+    );
+}
+
+
+bool applyBoundary(ivec2 texelCoord) {
+    const bvec4 boundbits = isBoundary(texelCoord);
+    ivec2 texelToFetch = texelCoord + ivec2(boundbits.xy) - ivec2(boundbits.zw);
+
+    imageStore(newPressureField, texelCoord, texelFetch(oldPressureField, texelToFetch, 0));
+    return any(boundbits);
+}
+
+
+float modified_jacobi_solver_pressure(
+    in ivec2 ij,
+    in float alpha,
+    in float inverseBeta,
+    in sampler2D x,
+    in float     b
+) {
+    vec4 neighbourValues = vec4(
+        texelFetch(x, ij + ivec2(1, 0), 0).z,
+        texelFetch(x, ij - ivec2(1, 0), 0).z,
+        texelFetch(x, ij + ivec2(0, 1), 0).z,
+        texelFetch(x, ij - ivec2(0, 1), 0).z
+    );
+    float result = neighbourValues.x + neighbourValues.y + neighbourValues.z + neighbourValues.w;
+    return (result + alpha * b) * inverseBeta;
+}

@@ -1,0 +1,85 @@
+#version 450 core
+layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
+layout (binding = 0)                    uniform sampler2D initialField;
+layout (binding = 1, rgba32f) writeonly uniform image2D   outputField;
+
+
+bool applyBoundary(ivec2 coords);
+
+
+/* 
+    Single iteration of a jacobi solver
+*/
+vec2 modified_jacobi_solver_velocity(
+    in ivec2 ij,
+    in float alpha,
+    in float inverseBeta,
+    in sampler2D x,
+    in vec2      b
+);
+
+uniform float ku_dt;
+uniform float ku_viscosity;
+uniform ivec2 ku_simdims;
+uniform vec2  ku_simUnitCoord;
+vec2 k_unitCoord = vec2(1) / vec2(ku_simdims); 
+vec2 k_simUnitCoordSq = ku_simUnitCoord * ku_simUnitCoord;
+
+
+void main()
+{
+    ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+
+    if(applyBoundary(texelCoord))
+        return;
+
+
+    vec4  valueij = texelFetch(initialField, texelCoord, 0);
+    float beta    = k_simUnitCoordSq.x * k_simUnitCoordSq.y / (ku_viscosity * ku_dt);
+    float alpha   = beta - 2.0f * (k_simUnitCoordSq.x + k_simUnitCoordSq.y);
+    vec2  result  = modified_jacobi_solver_velocity(texelCoord,
+        alpha, 
+        1.0f / beta, 
+        initialField,
+        valueij.xy
+    );
+    imageStore(outputField, texelCoord, vec4(result, valueij.zw));
+    return;
+}
+
+
+bvec4 isBoundary(ivec2 coords) {
+    return bvec4(
+        coords.x == 0, 
+        coords.y == 0,
+        coords.x == (ku_simdims.x - 1),
+        coords.y == (ku_simdims.y - 1)
+    );
+}
+
+
+bool applyBoundary(ivec2 texelCoord) {
+    const bvec4 boundbits = isBoundary(texelCoord);
+    ivec2 texelToFetch = texelCoord + ivec2(boundbits.xy) - ivec2(boundbits.zw);
+
+    imageStore(outputField, texelCoord, vec4(-1.0f, -1.0f, 1.0f, 1.0f) * texelFetch(initialField, texelToFetch, 0));
+    return any(boundbits);
+}
+
+
+vec2 modified_jacobi_solver_velocity(
+    in ivec2 ij,
+    in float alpha,
+    in float inverseBeta,
+    in sampler2D x,
+    in vec2      b
+) {
+    vec2 neighbourValues[4] = vec2[4](
+        k_simUnitCoordSq.y * texelFetch(x, ij + ivec2(1, 0), 0).xy,
+        k_simUnitCoordSq.y * texelFetch(x, ij - ivec2(1, 0), 0).xy,
+        k_simUnitCoordSq.x * texelFetch(x, ij + ivec2(0, 1), 0).xy,
+        k_simUnitCoordSq.x * texelFetch(x, ij - ivec2(0, 1), 0).xy
+    );
+    vec2 result = neighbourValues[0] + neighbourValues[1] + neighbourValues[2] + neighbourValues[3];
+    return (result + alpha * b) * inverseBeta;
+}

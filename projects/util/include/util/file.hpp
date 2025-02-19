@@ -19,6 +19,15 @@ UTIL_API bool loadFile(
 );
 
 
+/*
+
+*/
+UTIL_API void current_path(
+	unsigned int*  size, /* */
+	char* 		   out 	 /* Where the */
+);
+
+
 }
 
 

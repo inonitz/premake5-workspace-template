@@ -1,7 +1,17 @@
 #include "util/file.hpp"
 #include "util/ifcrash.hpp"
+#include "util/util.hpp"
+#include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+#ifdef _WIN32
+    #include <direct.h>
+    #define getcwd _getcwd // stupid MSFT "deprecation" warning
+#elif
+    #include <unistd.h>
+#endif
+#include <errno.h>
+#include <stdlib.h>
 
 
 bool util::loadFile(
@@ -34,6 +44,31 @@ bool util::loadFile(
 
 
 	fsize = fclose(to_open);
-	ifcrashfmt(fsize, "Couldn't close file handle. ERROR CODE: %llu\n", fsize);
+	ifcrashfmt(fsize, "Couldn't close file handle. ERROR CODE: %lld\n", fsize, errno);
 	return true;
+}
+
+
+/* 
+	Thanks to: 
+	https://stackoverflow.com/questions/2868680/what-is-a-cross-platform-way-to-get-the-current-directory 
+*/
+void util::current_path(
+	unsigned int*  size, 
+	char* 		   out
+) {
+	char*    allocated_path = getcwd(NULL, 0);
+	uint32_t pathlength	    = strlen(allocated_path); /* string is null terminated already */
+	ifcrashfmt(allocated_path == nullptr, "Couldn't get current path. ERROR CODE %lld", errno);
+
+
+	if(*size < pathlength || out == nullptr) {
+		/* A buffer wasn't allocated OR the size of the buffer is too small. */
+		*size = pathlength;
+		free(allocated_path);
+		return;
+	}
+	util::__memcpy(out, allocated_path, pathlength);
+	free(allocated_path);
+	return;
 }

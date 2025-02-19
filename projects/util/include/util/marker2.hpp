@@ -27,6 +27,14 @@
 #endif
 
 
+/*
+    This needs to be de-coupled into 2 different headers:
+	A. one for basic printing
+	B. one for marker functions specifically
+	Ex. debug_message() & debug_messagefmt() in base.hpp
+*/
+
+
 #if MARKER_FLAG_DEFINE_IMPLEMENTATION == 1
 #include "macro.h"
 

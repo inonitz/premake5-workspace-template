@@ -1,0 +1,53 @@
+#version 450 core
+layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
+layout(binding = 0)                    uniform sampler2D fieldSampler;
+layout(binding = 1, rgba32f) writeonly uniform image2D   screentexture;
+
+
+uniform ivec2 ku_simdims;
+uniform float drawingThreshold;
+uniform uint  drawingIndex;
+vec2 k_unitCoord = vec2(1) / vec2(ku_simdims);
+
+
+vec4 getDensityColor(in float density)
+{
+    const vec4 map[3] = {
+        vec4(1.0f, 0.0f, 0.0f, 1.0f),
+        vec4(0.0f, 0.0f, 1.0f, 1.0f),
+        vec4(1.0f, 1.0f, 1.0f, 1.0f),
+    };
+    return map[ uint(density > 0.0f) + uint(density == 0.0f) * 2 ];
+}
+
+
+vec4 biggerThanValue(in float component, in float value) {
+    return vec4(1.0f, 1.0f, 1.0f, 1.0f) * float(component > value);
+}
+
+
+void main()
+{
+    ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+    vec2 norm_texcoord = vec2(texelCoord) / vec2(ku_simdims);
+    
+
+    vec4 write_value = texelFetch(fieldSampler, texelCoord, 0);
+    imageStore(screentexture, texelCoord, write_value);
+    // imageStore(screentexture, texelCoord, getDensityColor(write_value.z));
+    // imageStore(screentexture, texelCoord, vec4(write_value.x, 0.0f, 0.0f, 1.0f));
+
+    // vec4 textureValue = vec4(0);
+    // switch(drawingIndex) {
+    //     case 0:
+    //     textureValue = biggerThanValue(write_value.x, drawingThreshold);
+    //     case 1:
+    //     textureValue = biggerThanValue(write_value.x, drawingThreshold);
+    //     case 2:
+    //     textureValue = biggerThanValue(write_value.x, drawingThreshold);
+        
+    // }
+
+    // imageStore(screentexture, texelCoord, biggerThanValue(write_value.z, 5.0f));
+    return;
+}
