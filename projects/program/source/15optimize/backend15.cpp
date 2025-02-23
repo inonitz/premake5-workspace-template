@@ -1,5 +1,5 @@
-#include "backend13.hpp"
-#include <glbinding/gl/gl.h>
+#include "backend15.hpp"
+#include <glbinding/gl46core/gl.h>
 #include <imgui/imgui.h>
 #include <awc2/C/awc2.h>
 #include <threads.h>
@@ -11,20 +11,33 @@
 
 
 static constexpr const char* computeShaderFilename[9] = {
-    "projects/program/source/13dye/0externalforce.comp",
-    "projects/program/source/13dye/1advection.comp",
-    "projects/program/source/13dye/2diffusion_new.comp",
-    "projects/program/source/13dye/3addition.comp",
-    "projects/program/source/13dye/4divergence.comp",
-    "projects/program/source/13dye/5diffusion2_new.comp",
-    "projects/program/source/13dye/6velocity.comp",
-    "projects/program/source/13dye/7draw.comp",
-    "projects/program/source/13dye/parallelReduction.comp"
+    "projects/program/source/15optimize/0externalforce.comp",
+    "projects/program/source/15optimize/1advection.comp",
+    "projects/program/source/15optimize/2double_diffusion.comp",
+    "projects/program/source/15optimize/3addition.comp",
+    "projects/program/source/15optimize/4divergence.comp",
+    "projects/program/source/15optimize/5diffusion2_new.comp",
+    "projects/program/source/15optimize/6velocity.comp",
+    "projects/program/source/15optimize/7draw.comp",
+    "projects/program/source/15optimize/parallelReductionSSBO.comp"
 };
 using namespace util::math;
 static u8                 g_runCodeOnceFlag{true};
 static u8                 g_contextid;
-static Time::Timestamp    g_frameTime;
+static Time::Timestamp    g_frameTime{};
+static Time::Timestamp    g_measuremisc0;
+static Time::Timestamp    g_measuremisc1;
+static Time::Timestamp    g_renderTime{};
+static Time::Timestamp    g_computeVelTime{};
+static Time::Timestamp    g_computeCFLTime{};
+static Time::Timestamp    g_computeFluidTime{};
+static Time::Timestamp    g_retrieveTextureData{};
+static Time::Timestamp    g_computeMaximum{};
+static Time::Timestamp    g_renderImguiTime;
+static Time::Timestamp    g_renderScreenTime;
+static Time::Timestamp    g_refreshShaderTime;
+
+
 static std::vector<vec4f> g_initialField;
 static vec2i              g_dims{1024, 1024};
 static vec2i              g_windims{g_dims};
@@ -32,12 +45,15 @@ static vec2f              g_simUnitCoords{1.0f};
 static f32                g_dt        = 0.2f;
 static f32                g_viscosity = 1.0f;
 static i32                g_maximumJacobiIterations = 35;
-static i32                g_reductionFactor = 64;
+static i32                g_reductionFactor = 4096;
 static i32                g_reductionBufferLength = g_dims.x * g_dims.y / g_reductionFactor;
 static std::vector<vec4f> g_reductionBuffer;
 static vec2f              g_velocityCFL{0.0f, 0.0f};
 
+static gl::GLsync         g_fence; 
 static u32                g_texture[19];
+static u32                g_buffer[2];
+static void*              g_mappedBuffer[2];
 static u32                g_fbo;
 static ShaderProgramV2    g_compute[__carraysize(computeShaderFilename)];
 static vec2f              g_mouseDragForce;
@@ -82,8 +98,8 @@ static u32& gr_outTexShader9 = g_texture[14];
 
 static u32& gr_simTexture0 = g_texture[15]; /* Components are [u.x, u.y, p, reserved] */
 static u32& gr_simTexture1 = g_texture[16];
-static u32& g_reductionMinTexture = g_texture[17];
-static u32& g_reductionMaxTexture = g_texture[18];
+static u32& g_reductionMinTexture = g_buffer[0];
+static u32& g_reductionMaxTexture = g_buffer[1];
 
 
 
@@ -104,22 +120,28 @@ static void compute_dye(
 static void compute_cfl(u32 texture);
 
 
-u8               program4::getContextID() { return g_contextid; }
-Time::Timestamp& program4::getFrameTime() { return g_frameTime; }
-bool             program4::getSlowRenderFlag() { return g_slowRender; }
+u8               optimize::getContextID()  { return g_contextid; }
+Time::Timestamp& optimize::getFrameTime()  { return g_frameTime; }
+Time::Timestamp& optimize::getRenderTime() { return g_renderTime; }
+Time::Timestamp& optimize::getTimer0() { return g_measuremisc0; }
+Time::Timestamp& optimize::getTimer1() { return g_measuremisc1; }
+bool             optimize::getSlowRenderFlag() { return g_slowRender; }
 
 
-void program4::initializeLibrary()
+void optimize::initializeLibrary()
 {
     markstr("AWC2 init begin"); /* Init awc2 */
     awc2init();
     g_contextid = awc2createContext();
+    auto desc = AWC2WindowDescriptor{};
+    // desc.createFlags |= AWC2_WINDOW_CREATION_FLAG_USE_VSYNC;
+    // desc.refreshRate = 280;
     AWC2ContextDescriptor ctxtinfo = {
         g_contextid,
         {0},
         __scast(u16, g_dims.x),
         __scast(u16, g_dims.y),
-        AWC2WindowDescriptor{}
+        desc
     };
     awc2initializeContext(&ctxtinfo);
     awc2setContextUserCallbackMouseButton(g_contextid, &custom_mousebutton_callback);
@@ -129,7 +151,7 @@ void program4::initializeLibrary()
 }
 
 
-void program4::destroyLibrary()
+void optimize::destroyLibrary()
 {
     markstr("AWC2 Destroy Begin");
     awc2destroyContext(g_contextid);
@@ -141,13 +163,15 @@ void program4::destroyLibrary()
 
 
 
-void program4::initializeGraphics()
+void optimize::initializeGraphics()
 {
     u8 alive{true};
 
 
     markstr("Graphics Init Begin");
     gl::glCreateTextures(gl::GL_TEXTURE_2D, __carraysize(g_texture), &g_texture[0]);
+    // gl::glCreateTextures(gl::GL_TEXTURE_1D, __carraysize(g_texture2), &g_texture2[0]);
+    gl::glCreateBuffers(__carraysize(g_buffer), &g_buffer[0]);
     gl::glCreateFramebuffers(1, &g_fbo);
 
 
@@ -161,7 +185,7 @@ void program4::initializeGraphics()
     ifcrashstr(!alive, "Unsuccessful shader compile");
 
 
-    for(u32 i = 0; i < __carraysize(g_texture) - 2; ++i) {
+    for(u32 i = 0; i < __carraysize(g_texture); ++i) {
         auto& tex = g_texture[i];
         gl::glTextureParameteri(tex, gl::GL_TEXTURE_WRAP_S, gl::GL_CLAMP_TO_EDGE);
         gl::glTextureParameteri(tex, gl::GL_TEXTURE_WRAP_T, gl::GL_CLAMP_TO_EDGE);
@@ -170,22 +194,38 @@ void program4::initializeGraphics()
         gl::glTextureStorage2D(tex, 1, gl::GL_RGBA32F, g_dims.x, g_dims.y);
         gl::glClearTexImage(tex, 0, gl::GL_RGBA, gl::GL_FLOAT, nullptr);
     }
-    gl::glTextureParameteri(g_reductionMinTexture, gl::GL_TEXTURE_WRAP_S, gl::GL_CLAMP_TO_EDGE);
-    gl::glTextureParameteri(g_reductionMinTexture, gl::GL_TEXTURE_WRAP_T, gl::GL_CLAMP_TO_EDGE);
-    gl::glTextureParameteri(g_reductionMinTexture, gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
-    gl::glTextureParameteri(g_reductionMinTexture, gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
-    gl::glTextureStorage2D(g_reductionMinTexture, 1, gl::GL_RGBA32F, g_reductionBufferLength, 1);
-    gl::glClearTexImage(g_reductionMinTexture, 0, gl::GL_RGBA, gl::GL_FLOAT, nullptr);
-    
-    gl::glTextureParameteri(g_reductionMaxTexture, gl::GL_TEXTURE_WRAP_S, gl::GL_CLAMP_TO_EDGE);
-    gl::glTextureParameteri(g_reductionMaxTexture, gl::GL_TEXTURE_WRAP_T, gl::GL_CLAMP_TO_EDGE);
-    gl::glTextureParameteri(g_reductionMaxTexture, gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
-    gl::glTextureParameteri(g_reductionMaxTexture, gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
-    gl::glTextureStorage2D(g_reductionMaxTexture, 1, gl::GL_RGBA32F, g_reductionBufferLength, 1);
-    gl::glClearTexImage(g_reductionMaxTexture, 0, gl::GL_RGBA, gl::GL_FLOAT, nullptr);
-    
-    g_reductionBuffer.resize(g_reductionBufferLength);
-    util::__memset( g_reductionBuffer.data(), g_reductionBufferLength, vec4f{0.0f});
+
+
+    for(u32 i = 0; i < __carraysize(g_buffer); ++i) {
+        auto& buf = g_buffer[i];
+        gl::glNamedBufferStorage(buf, 
+            g_reductionBufferLength * sizeof(vec4f), 
+            nullptr, 
+            gl::GL_MAP_READ_BIT 
+            | gl::GL_MAP_PERSISTENT_BIT 
+            | gl::GL_MAP_COHERENT_BIT
+        );
+        gl::glClearNamedBufferData(buf, gl::GL_RGBA32F, gl::GL_RGBA, gl::GL_FLOAT, nullptr);
+        g_mappedBuffer[i] = gl::glMapNamedBufferRange(buf, 
+            0, g_reductionBufferLength * sizeof(vec4f),
+            gl::GL_MAP_READ_BIT 
+            | gl::GL_MAP_PERSISTENT_BIT 
+            | gl::GL_MAP_COHERENT_BIT
+        );
+    }
+
+    // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO);
+    // for(u32 i = 0; i < __carraysize(g_texture2); ++i) {
+    //     auto& tex = g_texture2[i];
+    //     gl::glTextureParameteri(tex, gl::GL_TEXTURE_WRAP_S, gl::GL_CLAMP_TO_EDGE);
+    //     gl::glTextureParameteri(tex, gl::GL_TEXTURE_WRAP_T, gl::GL_CLAMP_TO_EDGE);
+    //     gl::glTextureParameteri(tex, gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
+    //     gl::glTextureParameteri(tex, gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
+    //     gl::glTextureStorage1D(tex, 1, gl::GL_RGBA32F, g_reductionBufferLength);
+    //     gl::glClearTexImage(tex, 0, gl::GL_RGBA, gl::GL_FLOAT, nullptr);
+    // }
+    // g_reductionBuffer.resize(g_reductionBufferLength);
+    // util::__memset( g_reductionBuffer.data(), g_reductionBufferLength, vec4f{0.0f});
 
 
 
@@ -200,12 +240,14 @@ void program4::initializeGraphics()
 }
 
 
-void program4::destroyGraphics()
+void optimize::destroyGraphics()
 {
     markstr("Graphics Destroy Begin");
 
 
     gl::glDeleteTextures(__carraysize(g_texture), &g_texture[0]);
+    // gl::glDeleteTextures(__carraysize(g_texture2), &g_texture2[0]);
+    gl::glDeleteBuffers(__carraysize(g_buffer), &g_buffer[0]);
     gl::glDeleteFramebuffers(1, &g_fbo);
     for(auto& comp : g_compute) {
         comp.destroy();
@@ -219,13 +261,14 @@ void program4::destroyGraphics()
 }
 
 
-void program4::render()
+void optimize::render()
 {
     static const vec4f defaultScreenColor = vec4f{1.0f, 1.0f, 1.0f, 1.0f}; 
     auto  currentWindowSize = awc2getCurrentContextViewport();
     u8    status = 1;
 
 
+    g_refreshShaderTime.begin();
     g_windims = vec2i{ currentWindowSize.x, currentWindowSize.y };
     /* shader refresh needs a rework to be more relevant, literally no point updating 9 shaders every time */
     if(awc2isKeyPressed(AWC2_KEYCODE_R)) {
@@ -239,6 +282,7 @@ void program4::render()
     if(!status)
         return; /* couldn't recompile successfully, code needs recheck */
 
+    g_refreshShaderTime.end();
 
 
     gl::glClearNamedFramebufferfv( /* Clear Screen */
@@ -249,11 +293,13 @@ void program4::render()
     );
 
 
-    render_imgui_interface();
-    u32 texToRender = compute_fluid();
+    u32 texToRender = 0;
+    TIME_NAMESPACE_TIME_CODE_BLOCK(g_renderImguiTime, render_imgui_interface());
+    TIME_NAMESPACE_TIME_CODE_BLOCK(g_computeFluidTime, texToRender = compute_fluid());
 
 
     /* literally just the velocity texture on the screen */
+    g_renderScreenTime.begin();
     gr_computeRenderToTex.bind();
     gr_computeRenderToTex.uniform1i("fieldSampler", 0);
     gr_computeRenderToTex.uniform1i("screentexture", 1);
@@ -276,7 +322,7 @@ void program4::render()
         gl::GL_COLOR_BUFFER_BIT, 
         gl::GL_NEAREST
     );
-    
+    g_renderScreenTime.end();
 
 
     g_mousePressed = false;
@@ -309,6 +355,23 @@ static void render_imgui_interface()
     char* simDimsStr      = g_dims.to_string();
     char* winDimsStr      = g_windims.to_string();
     char* maxVelStr       = g_velocityCFL.to_string();
+    static f32 timeMeasurements[16] = {0};
+
+
+    timeMeasurements[0] = g_frameTime.value_units<f32>(1000);
+    timeMeasurements[1] = g_renderTime.value_units<f32>(1000);
+    timeMeasurements[2] = g_computeFluidTime.value_units<f32>(1000);
+    timeMeasurements[3] = g_computeVelTime.value_units<f32>(1000);
+    timeMeasurements[4] = g_computeCFLTime.value_units<f32>(1000);
+    timeMeasurements[5] = g_retrieveTextureData.value_units<f32>(1000);
+    timeMeasurements[6] = g_computeMaximum.value_units<f32>(1000);
+    timeMeasurements[7] = timeMeasurements[4] - timeMeasurements[5] - timeMeasurements[6];
+    timeMeasurements[8] = timeMeasurements[2] - timeMeasurements[3] - timeMeasurements[4];
+    timeMeasurements[9] = g_refreshShaderTime.value_units<f32>(1000);
+    timeMeasurements[10] = g_renderImguiTime.value_units<f32>(1000);
+    timeMeasurements[11] = g_renderScreenTime.value_units<f32>(1000);
+    timeMeasurements[12] = g_measuremisc0.value_units<f32>(1000);
+    timeMeasurements[13] = g_measuremisc1.value_units<f32>(1000);
 
 
     ImGui::Begin("Simulation Parameters");
@@ -316,17 +379,56 @@ static void render_imgui_interface()
 Mouse Dragging Force %s\n\
 Mouse Position       %s\n\
 Mouse was Pressed    %u\n\
-FrameCounter         %u (%2.4f ms)\n\
+FrameCounter         %u (%6.4f ms)\n\
+Compute Time\n\
+    [awc2end] { \n\
+        %6.4f, \n\
+        %6.4f, \n\
+        %6.4f, \n\
+        %6.4f, \n\
+        %6.4f \n\
+    }\n\
+    %6.4f [misc0]\n\
+    %6.4f [misc1]\n\
+    %6.4f [render]\n\
+    - %6.4f [fluid]\n\
+        - %6.4f [velocity]\n\
+        - %6.4f [cfl]\n\
+            - %6.4f [retrieve]\n\
+            - %6.4f [for_loop]\n\
+            - %6.4f [remainder]\n\
+        - %6.4f [remainder]\n\
+    - %6.4f [shader_refresh]\n\
+    - %6.4f [render_imgui]\n\
+    - %6.4f [compute_screen+blit]\n\
 Simulation Dims      %s\n\
 Window     Dims      %s\n\
 Maximum Velocity     %s\n\
-CFL Condition (< 1)  %3.6f\n\
+CFL Condition (< 1)  %9.6f\n\
 ",
     dragForceStr, 
     mouseDragPosStr,
     g_mousePressed,
     g_frameCounter,
-    g_frameTime.value_units<f32>(1000),
+    timeMeasurements[0],
+    Time::getGeneralPurposeStamp(0).value_units<f32>(1000),
+    Time::getGeneralPurposeStamp(1).value_units<f32>(1000),
+    Time::getGeneralPurposeStamp(2).value_units<f32>(1000),
+    Time::getGeneralPurposeStamp(3).value_units<f32>(1000),
+    Time::getGeneralPurposeStamp(4).value_units<f32>(1000),
+    timeMeasurements[12],
+    timeMeasurements[13],
+    timeMeasurements[1],
+    timeMeasurements[2],
+    timeMeasurements[3],
+    timeMeasurements[4],
+    timeMeasurements[5],
+    timeMeasurements[6],
+    timeMeasurements[7],
+    timeMeasurements[8],
+    timeMeasurements[9],
+    timeMeasurements[10],
+    timeMeasurements[11],
     simDimsStr,
     winDimsStr,
     maxVelStr,
@@ -387,9 +489,12 @@ static u32 compute_fluid()
     }
 
 
-    compute_velocity(previousIterationVel, nextIterationVel);
-    compute_cfl(nextIterationVel);
+    TIME_NAMESPACE_TIME_CODE_BLOCK(g_computeVelTime, compute_velocity(previousIterationVel, nextIterationVel));
+    TIME_NAMESPACE_TIME_CODE_BLOCK(g_computeCFLTime, compute_cfl(nextIterationVel));
     // compute_dye(nextIterationVel, previousIterationDye, nextIterationDye);
+    // TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(4), gl::glFinish());
+    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(4), (void()));
+
     return nextIterationVel;
 }
 
@@ -414,35 +519,11 @@ static void compute_velocity(u32 previousIteration, u32 nextIteration)
         gr_computeInteractive.uniform4fv("ku_splatterColor",  g_splatterColor.begin());
         gr_computeInteractive.uniform1ui("ku_mousePressed",   g_mousePressed);
         gl::glBindImageTexture(0, gr_outTexShader0, 0, false, 0, 
-            gl::GL_WRITE_ONLY, 
+            gl::GL_WRITE_ONLY,
             gl::GL_RGBA32F
         );
         gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
     }
-
-
-    /* 
-        Current Advection causes horizontal pixel-like artifacts,
-        and generally unstable and unrealistic velocity fields
-        current investigation led to the following articles:
-            https://forum.afterworks.com/showthread.php?tid=1186 
-            https://jamie-wong.com/2016/08/05/webgl-fluid-simulation/#advection
-    */
-    /* apply advection to previousIteration, write to some other texture */
-    gr_computeAdvection.bind();
-    gr_computeAdvection.uniform1i("quantityField", 0);
-    gr_computeAdvection.uniform1i("velocityField", 1);
-    gr_computeAdvection.uniform1i("outputField",   2);
-    gr_computeAdvection.uniform1f("ku_dt",            g_dt);
-    gr_computeAdvection.uniform2iv("ku_simdims",      g_dims.begin());
-    gr_computeAdvection.uniform2fv("ku_simUnitCoord", g_simUnitCoords.begin());
-    gl::glBindTextureUnit(0, previousIteration);
-    gl::glBindTextureUnit(1, previousIteration);
-    gl::glBindImageTexture(1, gr_outTexShader1, 0, false, 0, 
-        gl::GL_WRITE_ONLY, 
-        gl::GL_RGBA32F
-    );
-    gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
 
 
     /* Compute diffuse component of the velocity field to diffusion texture (gr_outTexShader2) */
@@ -460,7 +541,7 @@ static void compute_velocity(u32 previousIteration, u32 nextIteration)
         gl::GL_WRITE_ONLY, 
         gl::GL_RGBA32F
     );
-    gl::glDispatchCompute(g_dims.x, g_dims.y / g_reductionFactor, 1);
+    gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
     gl::glMemoryBarrier(gl::GL_ALL_BARRIER_BITS);
 
 
@@ -472,7 +553,7 @@ static void compute_velocity(u32 previousIteration, u32 nextIteration)
             gl::GL_WRITE_ONLY, 
             gl::GL_RGBA32F
         );
-        gl::glDispatchCompute(g_dims.x, g_dims.y / g_reductionFactor, 1);
+        gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
 
 
         u32 tmp = textureInput;
@@ -491,88 +572,12 @@ static void compute_velocity(u32 previousIteration, u32 nextIteration)
     gl::glBindTextureUnit(0, gr_outTexShader0);
     gl::glBindTextureUnit(1, gr_outTexShader1);
     gl::glBindTextureUnit(2, gr_outTexShader2);
-    gl::glBindImageTexture(3, gr_outTexShader3, 0, false, 0, 
+    gl::glBindImageTexture(3, nextIteration, 0, false, 0, 
         gl::GL_WRITE_ONLY, 
         gl::GL_RGBA32F
     );
     gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
     gl::glMemoryBarrier(gl::GL_ALL_BARRIER_BITS);
-
-
-    /* 
-        Compute the divergence of the previous iteration. 
-        We write the result to the w component of the texture (1-1 copy but .w is div(gr_outTexShader3) ) 
-        resulting field in gr_outTexShader4
-    */
-    gr_computeDivergence.bind();
-    gr_computeDivergence.uniform1i("intermediateVelocityField", 0);
-    gr_computeDivergence.uniform1i("oldPressureFieldValue",     1);
-    gr_computeDivergence.uniform1i("outputField",               2);
-    gr_computeDivergence.uniform2fv("ku_simUnitCoord", g_simUnitCoords.begin());
-    gl::glBindTextureUnit(0, gr_outTexShader3);
-    gl::glBindTextureUnit(1, previousIteration);
-    gl::glBindImageTexture(2, gr_outTexShader4, 0, false, 0, 
-        gl::GL_WRITE_ONLY, 
-        gl::GL_RGBA32F
-    );
-    gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
-    gl::glMemoryBarrier(gl::GL_ALL_BARRIER_BITS);
-
-
-
-    /* Compute the new pressure to .z component (gr_outTexShader5) */
-    gr_computeDiffusionPressure.bind();
-    gr_computeDiffusionPressure.uniform1i("oldPressureField", 0);
-    gr_computeDiffusionPressure.uniform1i("newPressureField", 1);
-    gr_computeDiffusionPressure.uniform2iv("ku_simdims", g_dims.begin());
-    gr_computeDiffusionPressure.uniform2fv("ku_simUnitCoord", g_simUnitCoords.begin());
-    gl::glBindTextureUnit(0, gr_outTexShader4);
-    gl::glBindImageTexture(1, gr_outTexShader5, 0, false, 0, 
-        gl::GL_WRITE_ONLY, 
-        gl::GL_RGBA32F
-    );
-    gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
-    gl::glMemoryBarrier(gl::GL_ALL_BARRIER_BITS);
-
-
-    textureInput  = gr_outTexShader5;
-    textureOutput = gr_tmpTexture0;
-    for(i32 i = 1; i < g_maximumJacobiIterations; ++i) {
-        gl::glBindTextureUnit(0, textureInput);
-        gl::glBindImageTexture(1, textureOutput, 0, false, 0, 
-            gl::GL_WRITE_ONLY, 
-            gl::GL_RGBA32F
-        );
-        gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
-
-
-        u32 tmp = textureInput;
-        textureInput  = textureOutput;
-        textureOutput = tmp;
-        gl::glMemoryBarrier(gl::GL_ALL_BARRIER_BITS);
-    }
-    gl::glBindTextureUnit(0, textureInput);
-    gl::glBindImageTexture(1, gr_outTexShader5, 0, false, 0, 
-        gl::GL_WRITE_ONLY, 
-        gl::GL_RGBA32F
-    );
-    gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
-    gl::glMemoryBarrier(gl::GL_ALL_BARRIER_BITS);
-
-
-    /* add together all the shit we computed for the next iteration */
-    gr_computeNewVelocity.bind();
-    gr_computeNewVelocity.uniform1i("intermediate",  0);
-    gr_computeNewVelocity.uniform1i("updatedFields", 1);
-    gr_computeNewVelocity.uniform2fv("ku_simUnitCoord", g_simUnitCoords.begin());
-    gl::glBindTextureUnit(0, gr_outTexShader5);
-    gl::glBindImageTexture(1, nextIteration, 0, false, 0, 
-        gl::GL_WRITE_ONLY, 
-        gl::GL_RGBA32F
-    );
-    gl::glDispatchCompute(g_dims.x, g_dims.y, 1);
-    gl::glMemoryBarrier(gl::GL_ALL_BARRIER_BITS);
-    return;
 }
 
 
@@ -678,43 +683,70 @@ static void compute_dye(
 
 static void compute_cfl(u32 texture)
 {
+    auto LockBuffer = [](gl::GLsync& sync) {
+        if(sync) {
+            gl::glDeleteSync(sync);
+        }
+        sync = gl::glFenceSync(gl::GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        return;
+    };
+    auto WaitForBuffer = [](gl::GLsync& sync) {
+        if(sync) {
+            gl::GLenum waitForGPU;
+            bool wait = true;
+            while(wait) {
+                waitForGPU = gl::glClientWaitSync(sync, gl::GL_SYNC_FLUSH_COMMANDS_BIT, 1);
+                wait = (waitForGPU == gl::GL_ALREADY_SIGNALED) || (waitForGPU == gl::GL_CONDITION_SATISFIED);
+            }
+            return;
+        }
+    };
     /* 
         Thanks primarily to: https://en.wikipedia.org/wiki/Courant%E2%80%93Friedrichs%E2%80%93Lewy_condition
         Also: https://www.simscale.com/blog/cfl-condition/
     */
     gr_computeCFLCondition.bind();
     gr_computeCFLCondition.uniform1i("originalTexture", 0);
-    gr_computeCFLCondition.uniform1i("reductionMinimumTexture", 1);
-    gr_computeCFLCondition.uniform1i("reductionMaximumTexture", 2);
+    gr_computeCFLCondition.StorageBlock("reductionMaximumBuffer", 1);
+    gr_computeCFLCondition.StorageBlock("reductionMinimumBuffer", 2);
     gr_computeCFLCondition.uniform1i("ku_valuesToFetch", g_reductionFactor);
     gl::glBindTextureUnit(0, texture);
-    gl::glBindImageTexture(1, g_reductionMinTexture, 0, false, 0, 
-        gl::GL_WRITE_ONLY, 
-        gl::GL_RGBA32F
-    );
-    gl::glBindImageTexture(2, g_reductionMaxTexture, 0, false, 0, 
-        gl::GL_WRITE_ONLY, 
-        gl::GL_RGBA32F
-    );
-    gl::glDispatchCompute(g_reductionBufferLength / 16, 16, 1);
+    gl::glBindBufferBase(gl::GL_SHADER_STORAGE_BUFFER, 1, g_reductionMaxTexture);
+    gl::glBindBufferBase(gl::GL_SHADER_STORAGE_BUFFER, 2, g_reductionMinTexture);
+    
+    WaitForBuffer(g_fence);
+    gl::glDispatchCompute(g_reductionBufferLength, 1, 1);
     gl::glMemoryBarrier(gl::GL_ALL_BARRIER_BITS);
-
+    // gl::glMemoryBarrier(gl::GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
     /* get data computed in g_reductionMaxTexture to a CPU-side texture (g_reductionBuffer) */
-    gl::glGetTextureImage(
-        g_reductionMaxTexture, 
-        0, 
-        gl::GL_RGBA, 
-        gl::GL_FLOAT, 
-        g_reductionBufferLength * sizeof(vec4f), 
-        g_reductionBuffer.data()
-    );
+    
+
+    g_retrieveTextureData.begin();
+    LockBuffer(g_fence);
+    g_retrieveTextureData.end();
+
+    
+    g_computeMaximum.begin();
+    char* vecstr = __rcast(char*, std::malloc(256));
+    if(g_mousePressed && awc2isMouseButtonPressed(AWC2_MOUSEBUTTON_RIGHT)) {
+        for(i32 i = 0; i < g_reductionBufferLength; ++i) {
+            const auto* maxMemMapBuf = __rcast(vec4f*, g_mappedBuffer[0]);
+            maxMemMapBuf[i].to_strbuf(vecstr, 256);
+            printf("  %u => %s\n", i, vecstr);
+        }
+    }
+    std::free(vecstr);
+
+    
 
     for(i32 i = 0; i < g_reductionBufferLength; ++i) {
-        bool greaterThanX = boolean(g_reductionBuffer[i].x > g_velocityCFL.x);
-        bool greaterThanY = boolean(g_reductionBuffer[i].y > g_velocityCFL.y);
-        g_velocityCFL.x = __scast(f32, greaterThanX * g_reductionBuffer[i].x + !greaterThanX * g_velocityCFL.x);
-        g_velocityCFL.y = __scast(f32, greaterThanY * g_reductionBuffer[i].y + !greaterThanY * g_velocityCFL.y);
+        const auto* maxMemMapBuf = __rcast(vec4f*, g_mappedBuffer[0]);
+        bool greaterThanX = boolean(maxMemMapBuf[i].x > g_velocityCFL.x);
+        bool greaterThanY = boolean(maxMemMapBuf[i].y > g_velocityCFL.y);
+        g_velocityCFL.x = __scast(f32, greaterThanX * maxMemMapBuf[i].x + !greaterThanX * g_velocityCFL.x);
+        g_velocityCFL.y = __scast(f32, greaterThanY * maxMemMapBuf[i].y + !greaterThanY * g_velocityCFL.y);
     }
+    g_computeMaximum.end();
 
 
     return;

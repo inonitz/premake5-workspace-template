@@ -171,6 +171,15 @@ char* vec##fmt::to_string() const \
 	std::snprintf(strBuffer, size_s, strfmt, __VA_ARGS__); \
 	return strBuffer; \
 } \
+size_t vec##fmt::to_strbuf(char* buf, size_t bufsize) const \
+{ \
+	size_t size_s = std::snprintf(nullptr, 0, strfmt, __VA_ARGS__) + 1; \
+	if(bufsize == 0 || bufsize < size_s) { \
+		return size_s; \
+	} \
+	std::snprintf(buf, size_s, strfmt, __VA_ARGS__); \
+	return 0; \
+} \
 \
 \
 vec##fmt::__Mem& operator*(type_t a, vec##fmt::cref b) { mul(b.mem, a,                       temporaryBufferVec##fmt); return temporaryBufferVec##fmt; } \

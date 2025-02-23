@@ -5,7 +5,7 @@
 
 
 /* Source: https://github.com/hhrhhr/MurmurHash-for-Lua/blob/master/MurmurHash64A.c */
-__force_inline UTIL_API u64 MurmurHash64A(const void * key, i32 len, u64 seed)
+__force_inline inline UTIL_API u64 MurmurHash64A(const void * key, i32 len, u64 seed)
 {
 	const u64 m = 0xc6a4a7935bd1e995LLU;
 	const int r = 47;

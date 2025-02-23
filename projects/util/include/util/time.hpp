@@ -179,6 +179,12 @@ template class SMATick<32>;
     } \
 
 
+#define TIME_NAMESPACE_STATIC_TIMESTAMP_MAXIMUM 16
+
+
+Timestamp& getGeneralPurposeStamp(u8 index);
+
+
 } // namespace Time
 
 

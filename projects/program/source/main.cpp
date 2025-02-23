@@ -3,7 +3,7 @@
 #include <util/macro.h>
 
 #ifndef _SELECT_MAIN
-#   define _SELECT_MAIN 14
+#   define _SELECT_MAIN 17
 #endif
 
 #if _SELECT_MAIN == 0
@@ -35,7 +35,13 @@
 #elif _SELECT_MAIN == 13
 #   include "13dye/dye.hpp"
 #elif _SELECT_MAIN == 14
-#   include "14optimize/optimize.hpp"
+#   include "14measure/measure.hpp"
+#elif _SELECT_MAIN == 15
+#   include "15optimize/optimize.hpp"
+#elif _SELECT_MAIN == 16
+#   include "16makessbowork/ssbo.hpp"
+#elif _SELECT_MAIN == 17
+#   include "17optimize2/optimize2.hpp"
 #endif
 
 
@@ -73,7 +79,13 @@ int main(__unused int argc, __unused char* argv[]) {
 #elif _SELECT_MAIN == 13
     out = fluid_sim_2d_also_dye();
 #elif _SELECT_MAIN == 14
-    out = optimize_diffusion_and_work_distribution_across_shaders_also_revalidate_parallel_reduction();
+    out = started_optimization_derailed_to_measuring_everything();
+#elif _SELECT_MAIN == 15
+    out = after_measuring_you_cut_the_dead_wood();
+#elif _SELECT_MAIN == 16
+    out = make_ssbo_work_for_cfl();
+#elif _SELECT_MAIN == 17
+    out = optimize_again_and_again_and_again_and_again();
 #endif
 
     markstr("Successful Exit");

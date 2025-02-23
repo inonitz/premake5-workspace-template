@@ -2,10 +2,12 @@
 #include "internal_callback.hpp"
 #include "internal_instance.hpp"
 #include "internal_event.hpp"
+#include "util/time.hpp"
 #include <util/ifcrash.hpp>
 #include <util/marker2.hpp>
 #include <util/util.hpp>
 
+#include <glbinding/gl/gl.h>
 #include <glbinding/glbinding.h>
 #include <glbinding-aux/debug.h>
 #include <GLFW/glfw3.h>
@@ -90,6 +92,15 @@ void AWC2ContextData::initialize()
     /* OpenGL Context (Can only be initialized when creating its context ... ) */
     glbinding::initialize(m_id, glfwGetProcAddress, false, false);
     glbinding::aux::enableGetErrorCallback();
+
+    /* Can only happen after an opengl context is created */
+    bool test = boolean(__scast(i32, 
+        m_window.m_data.description.createFlags 
+        & 
+        WindowCreationFlag::USE_VSYNC
+    ));
+    printf("test is %u", test);
+    m_window.setVerticalSync(test);
     
     /* ImGui */
     ImGui::SetCurrentContext(__rcast(ImGuiContext*, m_imgui));
@@ -160,10 +171,12 @@ void AWC2ContextData::begin()
 
 void AWC2ContextData::end()
 {
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    m_window.swapBuffers();
-    m_io.reset();
+    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(0), ImGui::Render());
+    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(1), ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()));
+    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(2), m_window.swapBuffers());
+    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(3), m_io.reset());
+
+
     return;
 }
 

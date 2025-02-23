@@ -1,4 +1,5 @@
 #include "internal_window.hpp"
+#include "awc2/window_types.hpp"
 #include "internal_callback.hpp"
 #include <GLFW/glfw3.h>
 #include "util/aligned_malloc.hpp"
@@ -30,21 +31,21 @@ bool Window::create(
     glfwWindowHint(GLFW_OPENGL_PROFILE,        GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     /* Window Specific Hints*/
-    glfwWindowHint(GLFW_VISIBLE, __scast(i32, windesc.createFlags & 
-        WindowCreationFlag::STARTUP_VISIBLE) 
-    );
-    glfwWindowHint(GLFW_FOCUSED, __scast(i32, windesc.createFlags & 
-        WindowCreationFlag::STARTUP_FOCUSED) 
-    );
-    glfwWindowHint(GLFW_CENTER_CURSOR, __scast(i32, windesc.createFlags & 
-        WindowCreationFlag::STARTUP_CENTER_CURSOR) 
-    );
-    glfwWindowHint(GLFW_RESIZABLE, __scast(i32, windesc.createFlags & 
-        WindowCreationFlag::RESIZABLE) 
-    );
-    glfwWindowHint(GLFW_DECORATED, __scast(i32, windesc.createFlags & 
-        WindowCreationFlag::BORDER) 
-    );
+    glfwWindowHint(GLFW_VISIBLE, boolean(
+        __scast(i32, windesc.createFlags & WindowCreationFlag::STARTUP_VISIBLE) 
+    ));
+    glfwWindowHint(GLFW_FOCUSED, boolean(
+        __scast(i32, windesc.createFlags & WindowCreationFlag::STARTUP_FOCUSED)
+    ));
+    glfwWindowHint(GLFW_CENTER_CURSOR, boolean(
+        __scast(i32, windesc.createFlags & WindowCreationFlag::STARTUP_CENTER_CURSOR) 
+    ));
+    glfwWindowHint(GLFW_RESIZABLE, boolean(
+        __scast(i32, windesc.createFlags & WindowCreationFlag::RESIZABLE)
+    ));
+    glfwWindowHint(GLFW_DECORATED, boolean(
+        __scast(i32, windesc.createFlags & WindowCreationFlag::BORDER)
+    ));
     glfwWindowHint(GLFW_REFRESH_RATE, windesc.refreshRate == 0 
         ? GLFW_DONT_CARE : windesc.refreshRate
     );

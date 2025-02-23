@@ -277,7 +277,7 @@ newoption {
 
 -- Rebuild Project Solutions' Function --
 newaction {
-    trigger     = "cleanprojectcfg",
+    trigger     = "cleancfgs",
     description = "Remove all Project Solutions, Makefiles, Ninja build files, etc...",
     execute     = function ()
         local build_extensions = { "/Makefile", "/**.sln", "/**.vcxproj", "/**.vcxproj.filters", "/**.vcxproj.user", "/**.ninja", "/.ninja_deps", "/.ninja_log", "/.ninja_lock" }
@@ -399,7 +399,7 @@ newaction {
     description = "Trigger the following actions: cleanprojectconfigs, cleanclangd, cleanbuild",
     execute = function()
         print("[ACTION] = [cleanll] Begin\n")
-        os.execute("premake5 cleanprojectconfigs")
+        os.execute("premake5 cleancfgs")
         os.execute("premake5 cleanclangd")
         os.execute("premake5 cleanbuild")
         print("[ACTION] = [cleanll] End\n")

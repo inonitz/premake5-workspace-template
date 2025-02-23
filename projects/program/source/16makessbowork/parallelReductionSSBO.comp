@@ -1,8 +1,9 @@
 #version 450 core
 layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
-layout(binding = 0)                    uniform sampler2D originalTexture;
-layout(binding = 1, rgba32f) writeonly uniform image2D   reductionMinimumTexture; /* of size (originalTexture.x * originalTexture.y / ku_valuesToFetch, 1) */
-layout(binding = 2, rgba32f) writeonly uniform image2D   reductionMaximumTexture; /* of size (originalTexture.x * originalTexture.y / ku_valuesToFetch, 1) */
+layout(binding = 0) uniform sampler2D originalTexture;
+layout(binding = 1, std430) writeonly buffer reductionMaximumBuffer {
+    vec4 buf_maximum[];
+};
 
 
 uniform int ku_valuesToFetch;
@@ -26,20 +27,14 @@ ivec2 getTexelIndex(in int offset)
 
 void main()
 {
-    vec4 minimum = vec4(100000000);
     vec4 maximum = vec4(0);
 
     int oneDimensionalGroupIndex = flattenWorkGroupIndex();
     for(int i = 0; i < ku_valuesToFetch; ++i) {
         vec4 value = texelFetch(originalTexture, getTexelIndex(i), 0);
         bvec4 gt = greaterThan(value, maximum);
-        bvec4 lt = lessThan(value, minimum);
         maximum = vec4(gt) * value + vec4(not(gt)) * maximum;
-        minimum = vec4(lt) * value + vec4(not(lt)) * minimum;
-
-
-        imageStore(reductionMaximumTexture, ivec2(oneDimensionalGroupIndex, 0), maximum);
-        imageStore(reductionMinimumTexture, ivec2(oneDimensionalGroupIndex, 0), minimum);
     }
+    buf_maximum[oneDimensionalGroupIndex] = maximum;
     return;
 }

@@ -25,7 +25,7 @@ void main()
     vec4  result;
 
 
-    if(not(any(boundary))) {
+    if(!any(boundary)) {
         result = texelFetch(oldPressureField, texelCoord, 0);
         result.z = updated_pressure(
             oldPressureField, 

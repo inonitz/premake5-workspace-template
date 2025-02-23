@@ -15,6 +15,7 @@ enum class WindowCreationFlag : u8 {
     BORDER                = 0b0001'0000,
     BORDERLESS            = 0b0000'0000,
     RAW_MOUSE_MOTION      = 0b0010'0000,
+    USE_VSYNC             = 0b0100'0000,
     DEFAULT               = 0b0011'1101,
     MAX                   = 0b0100'0000
 };

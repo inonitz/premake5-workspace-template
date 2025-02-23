@@ -1,10 +1,9 @@
 #include "awc2/C/awc2.h"
-#include "awc2/awc2.hpp"
+#include "awc2/entry.hpp"
+#include "awc2/input.hpp"
 #include "../internal_event.hpp"
 #include "../internal_instance.hpp"
 #include "../internal_state.hpp"
-#include "awc2/context.hpp"
-#include "util/util.hpp"
 #include <util/static_assert.h>
 #ifdef __cplusplus
 #   define AWC2_EXTERNC extern "C"

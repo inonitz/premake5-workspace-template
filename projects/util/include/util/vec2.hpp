@@ -111,7 +111,8 @@ struct UTIL_API vec##fmt \
 	const type_t* begin() const { return mem.begin(); } \
 	const type_t* end()   const { return mem.end();   } \
     constexpr u64 bytes() const { return mem.bytes(); } \
-	char* to_string() const; \
+	char*  to_string() const; \
+	size_t to_strbuf(char* buf, size_t bufsize) const;\
 }; \
 \
 \
