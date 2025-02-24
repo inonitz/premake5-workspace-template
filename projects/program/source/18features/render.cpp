@@ -3,17 +3,17 @@
 #include <util/random.hpp>
 #include <awc2/C/awc2.h>
 #include "vars.hpp"
-#include "backend17.hpp"
+#include "backend18.hpp"
 #include <imgui/imgui.h>
 
 
-using namespace optimize17;
+using namespace features18;
 
 
 static void render_imgui_interface();
 
 
-void optimize17::render()
+void features18::render()
 {
     static const vec4f defaultScreenColor = vec4f{1.0f, 1.0f, 1.0f, 1.0f}; 
     auto  currentWindowSize = awc2getCurrentContextViewport();
@@ -27,7 +27,7 @@ void optimize17::render()
         markstr("Refreshing Compute Shaders...");
         for(auto& comp : g_compute) {
             comp.refreshFromFiles();
-            comp.resizeLocalWorkGroup(0, { 1, 1, 1 });
+            comp.resizeLocalWorkGroup(0, g_localWorkGroupSize);
             status = status && comp.compile();
         }
     }
@@ -95,7 +95,8 @@ static void render_imgui_interface()
     }
     if(awc2isMouseButtonPressed(AWC2_MOUSEBUTTON_RIGHT)) {
         if(g_runCodeOnceFlag) {
-            g_splatterColor = vec4f{ random32f(), random32f(), 0.0f, 1.0f };
+            g_splatterForce = vec4f{ random32f(), random32f(), 0.0f,        1.0f };
+            g_splatterColor = vec4f{ random32f(), random32f(), random32f(), 1.0f };
             g_runCodeOnceFlag = false;
         }
     }
@@ -104,31 +105,38 @@ static void render_imgui_interface()
     vec2f cfl = g_velocityCFL / g_simUnitCoords;
     char* dragForceStr    = g_mouseDragForce.to_string();
     char* mouseDragPosStr = g_mouseDragPosition.to_string();
-    char* simDimsStr      = g_dims.to_string();
-    char* winDimsStr      = g_windims.to_string();
-    char* maxVelStr       = g_velocityCFL.to_string();
     static f32 timeMeasurements[16] = {0};
 
+    f32& __wholeFrame   = timeMeasurements[0];
+    f32& __rendering    = timeMeasurements[1];
+    f32& __computefluid = timeMeasurements[2];
+    f32& __computevel   = timeMeasurements[3];
+    f32& __computedye   = timeMeasurements[4];
+    f32& __computecfl   = timeMeasurements[5];
+    f32& __cflgpuside   = timeMeasurements[6];
+    f32& __cflcpuside   = timeMeasurements[7];
+    f32& __ref_shader   = timeMeasurements[8];
+    f32& __imgui_render = timeMeasurements[9];
+    f32& __imgui_screen = timeMeasurements[10];
 
-    timeMeasurements[0] = g_frameTime.value_units<f32>(1000);
-    timeMeasurements[1] = g_renderTime.value_units<f32>(1000);
-    timeMeasurements[2] = g_computeFluidTime.value_units<f32>(1000);
-    timeMeasurements[3] = g_computeVelTime.value_units<f32>(1000);
-    timeMeasurements[4] = g_computeCFLTime.value_units<f32>(1000);
-    timeMeasurements[5] = g_retrieveTextureData.value_units<f32>(1000);
-    timeMeasurements[6] = g_computeMaximum.value_units<f32>(1000);
-    timeMeasurements[7] = timeMeasurements[4] - timeMeasurements[5] - timeMeasurements[6];
-    timeMeasurements[8] = timeMeasurements[2] - timeMeasurements[3] - timeMeasurements[4];
-    timeMeasurements[9] = g_refreshShaderTime.value_units<f32>(1000);
-    timeMeasurements[10] = g_renderImguiTime.value_units<f32>(1000);
-    timeMeasurements[11] = g_renderScreenTime.value_units<f32>(1000);
+    __wholeFrame   = g_frameTime.value_units<f32>(1000);
+    __rendering    = g_renderTime.value_units<f32>(1000);
+    __computefluid = g_computeFluidTime.value_units<f32>(1000);
+    __computevel   = g_computeVelTime.value_units<f32>(1000); 
+    __computedye   = g_computeDyeTime.value_units<f32>(1000);
+    __computecfl   = g_computeCFLTime.value_units<f32>(1000);
+    __cflgpuside   = g_computeMaximumCPU.value_units<f32>(1000);
+    __cflcpuside   = g_computeMaximumGPU.value_units<f32>(1000);
+    __ref_shader   = g_refreshShaderTime.value_units<f32>(1000);
+    __imgui_render = g_renderImguiTime.value_units<f32>(1000);
+    __imgui_screen = g_renderScreenTime.value_units<f32>(1000);
     timeMeasurements[12] = g_measuremisc0.value_units<f32>(1000);
     timeMeasurements[13] = g_measuremisc1.value_units<f32>(1000);
 
 
-    g_maxRenderTime = (g_maxRenderTime > timeMeasurements[0]) ? g_maxRenderTime : timeMeasurements[0];
-    g_minRenderTime = (g_minRenderTime < timeMeasurements[0]) ? g_minRenderTime : timeMeasurements[0];
-    g_avgRenderTime += timeMeasurements[0];
+    g_maxFrameTime = (g_maxFrameTime > timeMeasurements[0]) ? g_maxFrameTime : timeMeasurements[0];
+    g_minFrameTime = (g_minFrameTime < timeMeasurements[0]) ? g_minFrameTime : timeMeasurements[0];
+    g_avgFrameTime += __wholeFrame;
 
 
     ImGui::Begin("ImGui Interaction Window");
@@ -147,8 +155,8 @@ static void render_imgui_interface()
             g_velocityCFL = vec2f{0.0f};
         }
         if(ImGui::Button("Reset Min-Max Frame")) {
-            g_minRenderTime = 1000.0f;
-            g_maxRenderTime = 0.0f;
+            g_minFrameTime = 1000.0f;
+            g_maxFrameTime = 0.0f;
         }
         ImGui::DragFloat2("Unit Coordinate Size", g_simUnitCoords.begin(), 0.1f, 0.1f, 100.0f);
         ImGui::DragFloat("Ambient Temperature",  &g_ambientTemperature, 0.01f, -40.0f,  40.0f, "%9.6f");
@@ -157,74 +165,53 @@ static void render_imgui_interface()
         ImGui::DragFloat("Viscosity",            &g_viscosity,          0.01f,  0.1f,   10.0f, "%9.6f");
         ImGui::DragFloat("splatterRadius",       &g_splatterRadius,     0.001f, 0.001f, 0.2f,  "%9.6f");
         ImGui::DragInt("Diffusion Solver Iterations", &g_maximumJacobiIterations, 0.5f, 10, 80);
-        ImVec4* colorcvt = __rcast(ImVec4*, g_splatterColor.begin());
-        ImGui::ColorButton("splatterColor ", *colorcvt);
+        ImVec4* cvtptr = nullptr;
+        cvtptr = __rcast(ImVec4*, g_splatterForce.begin());
+        ImGui::ColorButton("splatterForce ", *cvtptr);
+        cvtptr = __rcast(ImVec4*, g_splatterColor.begin());
+        ImGui::ColorButton("splatterColor ", *cvtptr);
+
 
         ImGui::EndTabItem();
     }
     if (ImGui::BeginTabItem("Diagnostics"))
     {
         ImGui::Text("\
-Mouse Dragging Force %s\n\
-Mouse Position       %s\n\
-Mouse was Pressed    %u\n\
-CFL Condition (< 1)  %9.6f\n\
+Window     (%d, %d)\n\
+Simulation (%d, %d)\n\
+Mouse (Pressed = %u)\n\
+    - Dragging Force %s\n\
+    - Position       %s\n\
+CFL Condition (< 1)  %9.6f (%6.4f, %6.4f) <=> Maximum Velocity\n\
 FrameCounter         %u (%6.4f ms [min, max, avg] = [ %6.4f, %6.4f, %6.4f ] )\n\
 Compute Time\n\
-    [awc2end] { \n\
-        %6.4f, \n\
-        %6.4f, \n\
-        %6.4f, \n\
-        %6.4f, \n\
-        %6.4f \n\
-    }\n\
-    %6.4f [misc0]\n\
-    %6.4f [misc1]\n\
     %6.4f [render]\n\
     - %6.4f [fluid]\n\
         - %6.4f [velocity]\n\
+        - %6.4f [dye]\n\
         - %6.4f [cfl]\n\
-            - %6.4f [retrieve]\n\
-            - %6.4f [for_loop]\n\
-            - %6.4f [remainder]\n\
-        - %6.4f [remainder]\n\
+            - %6.4f [gpu_side]\n\
+            - %6.4f [cpu_side]\n\
     - %6.4f [shader_refresh]\n\
     - %6.4f [render_imgui]\n\
     - %6.4f [compute_screen+blit]\n\
-Simulation Dims      %s\n\
-Window     Dims      %s\n\
-Maximum Velocity     %s\n\
 ",
-    dragForceStr, 
-    mouseDragPosStr,
-    g_mousePressed,
-    (cfl.x + cfl.y) * g_dt,
-    g_frameCounter,
-    timeMeasurements[0],
-    g_minRenderTime,
-    g_maxRenderTime,
-    g_avgRenderTime / __scast(f32, g_frameCounter),
-    Time::getGeneralPurposeStamp(0).value_units<f32>(1000),
-    Time::getGeneralPurposeStamp(1).value_units<f32>(1000),
-    Time::getGeneralPurposeStamp(2).value_units<f32>(1000),
-    Time::getGeneralPurposeStamp(3).value_units<f32>(1000),
-    Time::getGeneralPurposeStamp(4).value_units<f32>(1000),
-    timeMeasurements[12],
-    timeMeasurements[13],
-    timeMeasurements[1],
-    timeMeasurements[2],
-    timeMeasurements[3],
-    timeMeasurements[4],
-    timeMeasurements[5],
-    timeMeasurements[6],
-    timeMeasurements[7],
-    timeMeasurements[8],
-    timeMeasurements[9],
-    timeMeasurements[10],
-    timeMeasurements[11],
-    simDimsStr,
-    winDimsStr,
-    maxVelStr
+    g_windims.x, g_windims.y,
+    g_dims.x, g_dims.y,
+    g_mousePressed, dragForceStr, mouseDragPosStr,
+    (cfl.x + cfl.y) * g_dt, g_velocityCFL.x, g_velocityCFL.y,
+    g_frameCounter, __wholeFrame, 
+    g_minFrameTime, g_maxFrameTime, g_avgFrameTime / __scast(f32, g_frameCounter),
+    __rendering,
+    __computefluid,
+    __computevel,
+    __computedye,
+    __computecfl,
+    __cflcpuside,
+    __cflgpuside,
+    __ref_shader,
+    __imgui_render,
+    __imgui_screen
 );
         ImGui::EndTabItem();
     }    
@@ -233,9 +220,6 @@ Maximum Velocity     %s\n\
 
     free(mouseDragPosStr);
     free(dragForceStr);
-    free(simDimsStr);
-    free(winDimsStr);
-    free(maxVelStr);
 
     /* 
         g_velocityCFL is from the previous frame. 

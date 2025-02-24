@@ -3,7 +3,7 @@
 #include <util/macro.h>
 
 #ifndef _SELECT_MAIN
-#   define _SELECT_MAIN 17
+#   define _SELECT_MAIN 18
 #endif
 
 #if _SELECT_MAIN == 0
@@ -42,6 +42,8 @@
 #   include "16makessbowork/ssbo.hpp"
 #elif _SELECT_MAIN == 17
 #   include "17optimize2/optimize2.hpp"
+#elif _SELECT_MAIN == 18
+#   include "18features/features.hpp"
 #endif
 
 
@@ -86,6 +88,8 @@ int main(__unused int argc, __unused char* argv[]) {
     out = make_ssbo_work_for_cfl();
 #elif _SELECT_MAIN == 17
     out = optimize_again_and_again_and_again_and_again();
+#elif _SELECT_MAIN == 18
+    out = add_features_and_then_optimize();
 #endif
 
     markstr("Successful Exit");

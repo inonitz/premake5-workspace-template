@@ -2,7 +2,6 @@
 #include "internal_callback.hpp"
 #include "internal_instance.hpp"
 #include "internal_event.hpp"
-#include "util/time.hpp"
 #include <util/ifcrash.hpp>
 #include <util/marker2.hpp>
 #include <util/util.hpp>
@@ -171,12 +170,10 @@ void AWC2ContextData::begin()
 
 void AWC2ContextData::end()
 {
-    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(0), ImGui::Render());
-    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(1), ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()));
-    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(2), m_window.swapBuffers());
-    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(3), m_io.reset());
-
-
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    m_window.swapBuffers();
+    m_io.reset();
     return;
 }
 

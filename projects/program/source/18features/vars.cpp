@@ -2,19 +2,19 @@
 #include <awc2/C/awc2.h>
 
 
-namespace optimize17 {
+namespace features18 {
 
 
 const char* computeShaderFilename[9] = {
-    "projects/program/source/17optimize2/0externalforce.comp",
-    "projects/program/source/17optimize2/1advection.comp",
-    "projects/program/source/17optimize2/2vel_singlestepnobranch.comp",
-    "projects/program/source/17optimize2/3addition.comp",
-    "projects/program/source/17optimize2/4divergence.comp",
-    "projects/program/source/17optimize2/5pressure_singlestep.comp",
-    "projects/program/source/17optimize2/6velocity.comp",
-    "projects/program/source/17optimize2/7draw.comp",
-    "projects/program/source/17optimize2/parallelReductionSSBO.comp"
+    "projects/program/source/18features/0externalforce.comp",
+    "projects/program/source/18features/1advection.comp",
+    "projects/program/source/18features/2vel_singlestepnobranch.comp",
+    "projects/program/source/18features/3addition.comp",
+    "projects/program/source/18features/4divergence.comp",
+    "projects/program/source/18features/5pressure_singlestep.comp",
+    "projects/program/source/18features/6velocity.comp",
+    "projects/program/source/18features/7draw.comp",
+    "projects/program/source/18features/parallelReductionSSBO.comp"
 };
 
 
@@ -24,22 +24,25 @@ Time::Timestamp    g_frameTime{};
 Time::Timestamp    g_measuremisc0;
 Time::Timestamp    g_measuremisc1;
 Time::Timestamp    g_renderTime{};
-f32                g_minRenderTime{1000};
-f32                g_maxRenderTime{0};
-f32                g_avgRenderTime{0};
+f32                g_minFrameTime{1000};
+f32                g_maxFrameTime{0};
+f32                g_avgFrameTime{0};
+Time::Timestamp    g_computeDyeTime{};
 Time::Timestamp    g_computeVelTime{};
 Time::Timestamp    g_computeCFLTime{};
 Time::Timestamp    g_computeFluidTime{};
-Time::Timestamp    g_retrieveTextureData{};
-Time::Timestamp    g_computeMaximum{};
+Time::Timestamp    g_computeMaximumCPU{};
+Time::Timestamp    g_computeMaximumGPU{};
 Time::Timestamp    g_renderImguiTime;
 Time::Timestamp    g_renderScreenTime;
 Time::Timestamp    g_refreshShaderTime;
 
 
 std::vector<vec4f> g_initialField;
-vec2i              g_dims{1024, 1024};
+vec2i              g_dims{1920, 1080};
 vec2i              g_windims{g_dims};
+vec3u              g_localWorkGroupSize = { 64, 1, 1 };
+vec3u              g_computeInvocationSize = vec3u{ g_dims.x, g_dims.y, 1 } / g_localWorkGroupSize;
 vec2f              g_simUnitCoords{1.0f};
 f32                g_dt        = 0.2f;
 f32                g_viscosity = 1.0f;
@@ -60,6 +63,7 @@ ShaderProgramV2    g_compute[__carraysize(computeShaderFilename)];
 vec2f              g_mouseDragForce;
 vec2f              g_mouseDragPosition;
 f32                g_splatterRadius{0.03};
+vec4f              g_splatterForce{1.0f, 1.0f, 1.0f, 1.0f};
 vec4f              g_splatterColor{1.0f, 1.0f, 1.0f, 1.0f};
 bool               g_windowFocus{false};
 bool               g_mousePressed{false};
@@ -106,10 +110,10 @@ u32& g_reductionMaxTexture = g_persistentbuf[1];
 void* g_reductionMaxMappedBuf = nullptr;
 
 
-} /* namespace optimize17 */
+} /* namespace features18 */
 
 
-namespace optimize17 {
+namespace features18 {
 
 
 static void custom_mousebutton_callback(AWC2User_callback_mousebutton_struct const* data);
@@ -166,13 +170,9 @@ void initializeGraphics()
         g_compute[i].createFrom({
             ShaderData{ computeShaderFilename[i], __scast(u32, gl::GL_COMPUTE_SHADER) }
         });
-        g_compute[i].resizeLocalWorkGroup(0, { 64, 1, 1 });
+        g_compute[i].resizeLocalWorkGroup(0, g_localWorkGroupSize);
         alive = alive && g_compute[i].compile();
     }
-    // gr_computeDiffusionVel.resizeLocalWorkGroup(0, { 64, 1, 1 });
-    // alive = alive && gr_computeDiffusionVel.compile();
-    // gr_computeDiffusionPressure.resizeLocalWorkGroup(0, { 64, 1, 1 });
-    // alive = alive && gr_computeDiffusionPressure.compile();
     ifcrashstr(!alive, "Unsuccessful shader compile");
 
 
@@ -261,4 +261,4 @@ static void custom_winfocus_callback(AWC2User_callback_winfocus_struct const* da
 }
 
 
-} /* namespace optimize17 */
+} /* namespace features18 */

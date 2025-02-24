@@ -5,7 +5,7 @@
 #include "gl/shader2.hpp"
 
 
-namespace optimize17 {
+namespace features18 {
 
 
 using namespace util::math;
@@ -18,14 +18,15 @@ extern Time::Timestamp    g_frameTime;
 extern Time::Timestamp    g_measuremisc0;
 extern Time::Timestamp    g_measuremisc1;
 extern Time::Timestamp    g_renderTime;
-extern f32                g_minRenderTime;
-extern f32                g_maxRenderTime;
-extern f32                g_avgRenderTime;
+extern f32                g_minFrameTime;
+extern f32                g_maxFrameTime;
+extern f32                g_avgFrameTime;
+extern Time::Timestamp    g_computeDyeTime;
 extern Time::Timestamp    g_computeVelTime;
 extern Time::Timestamp    g_computeCFLTime;
 extern Time::Timestamp    g_computeFluidTime;
-extern Time::Timestamp    g_retrieveTextureData;
-extern Time::Timestamp    g_computeMaximum;
+extern Time::Timestamp    g_computeMaximumCPU;
+extern Time::Timestamp    g_computeMaximumGPU;
 extern Time::Timestamp    g_renderImguiTime;
 extern Time::Timestamp    g_renderScreenTime;
 extern Time::Timestamp    g_refreshShaderTime;
@@ -34,6 +35,8 @@ extern Time::Timestamp    g_refreshShaderTime;
 extern std::vector<vec4f> g_initialField;
 extern vec2i              g_dims;
 extern vec2i              g_windims;
+extern vec3u              g_localWorkGroupSize;
+extern vec3u              g_computeInvocationSize;
 extern vec2f              g_simUnitCoords;
 extern f32                g_dt;
 extern f32                g_viscosity;
@@ -54,6 +57,7 @@ extern ShaderProgramV2    g_compute[__carraysize(computeShaderFilename)];
 extern vec2f              g_mouseDragForce;
 extern vec2f              g_mouseDragPosition;
 extern f32                g_splatterRadius;
+extern vec4f              g_splatterForce;
 extern vec4f              g_splatterColor;
 extern bool               g_windowFocus;
 extern bool               g_mousePressed;
@@ -112,4 +116,4 @@ void initializeGraphics();
 void destroyGraphics();
 
 
-}; /* namespace optimize17 */
+}; /* namespace features18 */

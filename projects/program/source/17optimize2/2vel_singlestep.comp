@@ -47,10 +47,10 @@ void main()
 
 bvec4 isBoundary(ivec2 coords) {
     return bvec4(
-        coords.x == 0, 
-        coords.y == 0,
-        coords.x == (ku_simdims.x - 1),
-        coords.y == (ku_simdims.y - 1)
+        coords.x <= 0, 
+        coords.y <= 0,
+        coords.x >= (ku_simdims.x - 1),
+        coords.y >= (ku_simdims.y - 1)
     );
 }
 
