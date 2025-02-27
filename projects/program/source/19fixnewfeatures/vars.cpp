@@ -128,10 +128,10 @@ u32& g_reductionMaxTexture = g_persistentbuf[1];
 void* g_reductionMaxMappedBuf = nullptr;
 
 
-} /* namespace features18 */
+} /* namespace fixfeatures19 */
 
 
-namespace features18 {
+namespace fixfeatures19 {
 
 
 static void custom_mousebutton_callback(AWC2User_callback_mousebutton_struct const* data);
