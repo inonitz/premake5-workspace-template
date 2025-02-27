@@ -40,7 +40,6 @@ u32 optimize17::compute_fluid()
 
     TIME_NAMESPACE_TIME_CODE_BLOCK(g_computeVelTime, compute_velocity(previousIterationVel, nextIterationVel));
     TIME_NAMESPACE_TIME_CODE_BLOCK(g_computeCFLTime, compute_cfl(nextIterationVel));
-    TIME_NAMESPACE_TIME_CODE_BLOCK(Time::getGeneralPurposeStamp(4), (void()));
 
     return nextIterationVel;
 }

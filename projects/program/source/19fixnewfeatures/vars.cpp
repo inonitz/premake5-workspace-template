@@ -2,7 +2,7 @@
 #include <awc2/C/awc2.h>
 
 
-namespace features18 {
+namespace fixfeatures19 {
 
 
 // const char* computeShaderFilename[8] = {
@@ -279,4 +279,4 @@ static void custom_winfocus_callback(AWC2User_callback_winfocus_struct const* da
 }
 
 
-} /* namespace features18 */
+} /* namespace fixfeatures19 */

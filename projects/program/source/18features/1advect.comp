@@ -16,9 +16,10 @@ vec4 advection_step(
 
 uniform uint  ku_writeAllComponents;
 uniform float ku_dt;
-uniform ivec2 ku_simdims;
 uniform vec2  ku_simUnitCoord;
-vec2 k_winUnitCoord = vec2(1) / vec2(ku_simdims); 
+uniform ivec2 ku_simdims;
+vec2 k_unitCoord = vec2(1) / vec2(ku_simdims);
+vec2 k_simrdxdy  = 1.0f / ku_simUnitCoord;
 
 
 void main()
@@ -26,32 +27,27 @@ void main()
     ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
     vec4  result = advection_step(
         texelCoord,
-        k_winUnitCoord * vec2(texelCoord),
+        k_unitCoord * vec2(texelCoord),
         velocityField,
         quantityField
     );
 
     if(!bool(ku_writeAllComponents)) { /* we only conserve velocity */
-        result = vec4(result.xy, 0.0f, 0.0f);
+        float oldPressure = texelFetch(quantityField, texelCoord, 0).z;
+        result = vec4(result.xy, oldPressure, 0.0f);
     }
     imageStore(outputField, texelCoord, result);
     return;
 }
 
 
-
-/* 
-    whatever quantity is advected must be conserved fully.
-    right now I only return .xy of the advected result,
-    which is incorrect
-*/
 vec4 advection_step(
     in ivec2     coord,
     in vec2      normcoord, 
     in sampler2D ufield, 
     in sampler2D quantity_read
 ) {
-    vec2 newcoord = normcoord - ku_dt * ku_simUnitCoord * texelFetch(ufield, coord, 0).xy;
+    vec2 newcoord = normcoord - ku_dt * k_simrdxdy * texelFetch(ufield, coord, 0).xy;
     return textureBiLerp(quantity_read, newcoord);
 }
 

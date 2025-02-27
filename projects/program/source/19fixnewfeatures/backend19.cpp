@@ -1,10 +1,10 @@
-#include "backend18.hpp"
+#include "backend19.hpp"
 #include <awc2/C/awc2.h>
 #include "glbinding/gl/functions.h"
 #include "vars.hpp"
 
 
-using namespace features18;
+using namespace fixfeatures19;
 
 
 static void compute_velocity(
@@ -20,7 +20,7 @@ static void compute_cfl(u32 texture);
 
 
 
-u32 features18::compute_fluid()
+u32 fixfeatures19::compute_fluid()
 {
     u32 previousIterationVel, nextIterationVel;
     u32 previousIterationDye, nextIterationDye;

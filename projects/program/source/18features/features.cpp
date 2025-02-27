@@ -1,6 +1,7 @@
 #include "features.hpp"
 #include <threads.h>
 #include <awc2/C/awc2.h>
+#include "util/time.hpp"
 #include "vars.hpp"
 #include "render.hpp"
 
@@ -11,12 +12,7 @@ i32 add_features_and_then_optimize()
         .tv_sec = 0,
         .tv_nsec = 6944444
     };
-    const struct timespec slow_render_sleep_duration{
-        .tv_sec = 0,
-        .tv_nsec = 100 * 1'000'000
-    };
-    u8 alive {true};
-    u8 paused{false}, prevPause{false};
+    u8 alive{true}, paused{false};
 
 
     markstr("add_features_and_then_optimize begin");
@@ -32,13 +28,12 @@ i32 add_features_and_then_optimize()
             awc2newframe();
             awc2begin();
         });
-        if(paused) {
-            thrd_sleep(&pause_sleep_duration, NULL);
-        } else {
-            if(features18::getSlowRenderFlag()) {
-                thrd_sleep(&slow_render_sleep_duration, NULL);
-            }
+
+        
+        if(likely(!paused)) {
             TIME_NAMESPACE_TIME_CODE_BLOCK(features18::getRenderTime(), features18::render());
+        } else {
+            thrd_sleep(&pause_sleep_duration, NULL);
         }
 
 
@@ -49,6 +44,7 @@ i32 add_features_and_then_optimize()
         
         TIME_NAMESPACE_TIME_CODE_BLOCK(features18::getTimer1(), awc2end());
         features18::getFrameTime().end();
+        ++features18::getFrameCounter();
     }
     markstr("Main App Loop End");
 

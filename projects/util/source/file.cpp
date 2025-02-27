@@ -7,7 +7,7 @@
 #ifdef _WIN32
     #include <direct.h>
     #define getcwd _getcwd // stupid MSFT "deprecation" warning
-#elif
+#elif defined __linux__
     #include <unistd.h>
 #endif
 #include <errno.h>

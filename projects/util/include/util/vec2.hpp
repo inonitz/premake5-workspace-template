@@ -1,6 +1,5 @@
 #ifndef __UTIL_VECTOR_MATH_LIBRARY2__
 #define __UTIL_VECTOR_MATH_LIBRARY2__
-#include "util_api.h"
 #include "util.hpp"
 #include "ifcrash.hpp"
 #include <xmmintrin.h>

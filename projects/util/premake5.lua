@@ -1,7 +1,6 @@
 project "util"
     systemversion "latest"
     warnings      "extra"
-    rtti          "On"
     SpecifyGlobalProjectCXXVersion()
     -- Project Structure
     files { 

@@ -1,6 +1,7 @@
 #ifndef __UTIL_TIME_HEADER__
 #define __UTIL_TIME_HEADER__
-#include "util/types.hpp"
+#include <util/util_api.h>
+#include <util/base_type.h>
 #include <chrono>
 
 
@@ -88,7 +89,7 @@ public:
         return get_underlying_value_choose<diff_type_t, true>();
     }
 
-    auto value() const {
+    auto previous_value() const {
         return get_underlying_value_choose<diff_type_t, false>();
     }
 
@@ -180,12 +181,13 @@ template class SMATick<32>;
 
 
 #define TIME_NAMESPACE_STATIC_TIMESTAMP_MAXIMUM 16
+#define TIME_NAMESPACE_STATIC_TIMESTAMP_MAXIMUM_INDEX (TIME_NAMESPACE_STATIC_TIMESTAMP_MAXIMUM - 1)
 
 
-Timestamp& getGeneralPurposeStamp(u8 index);
+UTIL_API Timestamp& getGeneralPurposeStamp(u8 index);
 
 
-} // namespace Time
+} /* namespace Time */
 
 
 #endif

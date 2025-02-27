@@ -5,14 +5,7 @@
 #include <threads.h>
 #include <util/vec2.hpp>
 #include <util/random.hpp>
-#include <util/time.hpp>
-#include "awc2/C/context.h"
 #include "gl/shader2.hpp"
-#include "glbinding/gl/bitfield.h"
-#include "glbinding/gl/enum.h"
-#include "glbinding/gl/functions-patches.h"
-#include "glbinding/gl/functions.h"
-#include "util/util.hpp"
 
 
 

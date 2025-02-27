@@ -93,13 +93,12 @@ void AWC2ContextData::initialize()
     glbinding::aux::enableGetErrorCallback();
 
     /* Can only happen after an opengl context is created */
-    bool test = boolean(__scast(i32, 
+    bool useVsync = boolean(__scast(i32, 
         m_window.m_data.description.createFlags 
         & 
         WindowCreationFlag::USE_VSYNC
     ));
-    printf("test is %u", test);
-    m_window.setVerticalSync(test);
+    m_window.setVerticalSync(useVsync);
     
     /* ImGui */
     ImGui::SetCurrentContext(__rcast(ImGuiContext*, m_imgui));

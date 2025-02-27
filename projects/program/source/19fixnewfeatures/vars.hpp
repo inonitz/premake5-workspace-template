@@ -5,7 +5,7 @@
 #include "gl/shader2.hpp"
 
 
-namespace features18 {
+namespace fixfeatures19 {
 
 
 using namespace util::math;
@@ -128,4 +128,4 @@ void initializeGraphics();
 void destroyGraphics();
 
 
-}; /* namespace features18 */
+}; /* namespace fixfeatures19 */
