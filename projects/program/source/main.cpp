@@ -1,12 +1,15 @@
-#include <util/marker2.hpp>
-#include <util/types.hpp>
 #include <util/macro.h>
+#include <util/base_type.h>
+#include <util/marker2.hpp>
+
 
 #ifndef _SELECT_MAIN
-#   define _SELECT_MAIN 18
+#   define _SELECT_MAIN 19
 #endif
 
-#if _SELECT_MAIN == 0
+#if _SELECT_MAIN == -1
+#   include "imgui_demo/render_demo.hpp"
+#elif _SELECT_MAIN == 0
 #   include "0gem38/gem38.hpp"
 #elif _SELECT_MAIN == 1
 #   include "1simple_window/simple_window.hpp"
@@ -44,6 +47,12 @@
 #   include "17optimize2/optimize2.hpp"
 #elif _SELECT_MAIN == 18
 #   include "18features/features.hpp"
+#elif _SELECT_MAIN == 19
+#   include "19cleanup/cleanup.hpp"
+#elif _SELECT_MAIN == 20
+#   include "20smoke/smoke.hpp"
+#elif _SELECT_MAIN == 21
+#   include "21boundaries/arbitrary.hpp"
 #endif
 
 
@@ -51,8 +60,9 @@ int main(__unused int argc, __unused char* argv[]) {
     i32 out = 0x69;
     markstr("Successful main enter");
 
-
-#if _SELECT_MAIN == 0
+#if _SELECT_MAIN == -1
+    out = render_imgui_demo_window();
+#elif _SELECT_MAIN == 0
     out = gpugems38_main();
 #elif _SELECT_MAIN == 1
     out = simple_window();
@@ -90,6 +100,12 @@ int main(__unused int argc, __unused char* argv[]) {
     out = optimize_again_and_again_and_again_and_again();
 #elif _SELECT_MAIN == 18
     out = add_features_and_then_optimize();
+#elif _SELECT_MAIN == 19
+    out = cleanup_old();
+#elif _SELECT_MAIN == 20
+    out = smoke_sim();
+#elif _SELECT_MAIN == 21
+    out = arbitrary_boundaries_in_sim();
 #endif
 
     markstr("Successful Exit");

@@ -1,4 +1,5 @@
 #include "shader2.hpp"
+#include "glbinding/gl/functions.h"
 #include "util/file.hpp"
 #include "util/marker2.hpp"
 #include <glbinding/gl/gl.h>
@@ -235,37 +236,36 @@ void Program::StorageBlock(std::string_view const& name, u32 blockIndex)
 		gl::glUniform##TypeSpecifier( gl::glGetUniformLocation(m_id, name.data()), __VA_ARGS__); \
 	} \
 
-
 CREATE_UNIFORM_FUNCTION_IMPL(1f,  f32 v, v);
 CREATE_UNIFORM_FUNCTION_IMPL(1i,  i32 v, v);
 CREATE_UNIFORM_FUNCTION_IMPL(1ui, u32 v, v);
 
-CREATE_UNIFORM_FUNCTION_IMPL(2f,  array2f const& v, v[0], v[1]			 );
-CREATE_UNIFORM_FUNCTION_IMPL(2i,  array2i const& v, v[0], v[1]			 );
-CREATE_UNIFORM_FUNCTION_IMPL(2ui, array2u const& v, v[0], v[1]			 );
+CREATE_UNIFORM_FUNCTION_IMPL(2f,  array2f const& v, v[0], v[1]);
+CREATE_UNIFORM_FUNCTION_IMPL(2i,  array2i const& v, v[0], v[1]);
+CREATE_UNIFORM_FUNCTION_IMPL(2ui, array2u const& v, v[0], v[1]);
 
-CREATE_UNIFORM_FUNCTION_IMPL(3f,  array3f const& v, v[0], v[1], v[2]		 );
-CREATE_UNIFORM_FUNCTION_IMPL(3i,  array3i const& v, v[0], v[1], v[2]		 );
-CREATE_UNIFORM_FUNCTION_IMPL(3ui, array3u const& v, v[0], v[1], v[2]		 );
+CREATE_UNIFORM_FUNCTION_IMPL(3f,  array3f const& v, v[0], v[1], v[2]);
+CREATE_UNIFORM_FUNCTION_IMPL(3ui, array3u const& v, v[0], v[1], v[2]);
+CREATE_UNIFORM_FUNCTION_IMPL(3i,  array3i const& v, v[0], v[1], v[2]);
 
 CREATE_UNIFORM_FUNCTION_IMPL(4f,  array4f const& v, v[0], v[1], v[2], v[3]);
 CREATE_UNIFORM_FUNCTION_IMPL(4i,  array4i const& v, v[0], v[1], v[2], v[3]);
 CREATE_UNIFORM_FUNCTION_IMPL(4ui, array4u const& v, v[0], v[1], v[2], v[3]);
 
-CREATE_UNIFORM_FUNCTION_IMPL(1fv, f32* v, 1, v);
-CREATE_UNIFORM_FUNCTION_IMPL(2fv, f32* v, 1, v);
-CREATE_UNIFORM_FUNCTION_IMPL(3fv, f32* v, 1, v);
-CREATE_UNIFORM_FUNCTION_IMPL(4fv, f32* v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(1fv, f32 const * v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(2fv, f32 const * v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(3fv, f32 const * v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(4fv, f32 const * v, 1, v);
 
-CREATE_UNIFORM_FUNCTION_IMPL(1iv, i32* v, 1, v);
-CREATE_UNIFORM_FUNCTION_IMPL(2iv, i32* v, 1, v);
-CREATE_UNIFORM_FUNCTION_IMPL(3iv, i32* v, 1, v);
-CREATE_UNIFORM_FUNCTION_IMPL(4iv, i32* v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(1iv, i32 const* v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(2iv, i32 const* v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(3iv, i32 const* v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(4iv, i32 const* v, 1, v);
 
-CREATE_UNIFORM_FUNCTION_IMPL(1uiv, u32* v, 1, v);
-CREATE_UNIFORM_FUNCTION_IMPL(2uiv, u32* v, 1, v);
-CREATE_UNIFORM_FUNCTION_IMPL(3uiv, u32* v, 1, v);
-CREATE_UNIFORM_FUNCTION_IMPL(4uiv, u32* v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(1uiv, u32 const* v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(2uiv, u32 const* v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(3uiv, u32 const* v, 1, v);
+CREATE_UNIFORM_FUNCTION_IMPL(4uiv, u32 const* v, 1, v);
 
 CREATE_UNIFORM_FUNCTION_IMPL(Matrix2fv,   std::vector<f32> const& v, 1, false, v.data());
 CREATE_UNIFORM_FUNCTION_IMPL(Matrix3fv,   std::vector<f32> const& v, 1, false, v.data());
@@ -277,14 +277,14 @@ CREATE_UNIFORM_FUNCTION_IMPL(Matrix4x2fv, std::vector<f32> const& v, 1, false, v
 CREATE_UNIFORM_FUNCTION_IMPL(Matrix3x4fv, std::vector<f32> const& v, 1, false, v.data());
 CREATE_UNIFORM_FUNCTION_IMPL(Matrix4x3fv, std::vector<f32> const& v, 1, false, v.data());
 
-CREATE_UNIFORM_FUNCTION_IMPL(Matrix2fv,   f32* v, 1, false, v);
-CREATE_UNIFORM_FUNCTION_IMPL(Matrix3fv,   f32* v, 1, false, v);
-CREATE_UNIFORM_FUNCTION_IMPL(Matrix4fv,   f32* v, 1, false, v);
-CREATE_UNIFORM_FUNCTION_IMPL(Matrix2x3fv, f32* v, 1, false, v);
-CREATE_UNIFORM_FUNCTION_IMPL(Matrix3x2fv, f32* v, 1, false, v);
-CREATE_UNIFORM_FUNCTION_IMPL(Matrix2x4fv, f32* v, 1, false, v);
-CREATE_UNIFORM_FUNCTION_IMPL(Matrix4x2fv, f32* v, 1, false, v);
-CREATE_UNIFORM_FUNCTION_IMPL(Matrix3x4fv, f32* v, 1, false, v);
-CREATE_UNIFORM_FUNCTION_IMPL(Matrix4x3fv, f32* v, 1, false, v);
+CREATE_UNIFORM_FUNCTION_IMPL(Matrix2fv,   f32 const* v, 1, false, v);
+CREATE_UNIFORM_FUNCTION_IMPL(Matrix3fv,   f32 const* v, 1, false, v);
+CREATE_UNIFORM_FUNCTION_IMPL(Matrix4fv,   f32 const* v, 1, false, v);
+CREATE_UNIFORM_FUNCTION_IMPL(Matrix2x3fv, f32 const* v, 1, false, v);
+CREATE_UNIFORM_FUNCTION_IMPL(Matrix3x2fv, f32 const* v, 1, false, v);
+CREATE_UNIFORM_FUNCTION_IMPL(Matrix2x4fv, f32 const* v, 1, false, v);
+CREATE_UNIFORM_FUNCTION_IMPL(Matrix4x2fv, f32 const* v, 1, false, v);
+CREATE_UNIFORM_FUNCTION_IMPL(Matrix3x4fv, f32 const* v, 1, false, v);
+CREATE_UNIFORM_FUNCTION_IMPL(Matrix4x3fv, f32 const* v, 1, false, v);
 CREATE_UNIFORM_FUNCTION_IMPL(Matrix4fv, math::mat4f const& v, 1, false, v.begin());
 #undef CREATE_UNIFORM_FUNCTION_IMPL

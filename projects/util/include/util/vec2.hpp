@@ -143,6 +143,12 @@ DEFINE_VECTOR_STRUCTURE( \
 		y = b; 
 		return; 
 	}
+	explicit vec2f(f64 a, f64 b)
+	{
+		x = __scast(f32, a);
+		y = __scast(f32, b);
+		return;
+	}
 	explicit vec2f(i32 a, i32 b)
 	{
 		x = __scast(f32, a);

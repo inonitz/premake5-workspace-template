@@ -1,8 +1,10 @@
 #include "vars.hpp"
+#include "glbinding/gl/enum.h"
+#include "glbinding/gl/functions.h"
 #include <awc2/C/awc2.h>
 
 
-namespace fixfeatures19 {
+namespace boundary22 {
 
 
 // const char* computeShaderFilename[8] = {
@@ -16,58 +18,82 @@ namespace fixfeatures19 {
 //     "shaders/minmax.comp"
 // };
 const char* computeShaderFilename[8] = {
-    "projects/program/source/18features/0force.comp",
-    "projects/program/source/18features/1advect.comp",
-    "projects/program/source/18features/2diffuse.comp",
-    "projects/program/source/18features/3div.comp",
-    "projects/program/source/18features/4pressure.comp",
-    "projects/program/source/18features/5final.comp",
-    "projects/program/source/18features/6draw.comp",
-    "projects/program/source/18features/minmax.comp"
+    "projects/program/source/21boundaries/shaders/0force.comp",
+    "projects/program/source/21boundaries/shaders/1advect.comp",
+    "projects/program/source/21boundaries/shaders/2diffuse.comp",
+    "projects/program/source/21boundaries/shaders/3div.comp",
+    "projects/program/source/21boundaries/shaders/4pressure.comp",
+    "projects/program/source/21boundaries/shaders/5final.comp",
+    "projects/program/source/21boundaries/shaders/6draw.comp",
+    "projects/program/source/21boundaries/shaders/minmax.comp"
 };
 
 
-u8                 g_runCodeOnceFlag{true};
-u8                 g_measureTimeOnce{true};
+/* 
+    Time Measurements / Constants
+*/
 u8                 g_contextid;
-Time::Timestamp    g_frameTime{};
-Time::Timestamp    g_measuremisc[3];
-Time::Timestamp    g_renderTime{};
-i64                g_minFrameTimeNs{1'000'000'000'000};
+u32                g_frameCounter{0};
+i64                g_minFrameTimeNs{1'000'000'000ll};
 i64                g_maxFrameTimeNs{0};
 i64                g_avgFrameTimeNs{0};
-i64                g_slowRenderWaitDurationNs{ 100 * 1'000'000 };
-i64                g_waitTime = g_slowRenderWaitDurationNs;
-Time::Timestamp    g_computeDyeTime{};
-Time::Timestamp    g_computeVelTime{};
-Time::Timestamp    g_computeCFLTime{};
+const i64          g_slowRenderDurationNs{50 * 1'000'000'000ll};
+i64                g_waitTime{};
+Time::Timestamp    g_frameTime{};
+Time::Timestamp    g_renderTime{};
+Time::Timestamp    g_beginFrameTime{};
+Time::Timestamp    g_endFrameTime{};
 Time::Timestamp    g_computeFluidTime{};
+Time::Timestamp    g_computeVelTime{};
+Time::Timestamp    g_computeDyeTime{};
+Time::Timestamp    g_computeCFLTime{};
 Time::Timestamp    g_computeMaximumCPU{};
 Time::Timestamp    g_computeMaximumGPU{};
-Time::Timestamp    g_renderImguiTime;
-Time::Timestamp    g_renderScreenTime;
-Time::Timestamp    g_refreshShaderTime;
+Time::Timestamp    g_renderImguiTime{};
+Time::Timestamp    g_renderScreenTime{};
 
 
-std::vector<vec4f> g_initialField;
+/* Simulation Constants */
+f32   g_kinematicViscosity = 1.0f;
+f32   g_confineVorticity   = 0.0f;
+f32   g_buoyancyStrength   = 1.0f;
+f32   g_ambientTemperature = 20.0f;
+f32   g_dt                 = 0.08f;
+f32   g_normdt             = g_dt;
+f32   g_cfl                = 0.0f;
+vec2f g_simUnitCoords{1.0f};
+
+
+
+/* User Interaction/Info */
+bool  g_mousePress;
+bool  g_mousePressLeft;
+bool  g_mousePressRight;
+bool  g_mousePressMiddle;
+bool  g_windowFocusFlag;
+bool  g_skipRendering;
+bool  g_useVorticityConfinement{false};
+bool  g_imGuiButton[10]{false};
+u8    g_runCodeOnce[3];
+u8    g_chooseTextureToRender{0};
+u8    g_chooseUserDrawFillType{0};
+f32   g_textureHighlightSmallValue{1.0f};
+f32   g_splatterRadius{0.009};
+vec2f g_mousedxdy{0, 0};
+vec2f g_mousePosition{0, 0};
+vec2f g_maxVelocity{0.0f, 0.0f};
+vec4f g_splatterForce{1.0f, 1.0f, 1.0f, 1.0f};
+vec4f g_splatterColor{1.0f, 1.0f, 1.0f, 1.0f};
+
+
 vec2i              g_dims{1920, 1080};
-// vec2i              g_dims{64, 64};
-vec2i              g_windims{g_dims};
+vec2i              g_windowSize{g_dims};
 vec3u              g_localWorkGroupSize = { 64, 1, 1 };
 vec3u              g_computeInvocationSize = vec3u{ g_dims.x, g_dims.y, 1 } / g_localWorkGroupSize;
-vec2f              g_simUnitCoords{1.0f};
-f32                g_dt         = 0.2f;
-f32                g_normdt     = g_dt;
-f32                g_viscosity  = 1.0f;
-f32                g_dampFactor = 1.0f;
-f32                g_vorticityConfinement = 0.0f;
-f32                g_buoyancy  = 1.0f;
-f32                g_ambientTemperature = 20.0f;
 i32                g_maximumJacobiIterations = 80;
 i32                g_reductionFactor = 4096;
 i32                g_reductionBufferLength = g_dims.x * g_dims.y / g_reductionFactor;
 std::vector<vec4f> g_reductionBuffer;
-vec2f              g_maxVelocity{0.0f, 0.0f};
 
 gl::GLsync         g_fence; 
 u32                g_texture[19];
@@ -75,21 +101,7 @@ u32                g_persistentbuf[2];
 void*              g_mappedBuffer[2];
 u32                g_fbo;
 ShaderProgramV2    g_compute[__carraysize(computeShaderFilename)];
-vec2f              g_mouseDragForce;
-vec2f              g_mouseDragPosition;
-f32                g_splatterRadius{0.03};
-vec4f              g_splatterForce{1.0f, 1.0f, 1.0f, 1.0f};
-vec4f              g_splatterColor{1.0f, 1.0f, 1.0f, 1.0f};
-bool               g_windowFocus{false};
-bool               g_mousePressed{false};
-bool               g_mouseDrawEvent{false};
-bool               g_slowRender{false};
-bool               g_skipRender{false};
-bool               g_buttonPressed[3]{false};
-bool               g_useVorticityConfinement{false};
-u32                g_whatToRender{0};
-u32                g_slowRenderCounter{0};
-u32                g_frameCounter{0};
+
 
 
 ShaderProgramV2& gr_computeInteractive       = g_compute[0];
@@ -102,13 +114,11 @@ ShaderProgramV2& gr_computeRenderToTex       = g_compute[6];
 ShaderProgramV2& gr_computeCFLCondition      = g_compute[7];
 
 
-u32&             gr_drawTexture = g_texture[0];
-u32&             gr_dyeTexture0 = g_texture[1];
-u32&             gr_dyeTexture1 = g_texture[2];
-u32&             gr_tmpTexture0 = g_texture[3];
-u32&             gr_tmpTexture1 = g_texture[4];
-
-
+u32& gr_drawTexture   = g_texture[0];
+u32& gr_dyeTexture0   = g_texture[1];
+u32& gr_dyeTexture1   = g_texture[2];
+u32& gr_tmpTexture0   = g_texture[3];
+u32& gr_tmpTexture1   = g_texture[4];
 u32& gr_outTexShader0 = g_texture[5];
 u32& gr_outTexShader1 = g_texture[6];
 u32& gr_outTexShader2 = g_texture[7]; /* will use tmpTexture for ping-pong */
@@ -119,23 +129,21 @@ u32& gr_outTexShader6 = g_texture[11];
 u32& gr_outTexShader7 = g_texture[12];
 u32& gr_outTexShader8 = g_texture[13];
 u32& gr_outTexShader9 = g_texture[14];
-
-
-u32& gr_simTexture0 = g_texture[15]; /* Components are [u.x, u.y, p, reserved] */
-u32& gr_simTexture1 = g_texture[16];
+u32& gr_simTexture0   = g_texture[15]; /* Components are [u.x, u.y, p, reserved] */
+u32& gr_simTexture1   = g_texture[16];
+u32& gr_bndryTexture0 = g_texture[17];
+u32& gr_bndryTexture1 = g_texture[18];
 u32& g_reductionMinTexture = g_persistentbuf[0];
 u32& g_reductionMaxTexture = g_persistentbuf[1];
 void* g_reductionMaxMappedBuf = nullptr;
 
 
-} /* namespace features18 */
-
-
-namespace features18 {
 
 
 static void custom_mousebutton_callback(AWC2User_callback_mousebutton_struct const* data);
 static void custom_winfocus_callback(AWC2User_callback_winfocus_struct const* data);
+static void custom_winsize_callback(AWC2User_callback_winsize_struct const*);
+static void custom_cursor_callback(AWC2User_callback_mousecursor_struct const* data);
 
 
 void initializeLibrary()
@@ -154,8 +162,10 @@ void initializeLibrary()
         desc
     };
     awc2initializeContext(&ctxtinfo);
-    awc2setContextUserCallbackMouseButton(g_contextid, &custom_mousebutton_callback);
-    awc2setContextUserCallbackWindowFocus(g_contextid, &custom_winfocus_callback);
+    awc2setContextUserCallbackMouseButton  (g_contextid, &custom_mousebutton_callback);
+    awc2setContextUserCallbackWindowFocus  (g_contextid, &custom_winfocus_callback);
+    awc2setContextUserCallbackWindowSize   (g_contextid, &custom_winsize_callback);
+    awc2setContextUserCallbackMousePosition(g_contextid, &custom_cursor_callback);
     markstr("AWC2 init end");
     return;
 }
@@ -245,7 +255,6 @@ void destroyGraphics()
     for(auto& comp : g_compute) {
         comp.destroy();
     }
-    g_initialField.resize(0); 
     g_reductionBuffer.resize(0);
     
 
@@ -266,17 +275,39 @@ static void custom_mousebutton_callback(AWC2User_callback_mousebutton_struct con
         awc2setCursorMode(AWC2_CURSORMODE_SCREEN_BOUND);
     else
         awc2setCursorMode(AWC2_CURSORMODE_NORMAL);
-
-
+    
+    g_mousePressLeft   = awc2isMouseButtonPressed(AWC2_MOUSEBUTTON_LEFT);
+    g_mousePressRight  = awc2isMouseButtonPressed(AWC2_MOUSEBUTTON_RIGHT);
+    g_mousePressMiddle = awc2isMouseButtonPressed(AWC2_MOUSEBUTTON_MIDDLE);
+    g_mousePress       = g_mousePressLeft || g_mousePressRight || g_mousePressMiddle;
     return;
 }
 
 
 static void custom_winfocus_callback(AWC2User_callback_winfocus_struct const* data) 
 {
-    g_windowFocus = data->focused;
+    g_windowFocusFlag = data->focused;
     return;
 }
 
 
-} /* namespace fixfeatures19 */
+static void custom_winsize_callback(AWC2User_callback_winsize_struct const* data)
+{
+    g_windowSize = vec2i{ 
+        __scast(u32, data->width), 
+        __scast(u32, data->height) 
+    };
+    return;
+}
+
+
+static void custom_cursor_callback(AWC2User_callback_mousecursor_struct const* data)
+{
+    auto mousedelta = awc2getMousePositionDelta();
+    g_mousePosition = vec2f{ data->pos.x  , data->pos.y };
+    g_mousedxdy     = vec2f{ mousedelta.x, mousedelta.y };
+    return;
+}
+
+
+} /* namespace cleanup19 */

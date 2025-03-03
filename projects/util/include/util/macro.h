@@ -34,7 +34,7 @@
 #      define DISABLE_WARNING_GNU_ZERO_VARIADIC_MACRO_ARGS  DISABLE_WARNING(-Wgnu-zero-variadic-macro-arguments)
 #   endif /* !defined DISABLE_WARNING_GNU_ZERO_VARIADIC_MACRO_ARGS */
 #   ifndef DISABLE_WARNING_PEDANTIC
-#      define DISABLE_WARNING_PEDANTIC 					 DISABLE_WARNING(-Wpedantic)
+#      define DISABLE_WARNING_PEDANTIC                      DISABLE_WARNING(-Wpedantic)
 #   endif /* !defined DISABLE_WARNING_PEDANTIC */
 #   ifndef DISABLE_WARNING_UNREFERENCED_FORMAL_PARAMETER
 #      define DISABLE_WARNING_UNREFERENCED_FORMAL_PARAMETER DISABLE_WARNING_UNUSED_PARAMETER
@@ -456,6 +456,24 @@ UTIL_STATIC_ASSERT( GET_ARG_COUNT(
 #   define __scast(type, val)
 #   define __rcast(type, val)
 #endif
+
+
+#define __rconce(__finished, ...) \
+        if(!boolean(__finished)) { \
+                { \
+                        __VA_ARGS__; \
+                        ++__finished; \
+                } \
+        } \
+
+
+#define __rcblock(times, __finished, code_block) \
+        if(boolean((uint16_t)times - __finished)) { \
+                { \
+                        code_block; \
+                        ++__finished; \
+                } \
+        } \
 
 
 #define boolean(arg) !!(arg)

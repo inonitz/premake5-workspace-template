@@ -37,9 +37,7 @@ project "program"
     filter {}
 
     -- Macros
-    defines {
-        "_AMD64_"
-    }
+    defines {}
 
 
     -- Custom Pre &// Post build Actions
