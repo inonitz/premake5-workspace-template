@@ -1,11 +1,9 @@
 #version 450 core
 layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
-layout (binding = 0)                    uniform sampler2D boundaryField;
-layout (binding = 1)                    uniform sampler2D oldPressureField;
-layout (binding = 2, rgba32f) writeonly uniform image2D   newPressureField;
+layout (binding = 0)                    uniform sampler2D oldPressureField;
+layout (binding = 1, rgba32f) writeonly uniform image2D   newPressureField;
 
 
-float innerBoundary(ivec2 coords);
 bvec4 isBoundary(ivec2 coords);
 float updated_pressure(
     in sampler2D tex,
@@ -36,7 +34,6 @@ void main()
         result.w
     );
     result.z = mix(tmp1, tmp0, float(any(boundary)));
-    result.z *= innerBoundary(texelCoord);
     imageStore(newPressureField, texelCoord, result);
     return;
 }
@@ -49,11 +46,6 @@ bvec4 isBoundary(ivec2 coords) {
         coords.x >= (ku_simdims.x - 1),
         coords.y >= (ku_simdims.y - 1)
     );
-}
-
-
-float innerBoundary(ivec2 coords) {
-    return 1.0f - texelFetch(boundaryField, coords, 0).x;
 }
 
 

@@ -223,7 +223,7 @@ static void compute_dye(
     gr_computeInteractive.uniform1ui("ku_addForce",       false);
     gr_computeInteractive.uniform1ui("ku_useVorticity",   false);
     gl::glBindTextureUnit(0, previousIterationDye);
-    gl::glBindImageTexture(1, gr_outTexShader0, 0, false, 0, 
+    gl::glBindImageTexture(1, gr_outTexShader6, 0, false, 0, 
         gl::GL_WRITE_ONLY,
         gl::GL_RGBA32F
     );
@@ -239,7 +239,7 @@ static void compute_dye(
     gr_computeAdvection.uniform1f("ku_dt",                  g_normdt);
     gr_computeAdvection.uniform2fv("ku_simUnitCoord",       g_simUnitCoords.begin());
     gr_computeAdvection.uniform2iv("ku_simdims",            g_dims.begin());
-    gl::glBindTextureUnit(0, gr_outTexShader0);
+    gl::glBindTextureUnit(0, gr_outTexShader6);
     gl::glBindTextureUnit(1, velocityPressureField);
     gl::glBindImageTexture(2, nextIterationDye, 0, false, 0, 
         gl::GL_WRITE_ONLY, 

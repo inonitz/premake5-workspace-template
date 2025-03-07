@@ -3,18 +3,18 @@
 #include <awc2/C/awc2.h>
 #include "util/time.hpp"
 #include "vars.hpp"
-#include "backend22.hpp"
+#include "backend23.hpp"
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
 
-using namespace boundary22;
+using namespace multigrid23;
 
 
 static void render_imgui_interface_new();
 
 
-void boundary22::render()
+void multigrid23::render()
 {
     static const vec4f defaultScreenColor = vec4f{1.0f, 1.0f, 1.0f, 1.0f}; 
 
@@ -102,6 +102,14 @@ Window Size    Simulation Size  Mouse (%u) Position       (%8.4f, %8.4f)\n\
 (%-4d, %-4d)   (%-4d, %-4d)     Mouse (%u) Dragging Force (%8.4f, %8.4f)\n\
 Normalized Timestep CFL (< 1 )  Maximum Velocity\n\
 %-9.6f           %-9.6f   (%-8.4f, %-8.4f)\n\
+Reynolds Number\n%-9.6f\n\
+Simulation Error (u.x, u.y, p, 0) \n\
+Min (%-8.4f, %-8.4f, %-8.4f, %-8.4f)\n\
+Max (%-8.4f, %-8.4f, %-8.4f, %-8.4f)\n\
+Avg (%-8.4f, %-8.4f, %-8.4f, %-8.4f)\n\
+Approximate Maximal Spectral Radius: %-8.4f\n\
+Approximate         Iteration Error: %-8.4f\n\
+\
 Compute Time\n\
 %-6.4f [render]\n\
 - %-6.4f [fluid]\n\
@@ -110,6 +118,9 @@ Compute Time\n\
     - %-6.4f [cfl]\n\
         - %-6.4f [gpu_side]\n\
         - %-6.4f [cpu_side]\n\
+    - %6.4f  [err]\n\
+        - %6.4f  [gpu_side]\n\
+        - %6.4f  [cpu_side]\n\
 - %-6.4f [render_imgui]\n\
 - %-6.4f [compute_screen+blit]\n\
 ";
@@ -123,8 +134,11 @@ Compute Time\n\
     f32& __computecfl   = timeMeasurements[5] = g_computeCFLTime.value_units<f32>(1000);
     f32& __cflgpuside   = timeMeasurements[6] = g_computeMaximumCPU.value_units<f32>(1000);
     f32& __cflcpuside   = timeMeasurements[7] = g_computeMaximumGPU.value_units<f32>(1000);
-    f32& __imgui_render = timeMeasurements[8] = g_renderImguiTime.value_units<f32>(1000);
-    f32& __imgui_screen = timeMeasurements[9] = g_renderScreenTime.value_units<f32>(1000);
+    f32& __computeerr   = timeMeasurements[8] = g_computeErrEstimateTime.value_units<f32>(1000);
+    f32& __errgpuside   = timeMeasurements[8] = g_computeErrorGPU.value_units<f32>(1000);
+    f32& __errcpuside   = timeMeasurements[9] = g_computeErrorCPU.value_units<f32>(1000);
+    f32& __imgui_render = timeMeasurements[10] = g_renderImguiTime.value_units<f32>(1000);
+    f32& __imgui_screen = timeMeasurements[11] = g_renderScreenTime.value_units<f32>(1000);
     frameTimeNs         = g_frameTime.previous_value().count();
     g_maxFrameTimeNs = (g_maxFrameTimeNs > frameTimeNs) ? g_maxFrameTimeNs : frameTimeNs;
     g_minFrameTimeNs = (g_minFrameTimeNs < frameTimeNs) ? g_minFrameTimeNs : frameTimeNs;
@@ -138,77 +152,118 @@ Compute Time\n\
         }
     }
     ImGui::SameLine();
-    if(ImGui::Button("Reset Min-Max")) {
+    if(ImGui::Button("Reset Min-Max-Avg")) {
         g_maxFrameTimeNs = 0;
         g_minFrameTimeNs = 1'000'000'000ll;
+        g_avgFrameTimeNs = 0;
     }
     ImGui::SameLine();
-    ImGui::Checkbox("Vorticity", &g_useVorticityConfinement);
-    ImGui::SameLine();
-    if(ImGui::Checkbox("Dye", &g_imGuiButton[5]))
-    {
-        if(g_imGuiButton[5]) g_imGuiButton[7] = 0;
-        g_chooseUserDrawFillType = g_imGuiButton[5] ? 0 : g_chooseUserDrawFillType;
+    if(ImGui::Checkbox("Lock Source", &g_mouseLockInPlace)) {
+        g_mousePressOverride = g_mouseLockInPlace;
     }
     ImGui::SameLine();
-    if(ImGui::Checkbox("Force", &g_imGuiButton[6]))
-    {
-        if(g_imGuiButton[6]) g_imGuiButton[7] = 0;
-        g_chooseUserDrawFillType = g_imGuiButton[6] ? 1 : g_chooseUserDrawFillType;
+    ImGui::Checkbox("Use Vorticity", &g_useVorticityConfinement);
+    ImGui::Text("Input Method\n");
+    ImGui::PushID("ImGuiCheckBoxInputMethodIndex9Dye");
+    if(ImGui::Checkbox("Dye", &g_imGuiButton[9])) {
+        if(g_imGuiButton[9]) g_imGuiButton[8] = 0;
+        g_chooseUserDrawFillType = g_imGuiButton[9] ? USER_DRAW_FILL_TYPE_DYE : g_chooseUserDrawFillType;
+    }
+    ImGui::PopID();
+    ImGui::SameLine();
+    if(ImGui::Checkbox("Force", &g_imGuiButton[8])) { 
+        if(g_imGuiButton[8]) g_imGuiButton[9] = 0;
+        g_chooseUserDrawFillType = g_imGuiButton[8] ? USER_DRAW_FILL_TYPE_FORCE : g_chooseUserDrawFillType;
     }
     ImGui::SameLine();
-    if(ImGui::Checkbox("Boundary", &g_imGuiButton[7]))
-    {
-        if(g_imGuiButton[7]) {
-            g_imGuiButton[5] = 0;
-            g_imGuiButton[6] = 0;
-        }
-        g_chooseUserDrawFillType = g_imGuiButton[7] ? 2 : g_chooseUserDrawFillType;
+    if(ImGui::Checkbox("Force And Dye", &g_imGuiButton[7])) { 
+        g_imGuiButton[9] = g_imGuiButton[7];
+        g_imGuiButton[8] = g_imGuiButton[7];
+        g_chooseUserDrawFillType = g_imGuiButton[7] ? USER_DRAW_FILL_TYPE_FORCE_AND_DYE : g_chooseUserDrawFillType;
     }
+    // ImGui::SameLine();
+    // if(ImGui::Checkbox("Boundary", &g_imGuiButton[7]))
+    // {
+    //     if(g_imGuiButton[7]) {
+    //         g_imGuiButton[5] = 0;
+    //         g_imGuiButton[6] = 0;
+    //     }
+    //     g_chooseUserDrawFillType = g_imGuiButton[7] ? 2 : g_chooseUserDrawFillType;
+    // }
 
-
-    if(ImGui::Checkbox("Velocity Texture", &g_imGuiButton[0])) {
+    ImGui::Text("Visualization");
+    if(ImGui::Checkbox("Velocity", &g_imGuiButton[0])) {
         if(g_imGuiButton[0]) {
             g_imGuiButton[1] = 0;
             g_imGuiButton[2] = 0;
             g_imGuiButton[3] = 0;
             g_imGuiButton[4] = 0;
+            g_imGuiButton[5] = 0;
         }
         markfmt("Chose %s", "Velocity Texture");
-        g_chooseTextureToRender = g_imGuiButton[0] ? 1 : g_chooseTextureToRender;
+        g_chooseTextureToRender = g_imGuiButton[0] ? TEXTURE_DRAW_VELOCITY_PRESSURE : g_chooseTextureToRender;
     }
-    ImGui::SameLine();
-    if(ImGui::Checkbox("Dye Texture", &g_imGuiButton[1])) {
+    ImGui::SameLine();    
+    ImGui::PushID("ImGuiCheckBoxDrawTextureTypeIndex1Dye");
+    if(ImGui::Checkbox("Dye", &g_imGuiButton[1])) {
         if(g_imGuiButton[1]) {
             g_imGuiButton[0] = 0;
             g_imGuiButton[2] = 0;
             g_imGuiButton[3] = 0;
             g_imGuiButton[4] = 0;
+            g_imGuiButton[5] = 0;
         }
         markfmt("Chose %s", "Dye Texture");
-        g_chooseTextureToRender = g_imGuiButton[1] ? 2 : g_chooseTextureToRender;
+        g_chooseTextureToRender = g_imGuiButton[1] ? TEXTURE_DRAW_DYE : g_chooseTextureToRender;
     }
+    ImGui::PopID();
     ImGui::SameLine();
-    if(ImGui::Checkbox("Curl Texture", &g_imGuiButton[2])) {
+    if(ImGui::Checkbox("Curl", &g_imGuiButton[2])) {
         if(g_imGuiButton[2]) {
             g_imGuiButton[0] = 0;
             g_imGuiButton[1] = 0;
             g_imGuiButton[3] = 0;
             g_imGuiButton[4] = 0;
+            g_imGuiButton[5] = 0;
         }
         markfmt("Chose %s", "Curl Texture");
-        g_chooseTextureToRender = g_imGuiButton[2] ? 3 : g_chooseTextureToRender;
+        g_chooseTextureToRender = g_imGuiButton[2] ? TEXTURE_DRAW_CURL : g_chooseTextureToRender;
     }
     ImGui::SameLine();
-    if(ImGui::Checkbox("Absolute Curl Texture", &g_imGuiButton[3])) {
+    if(ImGui::Checkbox("Absolute Curl", &g_imGuiButton[3])) {
         if(g_imGuiButton[3]) {
             g_imGuiButton[0] = 0;
             g_imGuiButton[1] = 0;
             g_imGuiButton[2] = 0;
             g_imGuiButton[4] = 0;
+            g_imGuiButton[5] = 0;
         }
         markfmt("Chose %s", "Abs Curl Texture");
-        g_chooseTextureToRender = g_imGuiButton[3] ? 4 : g_chooseTextureToRender;
+        g_chooseTextureToRender = g_imGuiButton[3] ? TEXTURE_DRAW_ABS_CURL : g_chooseTextureToRender;
+    }
+    ImGui::SameLine();
+    if(ImGui::Checkbox("Error (Velocity)", &g_imGuiButton[4])) {
+        if(g_imGuiButton[4]) {
+            g_imGuiButton[0] = 0;
+            g_imGuiButton[1] = 0;
+            g_imGuiButton[2] = 0;
+            g_imGuiButton[3] = 0;
+            g_imGuiButton[5] = 0;
+        }
+        markfmt("Chose %s", "Error Texture");
+        g_chooseTextureToRender = g_imGuiButton[4] ? TEXTURE_DRAW_ERROR_VELOCITY : g_chooseTextureToRender;
+    }
+    ImGui::SameLine();
+    if(ImGui::Checkbox("Error (Pressure)", &g_imGuiButton[5])) {
+        if(g_imGuiButton[5]) {
+            g_imGuiButton[0] = 0;
+            g_imGuiButton[1] = 0;
+            g_imGuiButton[2] = 0;
+            g_imGuiButton[3] = 0;
+            g_imGuiButton[4] = 0;
+        }
+        markfmt("Chose %s", "Error Texture");
+        g_chooseTextureToRender = g_imGuiButton[5] ? TEXTURE_DRAW_ERROR_PRESSURE : g_chooseTextureToRender;
     }
 
 
@@ -264,15 +319,21 @@ Compute Time\n\
     }
     if(g_mousePressRight) {
         if(g_runCodeOnce[0]) {
-            g_splatterForce = vec4f{ random32f(), random32f(), 0.0f,        1.0f };
             g_splatterColor = vec4f{ random32f(), random32f(), random32f(), 1.0f };
             g_runCodeOnce[0] = true;
         }
     }
     g_runCodeOnce[0] = awc2isMouseButtonReleased(AWC2_MOUSEBUTTON_RIGHT);
+    if(g_mouseLockInPlace) {
+        g_mousedxdy = vec4f{ 
+            std::sinf(2 * pi<f32> * g_dt * g_frameCounter / g_frameTime.value_units<f32>(1)), 
+            1.0f, 
+            0.0f, 0.0f
+        };
+    }
     ImGui::Text("splatterForce");
     ImGui::SameLine();
-    ImGui::ColorButton("splatterForce", *__rcast(ImVec4*, g_splatterForce.begin()) );
+    ImGui::ColorButton("splatterForce", *__rcast(ImVec4*, g_mousedxdy.begin()) );
     ImGui::Text("splatterColor");
     ImGui::SameLine();
     ImGui::ColorButton("splatterColor", *__rcast(ImVec4*, g_splatterColor.begin()) );
@@ -296,6 +357,14 @@ Compute Time\n\
         g_windowSize.x, g_windowSize.y, g_dims.x, g_dims.y, 
         g_mousePress, g_mousedxdy.x, g_mousedxdy.y,
         g_normdt, g_cfl, g_maxVelocity.x, g_maxVelocity.y,
+        util::math::dot(g_maxVelocity, g_simUnitCoords) / g_kinematicViscosity,
+
+        g_currErrorValues[0].x, g_currErrorValues[0].y, g_currErrorValues[0].z, g_currErrorValues[0].w,
+        g_currErrorValues[1].x, g_currErrorValues[1].y, g_currErrorValues[1].z, g_currErrorValues[1].w,
+        g_currErrorValues[2].x, g_currErrorValues[2].y, g_currErrorValues[2].z, g_currErrorValues[2].w,
+
+        g_maxSpectralRadius,
+        g_iterationErrorN,
 
         __rendering,
         __computefluid,
@@ -304,6 +373,9 @@ Compute Time\n\
         __computecfl,
         __cflcpuside,
         __cflgpuside,
+        __computeerr,
+        __errgpuside,
+        __errcpuside,
         __imgui_render,
         __imgui_screen
     );

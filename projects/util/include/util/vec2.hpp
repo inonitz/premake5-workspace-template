@@ -132,6 +132,7 @@ DEFINE_VECTOR_STRUCTURE( \
 	2,
 	float, 
 	2f, 
+	__m64 mmx;
 	struct { float x;   float y;     };
 	struct { float u;   float v;     };
 	struct { float i;   float j;     };
@@ -226,6 +227,10 @@ DEFINE_VECTOR_STRUCTURE( \
 	float,
 	4f,
 	__m128 xmm;
+	struct {
+		__m64 mmxl;
+		__m64 mmxh;
+	};
 	struct { float x;   float y;     float z;    float w;     }; 
 	struct { float r;   float g;     float b;    float a;     };
 	struct { float i;   float j;     float k;    float l;     };

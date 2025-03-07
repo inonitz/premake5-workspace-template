@@ -4,6 +4,14 @@ layout(binding = 0)                    uniform sampler2D fieldSampler;
 layout(binding = 1, rgba32f) writeonly uniform image2D   screentexture;
 
 
+#define TEXTURE_DRAW_DYE               0x00
+#define TEXTURE_DRAW_VELOCITY_PRESSURE 0x01
+#define TEXTURE_DRAW_CURL              0x02
+#define TEXTURE_DRAW_ABS_CURL          0x03
+#define TEXTURE_DRAW_ERROR_VELOCITY    0x04
+#define TEXTURE_DRAW_ERROR_PRESSURE    0x05
+
+
 uniform uint  ku_selectTextureDraw;
 uniform float ku_brightness;
 uniform ivec2 ku_simdims;
@@ -92,14 +100,24 @@ void main()
     vec2 norm_texcoord = vec2(texelCoord) / vec2(ku_simdims);
     
     vec4 write_value = texelFetch(fieldSampler, texelCoord, 0);
-    if(ku_selectTextureDraw == 1) {
+    switch(ku_selectTextureDraw) {
+        case TEXTURE_DRAW_DYE:
+        break;
+        case TEXTURE_DRAW_VELOCITY_PRESSURE:
         write_value *= ku_brightness;
-    } 
-    else if(ku_selectTextureDraw == 3) {
+        break;
+        case TEXTURE_DRAW_CURL:
         write_value = colourMap(curl2D(fieldSampler, texelCoord));
-    }
-    else if(ku_selectTextureDraw == 4) {
+        break;
+        case TEXTURE_DRAW_ABS_CURL:
         write_value = colourMap(ku_brightness * abs(curl2D(fieldSampler, texelCoord)));
+        break;
+        case TEXTURE_DRAW_ERROR_VELOCITY:
+        write_value = vec4(ku_brightness * abs(write_value.xy), 0, 0);
+        break;
+        case TEXTURE_DRAW_ERROR_PRESSURE:
+        write_value = vec4(0, 0, ku_brightness * abs(write_value.z), 0);
+        break;
     }
     imageStore(screentexture, texelCoord, write_value);
     return;

@@ -4,7 +4,7 @@
 
 
 #ifndef _SELECT_MAIN
-#   define _SELECT_MAIN 19
+#   define _SELECT_MAIN 23
 #endif
 
 #if _SELECT_MAIN == -1
@@ -53,6 +53,8 @@
 #   include "20smoke/smoke.hpp"
 #elif _SELECT_MAIN == 21
 #   include "21boundaries/arbitrary.hpp"
+#elif _SELECT_MAIN == 23
+#   include "23multigrid/mg.hpp"
 #endif
 
 
@@ -106,7 +108,10 @@ int main(__unused int argc, __unused char* argv[]) {
     out = smoke_sim();
 #elif _SELECT_MAIN == 21
     out = arbitrary_boundaries_in_sim();
+#elif _SELECT_MAIN == 23
+    out = multigrid_method_also_no_internal_boundaries_for_now();
 #endif
+
 
     markstr("Successful Exit");
     return out;

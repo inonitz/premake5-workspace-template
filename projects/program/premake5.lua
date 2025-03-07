@@ -21,7 +21,9 @@ project "program"
     SetupBuildDirectoriesForExecutable()
 
     -- Build Options
-    
+    buildoptions {
+        "-march=native"
+    }
 
     -- Linking Options 
     LinkToStandardLibraries()

@@ -27,13 +27,13 @@ ivec2 getTexelIndex(in int offset)
 
 void main()
 {
-    vec4 maximum = vec4(0);
+    vec4 maximum;
+    vec4 val;
 
     int oneDimensionalGroupIndex = flattenWorkGroupIndex();
-    for(int i = 0; i < ku_valuesToFetch; ++i) {
-        vec4 value = texelFetch(originalTexture, getTexelIndex(i), 0);
-        bvec4 gt = greaterThan(value, maximum);
-        maximum = vec4(gt) * value + vec4(not(gt)) * maximum;
+    for(int i = 0; i < ku_valuesToFetch; i++) {
+        val = texelFetch(originalTexture, getTexelIndex(i), 0);
+        maximum = max(maximum, val);
     }
     buf_maximum[oneDimensionalGroupIndex] = maximum;
     return;

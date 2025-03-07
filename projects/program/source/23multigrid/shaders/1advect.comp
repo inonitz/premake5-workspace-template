@@ -1,9 +1,8 @@
 #version 450 core
 layout(local_size_x =   5, local_size_y =   5, local_size_z =   5) in;
-layout (binding = 0)                    uniform sampler2D boundaryField;
-layout (binding = 1)                    uniform sampler2D quantityField;
-layout (binding = 2)                    uniform sampler2D velocityField;
-layout (binding = 3, rgba32f) writeonly uniform image2D   outputField;
+layout (binding = 0)                    uniform sampler2D quantityField;
+layout (binding = 1)                    uniform sampler2D velocityField;
+layout (binding = 2, rgba32f) writeonly uniform image2D   outputField;
 
 
 vec4 textureBiLerp(in sampler2D tex, in vec2 uv);
@@ -38,7 +37,6 @@ void main()
         result = vec4(result.xy, oldPressure, 0.0f);
     }
 
-    result *= 1.0f - texelFetch(boundaryField, texelCoord, 0).x;
     imageStore(outputField, texelCoord, result);
     return;
 }

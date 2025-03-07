@@ -3,10 +3,10 @@
 #include <util/time.hpp>
 
 
-namespace boundary22 {
+namespace multigrid23 {
 
 
 u32 compute_fluid();
 
 
-} /* namespace boundary22 */
+} /* namespace multigrid23 */
