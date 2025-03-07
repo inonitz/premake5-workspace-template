@@ -89,26 +89,7 @@ end
 
 
 
--- -- The reason for this hideous mess: https://groups.google.com/g/llvm-dev/c/WA1vKn9zDtM
--- -- Also, clang doesn't pass either '-nodefaultlibs' nor '-fms-runtime-lib',
--- -- (atleast when using -fuse-ld=lld-link) so It so happens that I ALWAYS link against static libraries of the CRT
--- LinkToStandardLibraries = function()
---     filter { "system:windows", "action:vs2022", "configurations:*Lib" }
---         staticruntime "on"
---     filter { "system:windows", "action:gmake2", "configurations:*Lib" }
---         buildoptions { "-static-libgcc",  "-static-libstdc++" }
-
-
---     filter { "system:windows", "action:vs2022", "configurations:*Dll" }
---         staticruntime "Off"
---     filter { "system:windows", "action:gmake2", "configurations:DebugDll" }
---         linkoptions { "-Wl,/nodefaultlib,kernel32.lib,ucrtd.lib,vcruntimed.lib,msvcrtd.lib,msvcprtd.lib" }
---     filter { "system:windows", "action:gmake2", "configurations:ReleaseDll" }
---         linkoptions { "-Wl,/nodefaultlib,kernel32.lib,ucrt.lib,vcruntime.lib,msvcrt.lib,msvcprt.lib" }
---     filter {}
--- end
-
-
+-- The reason for this mess: https://groups.google.com/g/llvm-dev/c/WA1vKn9zDtM
 LinkToStandardLibraries = function()
     -- Directly Taken from: https://learn.microsoft.com/en-us/cpp/c-runtime-library/crt-library-features?view=msvc-170
     -- Static Debug:
@@ -347,7 +328,7 @@ newaction {
 
 -- Clean Specific System--Architecture Build Function [TODO] --
 newaction {
-    trigger     = "CleanBuild[TODO]",
+    trigger     = "CleanArch[TODO]",
     description = "Delete All Debug & Release files generated for a specific system-architecture (e.g windows-x86_64)",
     execute     = function ()
         os.remove("build/bin/Debug-") 
