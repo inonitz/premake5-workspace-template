@@ -103,8 +103,12 @@ call ```premake5 help``` in the cloned repo directory ```(.vscode/..)```
 ## Roadmap
 - Adding an option to delete files based on architecture (e.g ```cleanarch --arch='x'```)
 - Premake should be able to generate vs2022 files. This premake project can't do that
-- Optimization of execution time (~7 seconds on windows, ~4 on wsl2)
-
+- Optimization of execution time:
+  * ```with-subprojects``` branch
+    * ~7sec [windows] 
+    * ~4sec [wsl2] 
+  * ```barebones``` branch
+    * ~242ms [windows]
 
 <!-- CONTRIBUTING -->
 ## Contributing

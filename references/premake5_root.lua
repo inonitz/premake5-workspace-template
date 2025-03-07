@@ -27,9 +27,9 @@ end
 PROJECT_DIR     = ROOT_PATH("projects")
 DEPENDENCY_DIR  = ROOT_PATH("dependencies")
 WORKSPACE_NAME  = "example-name-fucking-change-this"
--- Set START_PROJECT to the name of your executable project or the main linking target
+-- Set $(START_PROJECT) to the name of your executable project or the main linking target
 -- e.g 
-START_PROJECT   = "sampleprogram"
+START_PROJECT   = "set-this-to-the-name-of-your-executable-or-final-linking-target"
 
 
 BUILD_BINARY_DIRECTORY_GENERIC = "/build/bin/%{cfg.buildcfg}_%{cfg.platform}_%{prj.name}"
@@ -128,6 +128,33 @@ LinkToStandardLibraries = function()
 end
 
 
+IncludeGLFWDirectory = function()
+    includedirs { DEPENDENCY_DIR .. "/GLFW/include" }
+end
+
+GetGLFWLibraryPath = function()
+    return DEPENDENCY_DIR .. "/GLFW/windows/%{cfg.architecture}/lib-vc2022"
+end
+
+LinkGLFWLibrary = function()
+    filter "system:windows"
+        libdirs { GetGLFWLibraryPath() }
+    filter ""
+    filter { "system:windows", "configurations:*Lib" }
+        links { "glfw3_mt" }
+        links { "user32" }
+    filter { "system:windows", "configurations:*Dll" }
+        links { "glfw3dll" }
+        defines { "GLFW_DLL" }
+    filter {}
+    filter "system:linux" -- requires the following packages [debian]: apt-get install libglfw3 libglfw3-dev libgl-dev 
+        links { "glfw" }
+    filter ""
+    filter {}
+end
+
+
+
 
 -- try to use these generic functions to include & link every project, right now the only ones popping up on program is glfw (also for awc2 ...)
 IncludeProjectHeaders = function(ProjectName)
@@ -140,12 +167,41 @@ LinkProjectLibrary = function(ProjectName)
 end
 
 
-LinkLibExampleLibrary = function()
-    LinkProjectLibrary("libexample")
+LinkUtilLibrary = function()
+    LinkProjectLibrary("util")
     filter { "configurations:*Lib" }
-        defines { "LIBEXAMPLE_STATIC_DEFINE" }
+        defines { "UTIL_STATIC_DEFINE" }
     filter {}
 end
+
+LinkGLBindingLibraries = function()
+    LinkProjectLibrary("glbinding")
+    filter { "configurations:*Lib" }
+        defines { "GLBINDING_STATIC_DEFINE" }
+    filter {}
+    LinkProjectLibrary("glbinding-aux")
+    filter { "configurations:*Lib" }
+        defines { "GLBINDING_AUX_STATIC_DEFINE" }
+    filter {}
+end
+
+LinkImGuiLibrary = function()
+    LinkProjectLibrary("imgui")
+    filter { "system:windows", "configurations:*Lib" }
+        defines { "IMGUI_STATIC_DEFINE" }
+        links { "imm32" }
+    filter { "system:not windows", "configurations:*Lib" }
+        defines { "IMGUI_STATIC_DEFINE" }
+    filter {}
+end
+
+LinkAWC2Library = function()
+    LinkProjectLibrary("awc2")
+    filter { "configurations:*Lib" }
+        defines { "AWC2_STATIC_DEFINE" }
+    filter {}
+end
+
 
 
 
@@ -157,6 +213,29 @@ for _, path in ipairs(PROJECTS) do
     include(path .. "/premake5.lua")
 end
 
+
+-- Add Option to compile for a certain architecture, may not necessarily match the machine architecture
+-- [NOTE]: Deprecated and not used anymore
+-- newoption {
+--     trigger     = "arch",
+--     description = "Manually Specify the architecture of the project",
+--     value       = "x86_64",
+--     allowed = {
+--         { "universal", "Universal Binaries Supported by ios & macOS " },
+--         { "i386",                           "Alias for x86" },
+--         { "x86",                                         "" },
+--         { "amd64",                       "Alias for x86_64" },
+--         { "x86_64",                                      "" },
+--         { "ARM",                                         "" },
+--         { "ARM64",                                       "" },
+--         { "armv5",   "Only supported in VSAndroid projects" },
+--         { "armv7",   "Only supported in VSAndroid projects" },
+--         { "aarch64", "Only supported in VSAndroid projects" },
+--         { "mips",    "Only supported in VSAndroid projects" },
+--         { "mips64",  "Only supported in VSAndroid projects" },
+--     },
+--     default = "x86_64"
+-- }
 
 getProjectNames = function()
     folders = {}
@@ -173,6 +252,7 @@ newoption {
     description = "Set this when using cleanproj",
     allowed = getProjectNames()
 }
+
 
 
 -- Rebuild Project Solutions' Function --

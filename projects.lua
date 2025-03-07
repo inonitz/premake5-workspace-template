@@ -1,8 +1,4 @@
 PROJECTS = {
-    "projects/util",
-    "projects/glbinding",
-    "projects/glbinding-aux",
-    "projects/imgui",
-    "projects/awc2",
-    "projects/program"
+    "projects/libexample",
+    "projects/sample"
 }
