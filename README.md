@@ -31,7 +31,10 @@ Equipped with a new tool, I started migrating my previous **[project](https://gi
     ***This project is the result!***
 </br>
 ### Project Structure
-Each Project contains a ```premake5.lua``` file, describing everything about its compilation/linking  
+Each Project contains a ```premake5.lua``` file, describing everything about its compilation/linking
+**There are 5 sub-projects available as reference/guiding points if you don't understand the Explanation below**
+<br>
+<br>
 * To add a project to compilation/linking:
     * Add the path at ```projects/lua```
     * Specify a LinkMyLibraryName function at the root ```premake5.lua``` file (see ```LinkImGuiLibrary()``` for more info)
@@ -43,23 +46,20 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
         * IncludeProjectHeaders
     * Use The defined functions in your library/executable' premake5.lua 
 
-**Finally, The Point is that there are 5 sub-projects available as reference/guiding points if you  don't know what you're doing**
 
 ### Built With
-
-* [![ImGui][ImGui.js]][ImGui-url]
-* [![glbinding v3.3.0][glbinding.js]][glbinding-url]
-* [![GLFW v3.4][GLFW.js]][GLFW-url]
-
+<br> [<img height="100px" src="https://raw.githubusercontent.com/cginternals/glbinding/master/glbinding-logo.svg?sanitize=true">][glbinding-url] </br>
+<br> 
+  [![GLFW v3.4][GLFW.js]][GLFW-url]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  [![ImGui][ImGui.js]][ImGui-url] 
+</br>
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
 ### Prerequisites
-
-* [premake](https://premake.github.io/docs/)
-* If you're compiling an executable:
-    * Powershell / Any Standard unix-shell
+* [premake](https://premake.github.io/docs/) 
+* Powershell / Any Standard unix-shell **(If you're compiling an executable)**
 
 
 ### Installation
@@ -73,7 +73,7 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 ```sh
 # If you want everything
 git clone -b with-subprojects https://github.com/inonitz/premake5-workspace-template.git
-# If you prefer to do configure on your own
+# If you prefer to configure on your own
 git clone -b barebones https://github.com/inonitz/premake5-workspace-template.git
 # Don't forget to add your own remote repo
 git remote set-url origin your_github_username/premake5-workspace-template
@@ -93,6 +93,8 @@ call ```premake5 help``` in the cloned repo directory ```(.vscode/..)```
     premake cleanclangd
     premake export-compile-commands
     premake --os=windows --arch=x86_64 --cc=clang gmake2
+    premake --os=windows --arch=x86_64 --cc=clang vs2022
+    premake --os=linux --arch=x86_64 --cc=clang gmake2
 ```
 
 
@@ -111,7 +113,7 @@ If you have a suggestion, please fork the repo and create a pull request. You ca
 
 <!-- LICENSE -->
 ## License
-Distributed under the MIT. See `LICENSE` file for more information.
+Distributed under the MIT License. See `LICENSE` file for more information.
 
 
 <!-- ACKNOWLEDGMENTS -->
@@ -120,20 +122,18 @@ Distributed under the MIT. See `LICENSE` file for more information.
 * [Jarod42](https://github.com/Jarod42/premake-export-compile-commands/tree/Improvements) For the Improvements branch of export-compile-commands
 * [Best-README](https://github.com/othneildrew/Best-README-Template)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/inonitz/premake5-workspace-template.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/inonitz/premake5-workspace-template?style=for-the-badge&color=blue
 [contributors-url]: https://github.com/inonitz/premake5-workspace-template/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/inonitz/premake5-workspace-template.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/inonitz/premake5-workspace-template?style=for-the-badge&color=blue
 [forks-url]: https://github.com/inonitz/premake5-workspace-template/network/members
-[stars-shield]: https://img.shields.io/github/stars/inonitz/premake5-workspace-template.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/inonitz/premake5-workspace-template?style=for-the-badge&color=blue
 [stars-url]: https://github.com/inonitz/premake5-workspace-template/stargazers
 [issues-shield]: https://img.shields.io/github/issues/inonitz/premake5-workspace-template.svg?style=for-the-badge
 [issues-url]: https://github.com/inonitz/premake5-workspace-template/issues
-[license-shield]: https://img.shields.io/github/license/inonitz/premake5-workspace-template.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/inonitz/premake5-workspace-template?style=for-the-badge
 [license-url]: https://github.com/inonitz/premake5-workspace-template/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username
@@ -141,8 +141,8 @@ Distributed under the MIT. See `LICENSE` file for more information.
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 
 [ImGui-url]: https://github.com/ocornut/imgui
-[ImGui.js]: https://avatars.githubusercontent.com/u/8225057?s=48&v=4
+[ImGui.js]: https://avatars.githubusercontent.com/u/8225057?v=4&size=150
 [glbinding-url]: https://github.com/cginternals/glbinding/releases/tag/v3.3.0
-[glbinding.js]: https://avatars.githubusercontent.com/u/13125552?s=200&v=4
+[glbinding.js]: https://raw.githubusercontent.com/cginternals/glbinding/master/glbinding-logo.svg?sanitize=true
 [GLFW-url]: https://github.com/glfw/glfw/releases/tag/3.4
-[GLFW.js]: https://avatars.githubusercontent.com/u/3905364?s=200&v=4
+[GLFW.js]: https://avatars.githubusercontent.com/u/3905364?s=200&v=4&size=150
