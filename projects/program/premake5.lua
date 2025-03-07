@@ -10,9 +10,12 @@ project "program"
         "source/**.cpp"
     }
     -- Specify Include Headers
-    -- Other Project Includes Defined here...
-    -- e.g IncludeProjectHeaders(...)
     includedirs { "include", "source" }
+    IncludeProjectHeaders("util")
+    IncludeProjectHeaders("glbinding")
+    IncludeProjectHeaders("glbinding-aux")
+    IncludeProjectHeaders("imgui")
+    IncludeProjectHeaders("awc2")
 
     -- Build Directories &// Structure
     SetupBuildDirectoriesForExecutable()
@@ -24,9 +27,11 @@ project "program"
 
     -- Linking Options 
     LinkToStandardLibraries()
-    -- Other Project Library Links Defined here...
-    -- e.g LinkProjectA(...)
-
+    LinkUtilLibrary()
+    LinkGLBindingLibraries()
+    LinkImGuiLibrary()
+    LinkAWC2Library()
+    LinkGLFWLibrary()
     filter "system:windows"
         links { "gdi32", "shell32" }
     filter "system:linux" 

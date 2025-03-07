@@ -1,8 +1,7 @@
-#include <stdio>
+#include "2compute_screen/compute_screen.hpp"
 
 
 int main()
 {
-    std::printf("\nHello World!\n");
-    return 0x42;
+    return compute_shader_render_to_screen();
 }
