@@ -122,10 +122,9 @@ Distributed under the MIT License. See `LICENSE` file for more information.
 
 
 <!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-* [template-cpp-premake5](https://github.com/Kumodatsu/template-cpp-premake5/blob/master/premake5.lua)
-* [Jarod42](https://github.com/Jarod42/premake-export-compile-commands/tree/Improvements) For the Improvements branch of export-compile-commands
+## Acknowledgements
 * [Kumodatsu](https://github.com/Kumodatsu/template-cpp-premake5/tree/master) For the initial template repo
+* [Jarod42](https://github.com/Jarod42/premake-export-compile-commands/tree/Improvements) For the Improvements branch of export-compile-commands
 * [Best-README](https://github.com/othneildrew/Best-README-Template)
 
 
