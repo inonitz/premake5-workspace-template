@@ -51,7 +51,8 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 <br> [<img height="100px" src="https://raw.githubusercontent.com/cginternals/glbinding/master/glbinding-logo.svg?sanitize=true">][glbinding-url] </br>
 <br> 
   [![GLFW v3.4][GLFW.js]][GLFW-url]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  [![ImGui][ImGui.js]][ImGui-url] 
+  [![ImGui][ImGui.js]][ImGui-url]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  [![Premake][Premake.js]][Premake-url]
 </br>
 
 <!-- GETTING STARTED -->
@@ -151,3 +152,5 @@ Distributed under the MIT License. See `LICENSE` file for more information.
 [glbinding.js]: https://raw.githubusercontent.com/cginternals/glbinding/master/glbinding-logo.svg?sanitize=true
 [GLFW-url]: https://github.com/glfw/glfw/releases/tag/3.4
 [GLFW.js]: https://avatars.githubusercontent.com/u/3905364?s=200&v=4&size=150
+[Premake-url]: https://github.com/premake/premake-core
+[Premake.js]: https://avatars.githubusercontent.com/u/11135954?s=150&v=4
