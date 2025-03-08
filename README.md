@@ -60,7 +60,15 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 
 ### Prerequisites
 * [premake](https://premake.github.io/docs/) 
-* Powershell / Any Standard unix-shell **(If you're compiling an executable)**
+* Working compiler toolchain, preferably clang
+  * Windows: You should use [llvm](https://github.com/llvm/llvm-project/releases)
+  * Linux:
+      1. [installing-specific-llvm-version](https://askubuntu.com/questions/1508260/how-do-i-install-clang-18-on-ubuntu)
+      2. [configuring-symlinks](https://unix.stackexchange.com/questions/596226/how-to-change-clang-10-llvm-10-etc-to-clang-llvm-etc)
+  * Define these environment variables (in your PATH):
+    * LLVMInstallDir
+    * LLVMToolsVersion
+* Powershell / Any Standard unix-shell
 
 
 ### Installation
