@@ -39,7 +39,6 @@ BUILD_BINARY_DIRECTORY = "/build/bin/%{cfg.buildcfg}_%{cfg.platform}"
 
 
 SpecifyGlobalProjectCXXVersion = function()
-    language "C++"
     cppdialect "C++17"
     filter "files:**.c"
         buildoptions { "-std=c11" }

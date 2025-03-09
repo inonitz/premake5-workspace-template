@@ -81,7 +81,7 @@ static inline void render(GLState& gldata)
 
 i32 compute_shader_render_to_screen()
 {
-    static constexpr const char* computeShaderFilename = "projects/program/source/2compute_screen/new_visual.comp";
+    static constexpr const char* computeShaderFilename = "projects/program/source/2compute_screen/compute_screen.comp";
     const struct timespec pause_sleep_duration{
         .tv_sec = 0,
         .tv_nsec = 6944444

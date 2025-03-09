@@ -7,10 +7,13 @@ project "program"
     files {
         "include/**.hpp",
         "source/**.hpp",
-        "source/**.cpp"
+        "source/**.cpp",
+        "source/**.h",
+        "source/**.c"
     }
     -- Specify Include Headers
     includedirs { "include", "source" }
+    IncludeGLFWDirectory()
     IncludeProjectHeaders("util")
     IncludeProjectHeaders("glbinding")
     IncludeProjectHeaders("glbinding-aux")
