@@ -1,25 +1,17 @@
-project "awc2"
+project "glfw34"
     systemversion "latest"
     warnings      "extra"
     rtti          "On"
     SpecifyGlobalProjectCXXVersion()
     -- Project Structure
     files {
-        "include/**.h",
-        "include/**.c",
-        "include/**.hpp",
-        "source/**.cpp"
+        "source/**.h",
+        "source/**.c"
     }
 
     -- Specify Include Headers
     includedirs { "include" }
-    IncludeProjectHeaders("util")
-    IncludeProjectHeaders("glfw-3.4")
-    IncludeProjectHeaders("glbinding")
-    IncludeProjectHeaders("glbinding-aux")
-    IncludeProjectHeaders("imgui")
 
-    
     -- Build Directories &// Structure
     SetupBuildDirectoriesForLibrary()
 
@@ -30,18 +22,39 @@ project "awc2"
         cppdialect "C++17"
     filter {}
 
+
     -- Linking Options
     LinkToStandardLibraries()
-    LinkUtilLibrary()
-    LinkGLFWLibrary()
-    LinkGLBindingLibraries()
-    LinkImGuiLibrary()
-    
+    filter { "system:windows" }
+        links { 
+            "user32",
+            "imm32",
+            "gdi32",
+            "shell32"
+        }
+    filter {}
+    filter { "system:linux" }
+        links { 
+            "pthread",
+            "dl", 
+            "X11", 
+        }
+    filter {}
+
+
     -- Macros
-    filter { "configurations:*Lib" }
-        defines { "AWC2_STATIC_DEFINE" }
+    filter { "system:linux" }
+        defines { 
+            "_GLFW_X11"
+        }
+    filter { "system:windows" }
+        defines { 
+            "_GLFW_WIN32",
+            "_CRT_SECURE_NO_WARNINGS" 
+        }
+
     filter { "configurations:*Dll" }
-        defines { "AWC2_EXPORTS" }
+        defines { "_GLFW_BUILD_DLL" }
     filter {}
 
     -- Custom Pre &// Post build Actions

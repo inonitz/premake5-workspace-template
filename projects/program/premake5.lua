@@ -13,10 +13,10 @@ project "program"
     }
     -- Specify Include Headers
     includedirs { "include", "source" }
-    IncludeGLFWDirectory()
     IncludeProjectHeaders("util")
     IncludeProjectHeaders("glbinding")
     IncludeProjectHeaders("glbinding-aux")
+    IncludeProjectHeaders("glfw-3.4")
     IncludeProjectHeaders("imgui")
     IncludeProjectHeaders("awc2")
 
@@ -32,9 +32,9 @@ project "program"
     LinkToStandardLibraries()
     LinkUtilLibrary()
     LinkGLBindingLibraries()
+    LinkGLFWLibrary()
     LinkImGuiLibrary()
     LinkAWC2Library()
-    LinkGLFWLibrary()
     filter "system:windows"
         links { "gdi32", "shell32" }
     filter "system:linux" 
@@ -52,8 +52,7 @@ project "program"
     filter { "action:gmake2", "system:windows", "configurations:*Dll" }
         postbuildcommands {
             "if not exist %[../../%{BUILD_BINARY_DIRECTORY}] mkdir  %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copyfile} %[%{DEPENDENCY_DIR}/GLFW/windows/x86_64/lib-vc2022/glfw3.dll] %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copyfile} %[%{DEPENDENCY_DIR}/GLFW/windows/x86_64/lib-vc2022/glfw3dll.lib] %[../../%{BUILD_BINARY_DIRECTORY}] \
+            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glfw34/*       ] %[../../%{BUILD_BINARY_DIRECTORY}] \
             {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_util/*         ] %[../../%{BUILD_BINARY_DIRECTORY}] \
             {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glbinding/*    ] %[../../%{BUILD_BINARY_DIRECTORY}] \
             {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glbinding-aux/*] %[../../%{BUILD_BINARY_DIRECTORY}] \

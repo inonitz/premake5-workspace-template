@@ -4,6 +4,7 @@
 #include <util/marker2.hpp>
 #include <util/vec2.hpp>
 #include <awc2/C/awc2.h>
+#include "awc2/C/context.h"
 #include "gl/shader2.hpp"
 
 
@@ -110,6 +111,7 @@ i32 compute_shader_render_to_screen()
         __scast(u16, simulationDimensions.y),
         AWC2WindowDescriptor{}
     };
+    awc2WindowDescriptorDefault(&ctxtinfo.winDesc);
     awc2initializeContext(&ctxtinfo);
     awc2setContextUserCallbackMouseButton(contextid, &custom_mousebutton_callback);
     markstr("AWC2 init end");

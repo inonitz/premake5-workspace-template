@@ -128,32 +128,6 @@ LinkToStandardLibraries = function()
 end
 
 
-IncludeGLFWDirectory = function()
-    includedirs { DEPENDENCY_DIR .. "/GLFW/include" }
-end
-
-GetGLFWLibraryPath = function()
-    return DEPENDENCY_DIR .. "/GLFW/windows/%{cfg.architecture}/lib-vc2022"
-end
-
-LinkGLFWLibrary = function()
-    filter "system:windows"
-        libdirs { GetGLFWLibraryPath() }
-    filter ""
-    filter { "system:windows", "configurations:*Lib" }
-        links { "glfw3_mt" }
-        links { "user32" }
-    filter { "system:windows", "configurations:*Dll" }
-        links { "glfw3dll" }
-        defines { "GLFW_DLL" }
-    filter {}
-    filter "system:linux" -- requires the following packages [debian]: apt-get install libglfw3 libglfw3-dev libgl-dev 
-        links { "glfw" }
-    filter ""
-    filter {}
-end
-
-
 
 
 -- try to use these generic functions to include & link every project, right now the only ones popping up on program is glfw (also for awc2 ...)
@@ -171,6 +145,24 @@ LinkUtilLibrary = function()
     LinkProjectLibrary("util")
     filter { "configurations:*Lib" }
         defines { "UTIL_STATIC_DEFINE" }
+    filter {}
+end
+
+LinkGLFWLibrary = function()
+    LinkProjectLibrary("glfw34")
+    filter { "system:windows", "configurations:*Lib" }
+        links { 
+            "user32",
+            "imm32",
+            "gdi32",
+            "shell32"
+        }
+    filter { "system:linux", "configurations:*Lib" }
+        links { 
+            "pthread",
+            "dl", 
+            "X11", 
+        }
     filter {}
 end
 
