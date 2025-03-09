@@ -140,10 +140,26 @@ LinkProjectLibrary = function(ProjectName)
 end
 
 
-LinkLibExampleLibrary = function()
-    LinkProjectLibrary("libexample")
-    filter { "configurations:*Lib" }
-        defines { "LIBEXAMPLE_STATIC_DEFINE" }
+IncludeGLFWHeaders = function()
+    IncludeProjectHeaders("glfw-3.4")
+end
+
+
+LinkGLFWLibrary = function()
+    LinkProjectLibrary("glfw34")
+    filter { "system:windows", "configurations:*Lib" }
+        links { 
+            "user32",
+            "imm32",
+            "gdi32",
+            "shell32"
+        }
+    filter { "system:windows", "configurations:*Lib" }
+        links { 
+            "pthread",
+            "dl", 
+            "X11", 
+        }
     filter {}
 end
 

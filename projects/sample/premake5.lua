@@ -7,17 +7,20 @@ project "sampleprogram"
     files {
         "include/**.hpp",
         "source/**.hpp",
-        "source/**.cpp"
+        "source/**.cpp",
+        "source/**.h",
+        "source/**.c"
     }
     -- Specify Include Headers
     -- Other Project Includes Defined here...
     -- e.g IncludeProjectHeaders(...)
     includedirs { "include", "source" }
-    IncludeProjectHeaders("libexample")
+    IncludeGLFWHeaders()
 
 
     -- Build Directories &// Structure
     SetupBuildDirectoriesForExecutable()
+
 
     -- Build Options
     buildoptions {
@@ -28,13 +31,13 @@ project "sampleprogram"
     LinkToStandardLibraries()
     -- Other Project Library Links Defined here...
     -- e.g LinkProjectALibrary(...)
-    LinkLibExampleLibrary()
+    LinkGLFWLibrary()
 
 
     filter "system:windows"
         links { "shell32" }
     filter "system:linux" 
-        links { "dl" }
+        links { "dl", "pthread" }
     filter {}
 
     -- Macros
@@ -48,7 +51,7 @@ project "sampleprogram"
     filter { "action:gmake2", "system:windows", "configurations:*Dll" }
         postbuildcommands {
             "if not exist %[../../%{BUILD_BINARY_DIRECTORY}] mkdir  %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_libexample/*   ] %[../../%{BUILD_BINARY_DIRECTORY}] \
+            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glfw34/*   ] %[../../%{BUILD_BINARY_DIRECTORY}] \
             {copydir} %[%{cfg.buildtarget.directory}] %[../../%{BUILD_BINARY_DIRECTORY}]"
         }
     filter {}
