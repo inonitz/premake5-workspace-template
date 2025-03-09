@@ -1,7 +1,7 @@
 #ifndef __AWC2_C_EVENT_INTERFACE_HEADER__
 #define __AWC2_C_EVENT_INTERFACE_HEADER__
-#include <util/static_assert.h>
 #include "input.h"
+
 
 #ifdef __cplusplus
 extern "C" {

@@ -9,7 +9,6 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
-#include <util/marker2.hpp>
 
 
 using namespace gl;
@@ -32,7 +31,7 @@ void key_callback(GLFWwindow * window, int key, int /*scancode*/, int action, in
         PerWindow* __userdata = reinterpret_cast<PerWindow*>(glfwGetWindowUserPointer(window));
         glfwSetWindowShouldClose(window, 1);
         __userdata->shouldExit = true;
-        markfmt("%u close", __userdata->id);
+        printf("%u close", __userdata->id);
     }
     return;
 }
@@ -87,21 +86,21 @@ int awc2_wip_multi_context_without_encapsulation()
 
 
     for(auto& __data : winData) {
-        markfmt("Window %u: %llx, %llx", 
+        printf("Window %u: %p, %p", 
             __data.id, 
             __data.imgui, 
             __data.winptr
         );
-        mark(); glfwMakeContextCurrent(__data.winptr);
-        mark(); glfwSetWindowUserPointer(__data.winptr, &__data  );
-        mark(); glfwSetKeyCallback(__data.winptr, key_callback);
-        mark(); glfwSetFramebufferSizeCallback(__data.winptr, framebuffer_callback);
-        mark(); glbinding::initialize(__data.id, glbinding::getProcAddress, false, false);
-        mark(); glbinding::aux::enableGetErrorCallback();
-        mark(); ImGui::SetCurrentContext(__data.imgui);
-        mark(); ImGui::StyleColorsDark();
-        mark(); glver = ImGui_ImplGlfw_InitForOpenGL(__data.winptr, false);
-        mark(); glver = glver && ImGui_ImplOpenGL3_Init("#version 460");
+        glfwMakeContextCurrent(__data.winptr);
+        glfwSetWindowUserPointer(__data.winptr, &__data  );
+        glfwSetKeyCallback(__data.winptr, key_callback);
+        glfwSetFramebufferSizeCallback(__data.winptr, framebuffer_callback);
+        glbinding::initialize(__data.id, glbinding::getProcAddress, false, false);
+        glbinding::aux::enableGetErrorCallback();
+        ImGui::SetCurrentContext(__data.imgui);
+        ImGui::StyleColorsDark();
+        glver = ImGui_ImplGlfw_InitForOpenGL(__data.winptr, false);
+        glver = glver && ImGui_ImplOpenGL3_Init("#version 460");
         if(!glver)
             return -1;    
     }
@@ -114,14 +113,14 @@ int awc2_wip_multi_context_without_encapsulation()
                 continue;
 
             if(__data.shouldExit) {
-                mark(); glfwHideWindow(__data.winptr);
-                mark(); glfwMakeContextCurrent(nullptr);
+                glfwHideWindow(__data.winptr);
+                glfwMakeContextCurrent(nullptr);
                 __data.hiddenWindow = true;
                 __data.shouldExit = false;
                 continue;
             }
 
-            markfmt("Entered Draw Section for Context %u", __data.id);
+            printf("Entered Draw Section for Context %u", __data.id);
             glfwMakeContextCurrent(__data.winptr);
             glbinding::useContext(__data.id);
             ImGui::SetCurrentContext(__data.imgui);
@@ -150,16 +149,16 @@ int awc2_wip_multi_context_without_encapsulation()
 
 
     for(auto& __data : winData) {
-        mark(); ImGui::SetCurrentContext(__data.imgui);
-        mark(); ImGui_ImplOpenGL3_Shutdown();
-        mark(); ImGui_ImplGlfw_Shutdown();
-        mark(); ImGui::DestroyContext(__data.imgui);
-        mark(); ImGui::SetCurrentContext(nullptr);
-        mark(); glbinding::releaseContext(__data.id);
-        mark(); glfwDestroyWindow(__data.winptr);
-        mark(); __data.winptr = nullptr;
+        ImGui::SetCurrentContext(__data.imgui);
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext(__data.imgui);
+        ImGui::SetCurrentContext(nullptr);
+        glbinding::releaseContext(__data.id);
+        glfwDestroyWindow(__data.winptr);
+        __data.winptr = nullptr;
     }
     glfwTerminate();
-    markstr("Successful Exit");
+    printf("Successful Exit");
     return 0;
 }

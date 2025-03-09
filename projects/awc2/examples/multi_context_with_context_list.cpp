@@ -1,7 +1,6 @@
 #include "awc2/context.hpp"
 #include <awc2/awc2.hpp>
 #include <glbinding/gl/gl.h>
-#include <util/marker2.hpp>
 
 
 static void fbo_callback(__unused AWC2::user_callback_winsize_struct const* winsize) {
