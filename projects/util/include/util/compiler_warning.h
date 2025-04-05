@@ -11,7 +11,7 @@
 */
 #if defined( __GNUC__ ) || defined( __MINGW__ ) || defined ( __clang__ )
 #   define WARN(exp) ("WARNING: " exp)
-#elif defined(_MSC_VER)
+#elif defined _MSC_VER
 #	define STRINGISE_IMPL(x) #x
 #	define STRINGISE(x) STRINGISE_IMPL(x)
 #   define FILE_LINE_LINK __FILE__ "(" STRINGISE(__LINE__) ") : "
