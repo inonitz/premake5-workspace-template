@@ -29,7 +29,8 @@ project "imgui"
         links { 
             "imm32",
             "gdi32",
-            "user32"
+            "user32",
+            "shell32"
         }
     filter "system:linux"
         links { 

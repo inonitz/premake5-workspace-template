@@ -365,7 +365,6 @@ newaction {
 }
 
 
-
 newaction {
     trigger     = "cleanall",
     description = "Trigger the following actions: cleanprojectconfigs, cleanclangd, cleanbuild",
@@ -388,5 +387,20 @@ newaction {
         os.execute("premake5 gmake2")
         os.execute("make config=debuglib_amd64 -j 16")
         print("[ACTION] = [buildall] End\n")
+    end
+}
+
+
+-- Still Prototyping, not finished
+-- Requires Project context
+-- will probably use a mapping table, from arch & platform -> appropriate_compile_commands
+newaction {
+	trigger = "set-compile-commands",
+	description = "vscode will use the platform-specific compile_commands.json requested in this command; if you're using x86_64-debug, it'll use that, etc",
+    execute     = function ()
+        printf("----------------------------------------")
+        os.execute("{copyfile} %[../../.vscode/compile_commands/%{cfg.shortname}.json] %[../../.vscode/compile_commands/compile_commands.json]")
+        printf("----------------------------------------")
+        print("Done")
     end
 }
