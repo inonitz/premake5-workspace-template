@@ -1,4 +1,4 @@
--- Thankss to: https://stackoverflow.com/questions/75490124/how-to-require-a-file-with-a-dot-in-the-name
+-- Thanks to: https://stackoverflow.com/questions/75490124/how-to-require-a-file-with-a-dot-in-the-name
 local function __custom_searcher(module_name)
     -- Use "/" instead of "." as directory separator
     local path, err = package.searchpath(module_name, package.path, "/")
@@ -15,9 +15,6 @@ local function __custom_require(module_name)
 end
 
 
--- __custom_require(".vscode/export-compile-comms")
--- __custom_require(".vscode/ecc")
--- require(".vscode/ecc")
 require(".vscode/export-compile-comms")
 
 
