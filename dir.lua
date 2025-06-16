@@ -62,14 +62,6 @@ LinkProjectLibrary = function(ProjectName)
 end
 
 
-LinkUtilLibrary = function()
-    LinkProjectLibrary("util")
-    filter { "configurations:*Lib" }
-        defines { "UTIL_STATIC_DEFINE" }
-    filter {}
-end
-
-
 LinkUtil2Library = function()
     LinkProjectLibrary("util2")
     filter { "configurations:*Lib" }

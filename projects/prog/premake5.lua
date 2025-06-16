@@ -17,7 +17,6 @@ project "prog"
     -- Other Project Includes Defined here...
     -- e.g IncludeProjectHeaders(...)
     includedirs { "include", "source" }
-    IncludeProjectHeaders("util")
     IncludeProjectHeaders("util2")
 
 
@@ -33,7 +32,6 @@ project "prog"
     LinkToStandardLibraries()
     -- Other Project Library Links Defined here...
     -- e.g LinkProjectALibrary(...)
-    LinkUtilLibrary()
     LinkUtil2Library()
 
     filter "system:windows"
@@ -53,7 +51,7 @@ project "prog"
     filter { "system:windows", "configurations:*Dll", "action:gmake" }
         postbuildcommands {
             "if not exist %[../../%{BUILD_BINARY_DIRECTORY}] mkdir  %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_util/* ] %[../../%{BUILD_BINARY_DIRECTORY}] \
+            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_util2/* ] %[../../%{BUILD_BINARY_DIRECTORY}] \
             {copydir} %[%{cfg.buildtarget.directory}] %[../../%{BUILD_BINARY_DIRECTORY}]"
         }
     filter {}

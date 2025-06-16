@@ -113,12 +113,10 @@ workspace (WORKSPACE_NAME)
         buildoptions { 
             "-fsanitize=address",
             "-fsanitize=undefined",
-            "-fsanitize=leak"
         }
         linkoptions { 
             "-fsanitize=address",
             "-fsanitize=undefined",
-            "-fsanitize=leak"
         }
         -- Do Note: Production Builds have a problem with leak-Sanitizer
         -- Use the following before running your executable
@@ -129,6 +127,16 @@ workspace (WORKSPACE_NAME)
         -- But I don't need such fancy functionality, 
         -- especially when debug builds just work with leak-Sanitizer
     filter {}
+    -- Specify Leak Sanitizer for Debug/Production (Unix/Posix only for now...)
+    filter { "system:not windows", "configurations:Debug* or configurations:Production*", "toolset:gcc or toolset:clang" }
+        buildoptions { 
+            "-fsanitize=leak"
+        }
+        linkoptions { 
+            "-fsanitize=leak"
+        }
+    filter {}
+
 
 
     -- Release Configuration Across Multiple Platforms
