@@ -1,13 +1,17 @@
-project "sampleprogram"
+project "sample"
     kind          "ConsoleApp"
     systemversion "latest"
     warnings      "extra"
-    SpecifyGlobalProjectCXXVersion()
     -- Project Structure
     files {
         "include/**.hpp",
+        "include/**.h",
+
         "source/**.hpp",
-        "source/**.cpp"
+        "source/**.cpp",
+
+        "source/**.h",
+        "source/**.c"
     }
     -- Specify Include Headers
     -- Other Project Includes Defined here...
@@ -30,11 +34,10 @@ project "sampleprogram"
     -- e.g LinkProjectALibrary(...)
     LinkLibExampleLibrary()
 
-
     filter "system:windows"
-        links { "shell32" }
+        links { "shell32", "pthread" }
     filter "system:linux" 
-        links { "dl" }
+        links { "dl", "pthread" }
     filter {}
 
     -- Macros
@@ -45,10 +48,10 @@ project "sampleprogram"
     prebuildcommands {
         "{copyfile} %[../../.vscode/compile_commands/%{cfg.shortname}.json] %[../../.vscode/compile_commands/compile_commands.json]"
     }
-    filter { "action:gmake2", "system:windows", "configurations:*Dll" }
+    filter { "system:windows", "configurations:*Dll", "action:gmake" }
         postbuildcommands {
             "if not exist %[../../%{BUILD_BINARY_DIRECTORY}] mkdir  %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_libexample/*   ] %[../../%{BUILD_BINARY_DIRECTORY}] \
+            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_libexample/* ] %[../../%{BUILD_BINARY_DIRECTORY}] \
             {copydir} %[%{cfg.buildtarget.directory}] %[../../%{BUILD_BINARY_DIRECTORY}]"
         }
     filter {}

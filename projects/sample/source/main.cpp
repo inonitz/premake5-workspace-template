@@ -14,6 +14,18 @@ int main()
     
     std::printf("%s", example_library_get_string());
     
+
+    /* Tests for leak-sanitizer, address-sanitizer, undefined-behaviour-sanitizer */
+    // std::printf("Hello world %u\n", 5);
+    // int *prt = new int;
+
+    // int k = 0x7fffffff;
+    // k += 4;
+
+    // int *array = new int[100];
+    // delete [] array;
+    // return array[200];  // BOOM
     
-    return 0x42;
+    // std::printf("AH");
+    // return 0x42;
 }

@@ -32,26 +32,29 @@ Equipped with a new tool, I started migrating my previous **[project](https://gi
 </br>
 ### Project Structure
 Each Project contains a ```premake5.lua``` file, describing everything about its compilation/linking
-**There are 5 sub-projects available as reference/guiding points if you don't understand the Explanation below**
+**There are 5 sub-project lua files available as reference/guiding points if you don't understand the Explanation below**
 <br>
 <br>
 * To add a project to compilation/linking:
-    * Add the path at ```projects/lua```
-    * Specify a LinkMyLibraryName function at the root ```premake5.lua``` file (see ```LinkImGuiLibrary()``` for more info)
-    * Use ```IncludeProjectHeaders(...)``` & ```LinkMyLibraryName``` in your library/executable' premake5.lua 
-* To add a dependency to compilation/linking:
+    * Add the path to ```PROJECT_LIST``` in ```premake5.lua```
+    * Specify a LinkMyLibraryName function at the ```dir.lua``` file (see ```LinkLibExampleLibrary()``` for more info)
+    * Use ```IncludeProjectHeaders(...)``` & ```LinkMyLibraryName``` in your library/executables' (see ```sample/premake5.lua``` for more info)
+* To add a dependency (Header Only library, prebuilt shared/static library, etc...) to compilation/linking:
     * Add your library to the folder ```dependencies/```
-    * Specify 2 functions at the root ```premake5.lua``` file:
-        * LinkMyLibraryName
+    * Specify 2 functions at the ```dir.lua``` file:
+        * LinkMyDependencyName
         * IncludeProjectHeaders
-    * Use The defined functions in your library/executable' premake5.lua 
+    * Use The defined functions in your library/executables' premake5.lua 
 
 
 ### Built With
-<br> [<img height="100px" src="https://raw.githubusercontent.com/cginternals/glbinding/master/glbinding-logo.svg?sanitize=true">][glbinding-url] </br>
 <br> 
-  [![GLFW v3.4][GLFW.js]][GLFW-url]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  [![ImGui][ImGui.js]][ImGui-url]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  [![GLFW v3.4][GLFW.js]][GLFW-url]
+</br>
+<br>
+  [![ImGui][ImGui.js]][ImGui-url]
+</br>
+<br>
   [![Premake][Premake.js]][Premake-url]
 </br>
 
@@ -59,15 +62,19 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 ## Getting Started
 
 ### Prerequisites
-* [premake](https://premake.github.io/docs/) 
-* Working compiler toolchain, preferably clang
-  * Windows: You should use [llvm](https://github.com/llvm/llvm-project/releases)
-  * Linux:
-      1. [installing-specific-llvm-version](https://askubuntu.com/questions/1508260/how-do-i-install-clang-18-on-ubuntu)
-      2. [configuring-symlinks](https://unix.stackexchange.com/questions/596226/how-to-change-clang-10-llvm-10-etc-to-clang-llvm-etc)
-  * Define these environment variables (in your PATH):
-    * LLVMInstallDir
-    * LLVMToolsVersion
+* [premake5](https://premake.github.io/docs/)
+* Windows: 
+  * You should use Either:
+  1. [Msys2 Clang64](https://www.mingw-w64.org/getting-started/msys2-llvm)  
+  2. [Clang LLVM](https://github.com/llvm/llvm-project/releases)
+* Linux:
+    1. You Can use GCC - Has been Tested and works out of the box
+    2. The safer bet - Still use Clang [Installing a specific llvm version](https://askubuntu.com/questions/1508260/how-do-i-install-clang-18-on-ubuntu)
+    3. [Configure Symlinks](https://unix.stackexchange.com/questions/596226/how-to-change-clang-10-llvm-10-etc-to-clang-llvm-etc) - as clang-'version_number' will not be detected by premake5
+* Add your installation to the global PATH
+* **[NOTE]:** llvm-clang relies on Platform-Specific System Headers & Libraries
+  1. Windows Requires additional setup - Get a working Standard Library implementation with System-Headers, either MSVC, msys2, mingw-w64, WinLibs, etc...   
+  2. Linux Will very likely work out of the box
 * Powershell / Any Standard unix-shell
 
 
@@ -78,7 +85,7 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
     * ImGui
     * GLFW
     * glbinding
-    * awc2
+    * awc2 & util2 (My own Utility Libraries)
 ```sh
 # If you want everything
 git clone -b with-subprojects https://github.com/inonitz/premake5-workspace-template.git
@@ -92,18 +99,19 @@ git remote -v
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-call ```premake5 help``` in the cloned repo directory ```(.vscode/..)```
+call ```premake5 --help``` in the root of the repository
 
 ### Common Commands:
 ```sh
     premake5 --proj=program cleanproj 
     premake cleanall 
-    premake cleancfgs
+    premake cleancfg
     premake cleanclangd
     premake export-compile-commands
-    premake --os=windows --arch=x86_64 --cc=clang gmake2
+    premake --os=windows --arch=x86_64 --cc=clang gmake
     premake --os=windows --arch=x86_64 --cc=clang vs2022
-    premake --os=linux --arch=x86_64 --cc=clang gmake2
+    premake --os=linux --arch=x86_64 --cc=clang gmake
+    premake --os=linux --arch=x86_64 --cc=gcc gmake
 ```
 
 
@@ -111,13 +119,13 @@ call ```premake5 help``` in the cloned repo directory ```(.vscode/..)```
 <!-- ROADMAP -->
 ## Roadmap
 - Adding an option to delete files based on architecture (e.g ```cleanarch --arch='x'```)
-- Premake should be able to generate vs2022 files. This premake project can't do that
+- Premake should be able to generate vs2022 files. This premake project can't do that (yet)
 - Optimization of execution time:
   * ```with-subprojects``` branch
     * ~7sec [windows] 
     * ~4sec [wsl2] 
   * ```barebones``` branch
-    * ~242ms [windows]
+    * ~350ms [windows]
 
 
 <!-- CONTRIBUTING -->
@@ -127,7 +135,7 @@ If you have a suggestion, please fork the repo and create a pull request. You ca
 
 <!-- LICENSE -->
 ## License
-Distributed under the MIT License. See `LICENSE` file for more information.
+Distributed under the MIT License. See `LICENSE` file.
 
 
 <!-- ACKNOWLEDGEMENTS -->

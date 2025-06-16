@@ -1,8 +1,6 @@
-project "imgui"
+project "util2"
     systemversion "latest"
     warnings      "extra"
-    rtti          "On"
-    SpecifyGlobalProjectCXXVersion()
     -- Project Structure
     files { 
         "include/**.h",
@@ -10,40 +8,37 @@ project "imgui"
         "include/**.hpp",
         "source/**.cpp"
     }
+    filter "files:stb_image.h" -- stb_image gives wayy to many warnings...
+        warnings "Off"
+    filter {}
     -- Specify Include Headers
     includedirs { 
-        "include"
+        "include" 
     }
-    IncludeGLFWDirectory()
 
     -- Build Directories &// Structure
     SetupBuildDirectoriesForLibrary()
 
     -- Build Options
+    buildoptions {
+        "-pthread"
+    }
+    filter {}
 
     -- Linking Options
     LinkToStandardLibraries()
-    LinkGLFWLibrary()
-    filter "system:windows"
-        links { 
-            "imm32",
-            "gdi32",
-            "user32"
-        }
-    filter "system:linux"
-        links { 
-            "pthread",
-            "dl", 
-            "X11", 
-            "Xrandr"
-        }
-    filter {}
-
+    links {
+        "pthread"
+    }
+    
     -- Macros
+    -- filter { "system:windows" }
+    --     defines { "SYSTEM_WINDOWS" , "_CRT_SECURE_NO_WARNINGS" }
+    filter {}
     filter { "configurations:*Lib" }
-        defines { "IMGUI_STATIC_DEFINE" }
+        defines { "UTIL2_STATIC_DEFINE" }
     filter { "configurations:*Dll" }
-        defines { "IMGUI_EXPORTS" }
+        defines { "UTIL2_EXPORTS" }
     filter {}
 
 
