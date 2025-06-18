@@ -1,13 +1,13 @@
 #include "shader2.hpp"
-#include "util/file.hpp"
-#include "util/marker2.hpp"
+#include "util2/C/file.h"
+#include "util2/C/marker4.h"
 #include <glbinding/gl/gl.h>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 
 
-using namespace util;
+using namespace util2;
 
 
 static inline std::array<char, 2048> genericErrorLogBuffer;
@@ -110,9 +110,9 @@ void Program::refreshShaderSource(u32 shaderID, const char* filepath)
     filepath = m_shaders[shaderID].filepath; /* use default filepath if filepath == nullptr */
 
 
-    loadFile(filepath, &buf.size, __scast(char*, nullptr));
+    util2_load_file(filepath, &buf.size, __scast(char*, nullptr));
     m_sources[shaderID].resize(buf.size);
-    loadFile(filepath, &buf.size, m_sources[shaderID].data()); /* will crash if false, so no need to check return bool */
+    util2_load_file(filepath, &buf.size, m_sources[shaderID].data()); /* will crash if false, so no need to check return bool */
     return;
 }
 

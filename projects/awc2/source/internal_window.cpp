@@ -2,9 +2,9 @@
 #include "awc2/window_types.hpp"
 #include "internal_callback.hpp"
 #include <GLFW/glfw3.h>
-#include "util/aligned_malloc.hpp"
-#include <util/macro.h>
-#include <util/util.hpp>
+#include <util2/C/macro.h>
+#include <util2/string.hpp>
+#include "util2/aligned_malloc.hpp"
 #include <cstdio>
 
 
@@ -21,7 +21,7 @@ bool Window::create(
     GLFWwindow* win_share
 ) {
     WindowDescriptor windesc;
-    util::__memcpy(__scast(void*, &windesc), __scast(void*, &windowOptions), sizeof(decltype(windesc)));
+    util2::memcpy(__scast(void*, &windesc), __scast(void*, &windowOptions), sizeof(decltype(windesc)));
 
 
     /* OpenGL Context Hints */
@@ -61,7 +61,7 @@ bool Window::create(
     i32 size_s = DEFAULT32;
     char* strBuffer = nullptr;
 	size_s    = std::snprintf(nullptr, 0, "Window %u", __give_id_to_win) + 1;
-	strBuffer = __scast(char*, util::aligned_malloc<8>(size_s));
+	strBuffer = __scast(char*, util2::aligned_malloc<8>(size_s));
 	std::snprintf(strBuffer, size_s, "Window %u", __give_id_to_win);
     ++__give_id_to_win;
     
@@ -79,7 +79,7 @@ bool Window::create(
         width,
         height
     };
-    util::aligned_free(strBuffer);
+    util2::aligned_free(strBuffer);
     return m_data.handle == nullptr;
 }
 

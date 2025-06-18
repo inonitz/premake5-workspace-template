@@ -1,4 +1,5 @@
 #include "vertexArray.hpp"
+#include <util2/C/macro.h>
 #include <glbinding/gl/gl.h>
 #include <array>
 

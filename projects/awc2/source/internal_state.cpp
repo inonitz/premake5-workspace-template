@@ -2,9 +2,9 @@
 #include "internal_callback.hpp"
 #include "internal_instance.hpp"
 #include "internal_event.hpp"
-#include <util/ifcrash.hpp>
-#include <util/marker2.hpp>
-#include <util/util.hpp>
+#include <util2/C/marker4.h>
+#include <util2/ifcrash.hpp>
+#include <util2/string.hpp>
 
 #include <glbinding/gl/gl.h>
 #include <glbinding/glbinding.h>
@@ -41,7 +41,7 @@ void AWC2ContextData::create(
 
 
     /* GLFW Window */
-    util::__memcpy(&win_desc_bits, __rcast(u64*, &win_desc), 1);
+    util2::memcpy(&win_desc_bits, __rcast(u64*, &win_desc), 1);
     bool not_good = m_window.create(
         __win_width, 
         __win_height,
@@ -78,7 +78,7 @@ void AWC2ContextData::initialize()
 
 
     /* User Defined Event table */
-    util::__memset<u64>(m_event_table.pointers, 
+    util2::memset<u64>(m_event_table.pointers, 
         __carraysize(m_event_table.pointers) - __carraysize(m_event_table.reserved0), 
         __rcast(u64, &user_callback_func_noop)
     );
@@ -144,13 +144,13 @@ void AWC2ContextData::destroy()
     m_window.destroy();
 
     /* Reset Variable Members */
-    util::__memset(reserved, __carraysize(reserved));
+    util2::memset(reserved, __carraysize(reserved));
     m_FlagClosed = DEFAULT8;
     m_FlagInit   = DEFAULT8;
     m_id         = DEFAULT8;
     m_imgui      = DEFAULTVOIDPTR;
     m_io.reset();
-    util::__memset(
+    util2::memset(
         m_event_table.pointers, 
         __carraysize(m_event_table.pointers), 
         DEFAULT64
