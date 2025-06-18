@@ -43,10 +43,12 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 
 
 ### Built With
-<br> [<img height="100px" src="https://avatars.githubusercontent.com/u/11135954?s=150&v=4">][Premake-url] </br>
-<br> [<img height="100px" src="https://avatars.githubusercontent.com/u/3905364?s=150&v=4">][GLFW-url] </br>
-<br> [<img height="100px" src="https://avatars.githubusercontent.com/u/8225057?s=150&v=4">][ImGui-url] </br>
 <br> [<img height="100px" src="https://raw.githubusercontent.com/cginternals/glbinding/master/glbinding-logo.svg?sanitize=true">][glbinding-url] </br>
+<br>
+[<img height="150px" src="https://avatars.githubusercontent.com/u/11135954?s=150&v=4">][Premake-url]
+[<img height="150px" src="https://avatars.githubusercontent.com/u/3905364?s=150&v=4">][GLFW-url]
+[<img height="150px" src="https://avatars.githubusercontent.com/u/8225057?s=150&v=4">][ImGui-url]
+</br>
 
 <!-- GETTING STARTED -->
 ## Getting Started
