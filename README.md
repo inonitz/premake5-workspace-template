@@ -57,9 +57,10 @@ Moreover, With the complexity involved in managing updates across multiple proje
 Each Project contains a ```premake5.lua``` file, describing everything about its compilation/linking  
 **There are 5 sub-project lua files available as reference/guiding points if you don't understand the Explanation below**
 #### To add a project to compilation/linking:
+* Create a ```premake5.lua``` file in your project root folder (see examples)
 * Add project path to ```PROJECT_LIST``` in ```premake5.lua```
 * Specify a ```LinkMyLibraryName``` function in ```dir.lua``` (see ```LinkLibExampleLibrary()``` for more info)
-* Use ```IncludeProjectHeaders(...)``` & ```LinkMyLibraryName``` in your library/executables' (see ```sample/premake5.lua``` for more info)
+* Use ```IncludeProjectHeaders(...)``` & ```LinkMyLibraryName``` in your other libraries/executables' (see ```sample/premake5.lua``` for more info)
 #### To add a dependency (Header Only library, prebuilt shared/static library, etc...) to compilation/linking:
 * Add the library to ```dependencies/```
 * Specify 2 functions in ```dir.lua```:
@@ -100,15 +101,15 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 5. Bash Shell 
     - **Windows:**
     - [Git for Windows](https://gitforwindows.org/) 
-    - MSYS2 Clang64 Shell
+    - MSYS2 Clang64 Shell (Using MSYS2 without the provided terminal causes program execution issues with DLL's)
     - **Linux:**
-    * Use your favourite package manager
+    * Use your favourite Bash Shell
 
 
 ### Installation
 #### There are 2 branches available:
-* **with-subprojects** - Includes ImGui, GLFW, glbinding, awc2, util2 and a sample program at *program/*
-* **barebones** - Executable-With-Library Samples, including reference premake files for: 
+* **with-subprojects** - Includes **Everything** with a sample program
+* **barebones** - Executable-With-Library Sample, including reference premake files for: 
     * ImGui
     * GLFW
     * glbinding
@@ -151,8 +152,13 @@ call ```premake5 --help``` in the root of the repository
 - Supporting VS2022 Project Solutions (they do not generate correctly)
 - Generating a launch.json at Project-Generation Time
 - Deleting files based on architecture (e.g ```cleanarch --arch='x'```)
-- Lua script to generate Test-Unit Executable Projects for each library (see ```)
+- Generating Test-Unit Projects for each library (see prototype ```premake5_generate_unit_test_per_tu.lua```)
 - Updating the compile_commands.json on command
+- Integrating Cppcheck
+- Integrating a cross-platform C++ profiler With Flame Graphs - [Tracy](https://github.com/wolfpld/tracy)(?)/[Optick](https://github.com/bombomby/optick)(?)/(?)
+- Cross-platform package management - [Spack](github.com/spack/spack?tab=readme-ov-file)(?)
+- Integration of [LLVM Machine-Code Analyzer](https://llvm.org/docs/CommandGuide/llvm-mca.html)
+- Automating this whole thing with Dev-Containers & Docker (Several issues, one being very gpu-specific solutions from every vendor) 
 - Optimization of Project-Generation Time:
   * ```with-subprojects``` branch
     * ```gmake```
