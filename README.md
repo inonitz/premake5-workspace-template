@@ -100,6 +100,7 @@ call ```premake5 --help``` in the root of the repository
     premake cleanclangd
     premake export-compile-commands
     premake --os=windows --arch=x86_64 --cc=clang gmake
+    premake --os=windows --arch=x86_64 --cc=clang gmake
     premake --os=windows --arch=x86_64 --cc=clang vs2022
     premake --os=linux --arch=x86_64 --cc=clang gmake
     premake --os=linux --arch=x86_64 --cc=gcc gmake
