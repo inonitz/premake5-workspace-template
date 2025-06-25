@@ -153,11 +153,12 @@ call ```premake5 --help``` in the root of the repository
 - Generating a launch.json at Project-Generation Time
 - Deleting files based on architecture (e.g ```cleanarch --arch='x'```)
 - Generating Test-Unit Projects for each library (see prototype ```premake5_generate_unit_test_per_tu.lua```)
-- Updating the compile_commands.json on command
+- Adding an action to update compile_commands.json based on target
 - Integrating Cppcheck
 - Integrating a cross-platform C++ profiler With Flame Graphs - [Tracy](https://github.com/wolfpld/tracy)(?)/[Optick](https://github.com/bombomby/optick)(?)/(?)
 - Cross-platform package management - [Spack](github.com/spack/spack?tab=readme-ov-file)(?)
 - Integration of [LLVM Machine-Code Analyzer](https://llvm.org/docs/CommandGuide/llvm-mca.html)
+- Utilizing [Profile-Guided Optimization](https://clang.llvm.org/docs/UsersManual.html#profile-guided-optimization)
 - Automating this whole thing with Dev-Containers & Docker (Several issues, one being very gpu-specific solutions from every vendor) 
 - Optimization of Project-Generation Time:
   * ```with-subprojects``` branch
