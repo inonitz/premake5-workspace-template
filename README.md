@@ -170,8 +170,11 @@ call ```premake5 --help``` in the root of the repository
       * ~2800ms [wsl2]
   * ```barebones``` branch
     * ```gmake```
-      * ~350ms [windows]
-      * ~250ms [wsl2]
+      * ~120ms [windows]
+      * ~TBD [wsl2]
+    * ninja
+      * ~120ms [windows]
+      * ~TBD [wsl2]
 
 
 <!-- CONTRIBUTING -->

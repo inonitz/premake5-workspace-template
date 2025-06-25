@@ -4,16 +4,20 @@ require(".vscode/premake-ninja")
 
 
 WORKSPACE_NAME = "DefaultWorkspace"
-PROJECT_LIST   = {
-    "projects/util2",
-    "projects/glbinding",
-    "projects/glbinding-aux",
-    "projects/glfw34",
-    "projects/imgui",
-    "projects/awc2",
-    "projects/program"
+-- PROJECT_LIST   = {
+--     "projects/util2",
+--     "projects/glbinding",
+--     "projects/glbinding-aux",
+--     "projects/glfw34",
+--     "projects/imgui",
+--     "projects/awc2",
+--     "projects/program"
+-- }
+PROJECT_LIST = {
+    "projects/libexample",
+    "projects/sample"
 }
-START_PROJECT = "program"
+START_PROJECT = "sample"
 
 
 include "toolchain.lua"
