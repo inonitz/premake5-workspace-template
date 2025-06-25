@@ -18,6 +18,7 @@ project "program"
     -- e.g IncludeProjectHeaders(...)
     includedirs { "include", "source" }
     IncludeProjectHeaders("util2")
+    IncludeProjectHeaders("glfw34")
     IncludeProjectHeaders("glbinding")
     IncludeProjectHeaders("glbinding-aux")
     IncludeProjectHeaders("imgui")
@@ -41,7 +42,7 @@ project "program"
     LinkImGuiLibrary()
     LinkAWC2Library()
     filter "system:windows"
-        links { "gdi32", "shell32" }
+        links { "gdi32", "shell32", "pthread" }
     filter "system:linux" 
         links { "dl", "pthread" }
     filter {}
@@ -52,23 +53,25 @@ project "program"
 
 
     -- Custom Pre &// Post build Actions
-    -- filter { "action:gmake", "system:windows" }
-        prebuildcommands {
-            "{copyfile} %[../../.vscode/compile_commands/%{cfg.shortname}.json] %[../../.vscode/compile_commands/compile_commands.json]"
-        }
+    -- -- filter { "action:gmake", "system:windows" }
+    --     prebuildcommands {
+    --         "{copyfile} %[../../.vscode/compile_commands/%{cfg.shortname}.json] %[../../.vscode/compile_commands/compile_commands.json]"
+    --     }
+    -- -- filter {}
+    -- filter { "action:gmake or action:vs2022", "system:windows", "configurations:*Dll" }
+    --     postbuildcommands {
+    --         "if not exist %[../../%{BUILD_BINARY_DIRECTORY}] mkdir  %[../../%{BUILD_BINARY_DIRECTORY}] \
+    --         {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_util2/*        ] %[../../%{BUILD_BINARY_DIRECTORY}] \
+    --         {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glbinding/*    ] %[../../%{BUILD_BINARY_DIRECTORY}] \
+    --         {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glbinding-aux/*] %[../../%{BUILD_BINARY_DIRECTORY}] \
+    --         {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glfw34/*       ] %[../../%{BUILD_BINARY_DIRECTORY}] \
+    --         {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_imgui/*        ] %[../../%{BUILD_BINARY_DIRECTORY}] \
+    --         {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_awc2/*         ] %[../../%{BUILD_BINARY_DIRECTORY}] \
+    --         {copydir} %[%{cfg.buildtarget.directory}] %[../../%{BUILD_BINARY_DIRECTORY}]"
+    --     }
     -- filter {}
-    filter { "action:gmake or action:vs2022", "system:windows", "configurations:*Dll" }
-        postbuildcommands {
-            "if not exist %[../../%{BUILD_BINARY_DIRECTORY}] mkdir  %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_util2/*        ] %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glbinding/*    ] %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glbinding-aux/*] %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_glfw34/*       ] %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_imgui/*        ] %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_awc2/*         ] %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[%{cfg.buildtarget.directory}] %[../../%{BUILD_BINARY_DIRECTORY}]"
-        }
-    filter {}
+    PreBuildCopyBuildTargetCompileCommandsToFolder()
+    PostBuildCommmandsForExecutable()
 
 
     -- If you have a library in dependencies/

@@ -7,6 +7,7 @@
 #include <util2/C/aligned_malloc.h>
 #include <util2/ifcrash.hpp>
 #include <util2/string.hpp>
+#include <util2/pool.hpp>
 
 
 namespace AWC2 {

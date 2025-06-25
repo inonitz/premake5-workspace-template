@@ -42,9 +42,11 @@ UTIL2_API UTIL2_EXTERNC void util2_marker_flag(
 );
 
 
+// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg, cppcoreguidelines-macro-usage)
 #	define mark()            util2_marker_flag(__FILE__, __LINE__, "");
 #	define markstr(str)      util2_marker_flag(__FILE__, __LINE__, str);
 #	define markfmt(str, ...) util2_marker_flag(__FILE__, __LINE__, str, __VA_ARGS__);
+// NOLINTEND(cppcoreguidelines-pro-type-vararg, cppcoreguidelines-macro-usage)
 
 
 #endif /* UTIL2_MARKER_FLAG_DISABLE */

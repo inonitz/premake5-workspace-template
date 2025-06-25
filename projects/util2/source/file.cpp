@@ -1,10 +1,10 @@
 #include "util2/file.hpp"
-#include "util2/C/util2_extern.h"
 #include "util2/C/base_type.h"
 #include "util2/ifcrash.hpp"
 #include <filesystem>
 #include <string.h>
 #include <stdio.h>
+#include <cinttypes>
 
 
 bool util2::loadFile(
@@ -32,12 +32,12 @@ bool util2::loadFile(
 	fsize = fread(out, sizeof(unsigned char), *size, to_open);
 	ifcrashdo(fsize != *size, {
 		fclose(to_open); 
-		printf("Something went wrong - file size is %lu bytes, read only %lu bytes\n", __scast(uint64_t, *size), fsize);
+		printf("Something went wrong - file size is %" PRIu64 " bytes, read only %" PRIu64 " bytes\n", __scast(uint64_t, *size), fsize);
 	});
 
 
 	fsize = fclose(to_open);
-	ifcrashfmt(fsize, "Couldn't close file handle. ERROR CODE: %lld\n", fsize, errno);
+	ifcrashfmt(fsize, "Couldn't close file handle. ERROR CODE: %" PRId64 "\n", fsize, errno);
 	return true;
 }
 
@@ -63,16 +63,7 @@ void util2::current_path(
 }
 
 
-UTIL2_EXTERNC bool util2_load_file(
-	const char*   path,
-	unsigned int* size,
-	char*		  out  
-) {
-	return util2::loadFile(path, size, out);
-}
-
-
-UTIL2_EXTERNC void util2_current_path(
+void util2_current_path(
 	unsigned int*  size,
 	char* 		   out 	
 ) {

@@ -122,11 +122,16 @@ __force_inline inline void memcpy(
 	T const* psrc, 
 	u64 	 count
 ) {
-	while(count) {
+	// while(count) {
+	// 	*pdest = *psrc;
+	// 	++pdest;
+	// 	++psrc;
+	// 	--count;
+	// }
+	for(; --count; ) {
 		*pdest = *psrc;
-		++pdest;
 		++psrc;
-		--count;
+		++pdest;
 	}
 	return;
 }

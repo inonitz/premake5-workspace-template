@@ -1,5 +1,5 @@
-#ifndef __UTIL2_GENERIC_VECTOR_BUFFER__
-#define __UTIL2_GENERIC_VECTOR_BUFFER__
+#ifndef __UTIL2_C_DEFINITION_GENERIC_VECTOR_BUFFER__
+#define __UTIL2_C_DEFINITION_GENERIC_VECTOR_BUFFER__
 #include "util2/C/util2_api.h"
 #include "util2/C/util2_extern.h"
 #include "util2/C/macro.h"

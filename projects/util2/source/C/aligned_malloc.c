@@ -1,6 +1,8 @@
 #include "util2/C/aligned_malloc.h"
 #include "util2/C/macro.h"
+#include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 
 /*
@@ -29,18 +31,46 @@ void* util2_aligned_malloc(u64 bytes, u16 alignment)
     return __rcast(void*, aligned_addr);
 }
 
-
 void util2_aligned_free(void* ptr)
 {
     /* Self Explanatory */
-    u64 offset_to_original_alloc = *(__rcast(u16*, ptr) - 1);
-    
+    u16 offset_to_original_alloc = *__rcast(u16*, __rcast(uintptr_t, ptr) - 2);
+
     /* Now we re-use 'offset_to_original_alloc' to get the original address in integer form */
-    offset_to_original_alloc = __rcast(u64, ptr) - offset_to_original_alloc;
+    u64 original_address = __rcast(uintptr_t, ptr) - offset_to_original_alloc;
     /* Free the original address */
-    free(__rcast(void*, offset_to_original_alloc));
+    free(__rcast(void*, original_address));
 
 
     return;
 }
+
+
+// void* util2_aligned_malloc2(u64 bytes, u32 alignment) {
+//     if(unlikely((alignment % 2) != 0)) {
+//         fprintf(stderr, "util2_aligned_malloc2(...) ==> Invalid Alignment (%" PRIu32 ") supplied\n", alignment);
+//         return NULL;
+//     }
+//     uintptr_t initial_addr, aligned_addr;
+//     const u32 hdr_size = sizeof(u32) + alignment;
+
+
+//     initial_addr = __rcast(uintptr_t, malloc(bytes + hdr_size));
+//     aligned_addr = alignment - ( initial_addr & (alignment - 1) ); /* how much we need to add to aligned_addr to make it actually aligned */
+//     if(likely(initial_addr != 0)) {
+//         *__rcast(u32*, initial_addr) = aligned_addr;
+//     }
+//     aligned_addr += initial_addr;
+
+
+//     return __rcast(void*, aligned_addr);
+// }
+
+// void util2_aligned_free(void* ptr)
+// {
+//     uintptr_t offset;
+//     uintptr_t address = __rcast(uintptr_t, ptr);
+// }
+
+
 

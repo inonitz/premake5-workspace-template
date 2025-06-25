@@ -1,5 +1,6 @@
 include "searchlocal.lua"
 require(".vscode/export-compile-comms")
+require(".vscode/premake-ninja")
 
 
 WORKSPACE_NAME = "DefaultWorkspace"

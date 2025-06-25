@@ -110,6 +110,21 @@ struct alignsz(8) WindowDescriptor {
         stateFlags  = __scast(WindowStateFlag,    (wd_bits >> 56) & 0xFF);
         return *this;
     }
+
+
+    static WindowDescriptor getNullDescriptor() {
+        return WindowDescriptor{0, 0, WindowCreationFlag::MAX };
+    }
+
+
+    u64 asBits() const {
+        u64 result;
+        result  = ( __scast(u64, stateFlags)  << 56 );
+        result |= ( __scast(u64, createFlags) << 48 );
+        result |= ( __scast(u64, refreshRate) << 32 );
+        result |= framebufferChannels;
+        return result;
+    }
 };
 UTIL2_STATIC_ASSERT(sizeof(WindowDescriptor) == 8, WindowDescriptor, "Conforming Size Types Across Compilers")
 

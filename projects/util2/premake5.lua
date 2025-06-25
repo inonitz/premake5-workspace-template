@@ -20,21 +20,17 @@ project "util2"
     SetupBuildDirectoriesForLibrary()
 
     -- Build Options
-    buildoptions {
-        "-pthread"
-    }
-    filter {}
+    buildoptions { "-pthread" }
 
     -- Linking Options
     LinkToStandardLibraries()
-    links {
-        "pthread"
-    }
+    links { "pthread" }
+    
     
     -- Macros
     -- filter { "system:windows" }
     --     defines { "SYSTEM_WINDOWS" , "_CRT_SECURE_NO_WARNINGS" }
-    filter {}
+    -- filter {}
     filter { "configurations:*Lib" }
         defines { "UTIL2_STATIC_DEFINE" }
     filter { "configurations:*Dll" }

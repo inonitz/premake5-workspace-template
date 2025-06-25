@@ -1,6 +1,6 @@
 #include "shader2.hpp"
-#include "util2/C/file.h"
-#include "util2/C/marker4.h"
+#include <util2/C/file.h>
+#include <util2/C/marker4.h>
 #include <glbinding/gl/gl.h>
 #include <cmath>
 #include <cstdio>
@@ -110,7 +110,7 @@ void Program::refreshShaderSource(u32 shaderID, const char* filepath)
     filepath = m_shaders[shaderID].filepath; /* use default filepath if filepath == nullptr */
 
 
-    util2_load_file(filepath, &buf.size, __scast(char*, nullptr));
+    util2_load_file(filepath, &buf.size, NULL);
     m_sources[shaderID].resize(buf.size);
     util2_load_file(filepath, &buf.size, m_sources[shaderID].data()); /* will crash if false, so no need to check return bool */
     return;
@@ -135,27 +135,27 @@ void Program::resizeLocalWorkGroup(u32 shaderID, u32 workGroupSizeX, u32 workGro
 
 bool Program::compile()
 {
-    size_t     i             = 0;
+    size_t     curr          = 0;
     i32        successStatus = __scast(i32, gl::GL_TRUE);
     BufferData populate      = {nullptr, 0};
 
 
     /* Shader Compile stage Begin. */
-    for(; i < m_shaders.size() && successStatus; ++i) {
-        ifcrash_debug(m_sources[i].size() > UINT32_MAX);
+    for(; curr < m_shaders.size() && successStatus; ++curr) {
+        ifcrash_debug(m_sources[curr].size() > UINT32_MAX);
         populate = {
-            m_sources[i].data(),
-            __scast(u32, m_sources[i].size())
+            m_sources[curr].data(),
+            __scast(u32, m_sources[curr].size())
         };
         // debug_messagefmt("Loading shader [%s/%u ] with Buffer %p [%llu bytes]\nSource:\n%s\n", shaderTypeToString(shaders[i].type), shaders.size(), populate.data, populate.size, sources[i].data());
-        successStatus = successStatus && loadShader(m_shaders[i], populate); 
+        successStatus = successStatus && loadShader(m_shaders[curr], populate); 
     }
     /* Shader Compile stage End. */
     
     /* Error Checking For Shader Stage */
     if(!successStatus) {
-        markfmt("Failed to load Shader Files/Buffers. Failed on shaderID = %llu\n", i);
-        for(size_t s = 0; s < i; ++s) { /* Delete previously compiled shaders */
+        markfmt("Failed to load Shader Files/Buffers. Failed on shaderID = %llu\n", curr);
+        for(size_t s = 0; s < curr; ++s) { /* Delete previously compiled shaders */
             gl::glDeleteShader(m_shaders[s].id);
             m_shaders[s].id = DEFAULT32;
         }

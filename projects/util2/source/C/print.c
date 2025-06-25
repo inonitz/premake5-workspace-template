@@ -53,7 +53,8 @@ __force_inline static inline void __util2_end_exclusion()
     return;
 }
 
-static void __util2_internal_printfmt_va_list(
+
+void util2_va_fprintf(
     FILE*       write_into,
     const char* format, 
     va_list     arg_list
@@ -73,7 +74,7 @@ static void __util2_internal_printfmt_va_list(
     va_end(arglistcopy);
 
     if (size > __UTIL2_GENERIC_FORMAT_BUFFER_MAX_SIZE) {
-        fputs("\n[print.c] => __util2_internal_printfmt_va_list() __VA_ARGS__ too large\n", write_into);
+        fputs("\n[print.c] => util2_va_fprintf() __VA_ARGS__ too large\n", write_into);
         invalid_state = BOOL_TRUE;
     }
     if (!invalid_state) { /* on success iterate-over/use the given arg_list inside vsnprintf, va_end() will be called outside the function */
@@ -82,7 +83,7 @@ static void __util2_internal_printfmt_va_list(
 
 
     if (invalid_state || done < 0) {
-        fputs("\n[print.c] => __util2_internal_printfmt_va_list() Couldn't format __VA_ARGS__\n", write_into);
+        fputs("\n[print.c] => util2_va_fprintf() Couldn't format __VA_ARGS__\n", write_into);
         fmtbuf.mem[0] = '\0'; /* if fputs encounters an eol it'll stop */
     }
     fputs(fmtbuf.mem, write_into);
@@ -111,7 +112,7 @@ void util2_printf(const char* format, ...)
 
     va_list arg_list;
     va_start(arg_list, format);
-    __util2_internal_printfmt_va_list(__log_buffer, format, arg_list);
+    util2_va_fprintf(__log_buffer, format, arg_list);
     va_end(arg_list);
     __util2_end_exclusion();
     return;
@@ -122,7 +123,7 @@ void util2_fprintf(FILE* write_to, const char* format, ...)
     __util2_begin_exclusion();
     va_list arg_list;
     va_start(arg_list, format);
-    __util2_internal_printfmt_va_list(write_to, format, arg_list);
+    util2_va_fprintf(write_to, format, arg_list);
     va_end(arg_list);
     __util2_end_exclusion();
     return;

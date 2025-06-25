@@ -17,13 +17,9 @@ static u8 __give_id_to_win = 0;
 bool Window::create(
     u16 width, 
     u16 height, 
-    u64 windowOptions,
+    WindowDescriptor winopt,
     GLFWwindow* win_share
 ) {
-    WindowDescriptor windesc;
-    util2::memcpy(__scast(void*, &windesc), __scast(void*, &windowOptions), sizeof(decltype(windesc)));
-
-
     /* OpenGL Context Hints */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -33,29 +29,29 @@ bool Window::create(
     glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS,    GLFW_LOSE_CONTEXT_ON_RESET); /* glGetGraphicsResetStatus() */
     /* Window Specific Hints*/
     glfwWindowHint(GLFW_VISIBLE, boolean(
-        __scast(i32, windesc.createFlags & WindowCreationFlag::STARTUP_VISIBLE) 
+        __scast(i32, winopt.createFlags & WindowCreationFlag::STARTUP_VISIBLE) 
     ));
     glfwWindowHint(GLFW_FOCUSED, boolean(
-        __scast(i32, windesc.createFlags & WindowCreationFlag::STARTUP_FOCUSED)
+        __scast(i32, winopt.createFlags & WindowCreationFlag::STARTUP_FOCUSED)
     ));
     glfwWindowHint(GLFW_CENTER_CURSOR, boolean(
-        __scast(i32, windesc.createFlags & WindowCreationFlag::STARTUP_CENTER_CURSOR) 
+        __scast(i32, winopt.createFlags & WindowCreationFlag::STARTUP_CENTER_CURSOR) 
     ));
     glfwWindowHint(GLFW_RESIZABLE, boolean(
-        __scast(i32, windesc.createFlags & WindowCreationFlag::RESIZABLE)
+        __scast(i32, winopt.createFlags & WindowCreationFlag::RESIZABLE)
     ));
     glfwWindowHint(GLFW_DECORATED, boolean(
-        __scast(i32, windesc.createFlags & WindowCreationFlag::BORDER)
+        __scast(i32, winopt.createFlags & WindowCreationFlag::BORDER)
     ));
-    glfwWindowHint(GLFW_REFRESH_RATE, windesc.refreshRate == 0 
-        ? GLFW_DONT_CARE : windesc.refreshRate
+    glfwWindowHint(GLFW_REFRESH_RATE, winopt.refreshRate == 0 
+        ? GLFW_DONT_CARE : winopt.refreshRate
     );
-    glfwWindowHint(GLFW_DEPTH_BITS,   (windesc.framebufferChannels >> 25) & 0b11111);
-    glfwWindowHint(GLFW_STENCIL_BITS, (windesc.framebufferChannels >> 20) & 0b11111);
-    glfwWindowHint(GLFW_RED_BITS,     (windesc.framebufferChannels >> 15) & 0b11111);
-    glfwWindowHint(GLFW_GREEN_BITS,   (windesc.framebufferChannels >> 10) & 0b11111);
-    glfwWindowHint(GLFW_BLUE_BITS,    (windesc.framebufferChannels >> 5 ) & 0b11111);
-    glfwWindowHint(GLFW_ALPHA_BITS,   (windesc.framebufferChannels >> 0 ) & 0b11111);
+    glfwWindowHint(GLFW_DEPTH_BITS,   (winopt.framebufferChannels >> 25) & 0b11111);
+    glfwWindowHint(GLFW_STENCIL_BITS, (winopt.framebufferChannels >> 20) & 0b11111);
+    glfwWindowHint(GLFW_RED_BITS,     (winopt.framebufferChannels >> 15) & 0b11111);
+    glfwWindowHint(GLFW_GREEN_BITS,   (winopt.framebufferChannels >> 10) & 0b11111);
+    glfwWindowHint(GLFW_BLUE_BITS,    (winopt.framebufferChannels >> 5 ) & 0b11111);
+    glfwWindowHint(GLFW_ALPHA_BITS,   (winopt.framebufferChannels >> 0 ) & 0b11111);
 
 
     i32 size_s = DEFAULT32;
@@ -67,7 +63,7 @@ bool Window::create(
     
     
     m_data = {
-        windesc,
+        winopt,
         glfwCreateWindow(
             __scast(i32, width), 
             __scast(i32, height), 

@@ -1,4 +1,5 @@
 #include "awc2/C/awc2.h"
+#include "awc2/context.hpp"
 #include "awc2/entry.hpp"
 #include "awc2/input.hpp"
 #include "../internal_event.hpp"
@@ -133,7 +134,7 @@ AWC2_EXTERNC void awc2initializeContext(AWC2ContextDescriptor const* ctxt)
         AWC2::WindowDescriptor{
             ctxt->winDesc.framebufferChannels,
             ctxt->winDesc.refreshRate,
-            __scast(AWC2::WindowCreationFlag, ctxt->winDesc.createFlags)
+            AWC2::WindowCreationFlag{ctxt->winDesc.createFlags}
         }
     };
     AWC2::initializeContext(cppdesc);

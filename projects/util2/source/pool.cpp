@@ -3,6 +3,7 @@
 #include "util2/aligned_malloc.hpp"
 #include <cstring>
 #include <cstdio>
+#include <cinttypes>
 
 
 namespace util2::detail {
@@ -88,11 +89,16 @@ void CommonPoolDef<objectSizeInBytes>::print() const
 {
     static const char* strs[2] = { "Occupied", "Free    " };
     bool tmp = false;
-    std::printf("Static Pool Allocator:\nObject Array[%lu]: %p\n    Free:     %lu\n    Occupied: %lu\n    ", m_elemCount, __scast(void*, m_buffer), m_freeBlk, m_elemCount - m_freeBlk);
+    std::printf("Static Pool Allocator Located at 0x%" PRIxPTR " [%" PRIuLEAST64 "/ %" PRIuLEAST64 "] Occupied\n",
+        __rcast(std::uintptr_t, m_buffer),
+        m_elemCount - m_freeBlk,
+        m_elemCount
+    );
+
     for(u64 i = 0; i < m_elemCount; ++i)
     {
         tmp = boolean(m_freelist[i].index > 0);
-        std::printf("    Object [i = %lu] [%s] => Object [%lu]\n", i, strs[tmp], __scast(u64, m_freelist[i].index));
+        std::printf("    [%" PRIuLEAST64 "] [%s] => Object [%" PRIuLEAST64 "]\n", i, strs[tmp], __scast(u64, m_freelist[i].index));
     }
     return;
 }
@@ -117,23 +123,23 @@ void CommonPoolDef<objectSizeInBytes>::common_init(u64 amountOfElements)
 }
 
 
-template struct CommonPoolDef<0x08>;
-template struct CommonPoolDef<0x10>;
-template struct CommonPoolDef<0x18>;
-template struct CommonPoolDef<0x20>;
-template struct CommonPoolDef<0x28>;
-template struct CommonPoolDef<0x30>;
-template struct CommonPoolDef<0x38>;
-template struct CommonPoolDef<0x40>;
-template struct CommonPoolDef<0x48>;
-template struct CommonPoolDef<0x50>;
-template struct CommonPoolDef<0x58>;
-template struct CommonPoolDef<0x60>;
-template struct CommonPoolDef<0x68>;
-template struct CommonPoolDef<0x70>;
-template struct CommonPoolDef<0x78>;
-template struct CommonPoolDef<0x80>;
-template struct CommonPoolDef<0xc0>;
+template struct CommonPoolDef<0x008>;
+template struct CommonPoolDef<0x010>;
+template struct CommonPoolDef<0x018>;
+template struct CommonPoolDef<0x020>;
+template struct CommonPoolDef<0x028>;
+template struct CommonPoolDef<0x030>;
+template struct CommonPoolDef<0x038>;
+template struct CommonPoolDef<0x040>;
+template struct CommonPoolDef<0x048>;
+template struct CommonPoolDef<0x050>;
+template struct CommonPoolDef<0x058>;
+template struct CommonPoolDef<0x060>;
+template struct CommonPoolDef<0x068>;
+template struct CommonPoolDef<0x070>;
+template struct CommonPoolDef<0x078>;
+template struct CommonPoolDef<0x080>;
+template struct CommonPoolDef<0x0c0>;
 template struct CommonPoolDef<0x100>;
 template struct CommonPoolDef<0x140>;
 template struct CommonPoolDef<0x180>;
@@ -141,7 +147,7 @@ template struct CommonPoolDef<0x1c0>;
 template struct CommonPoolDef<0x200>;
 
 
-} // namespace detail
+} // namespace util2::detail
 
 
 

@@ -33,9 +33,10 @@ project "glbinding-aux"
     filter { "configurations:*Dll" }
         defines { "glbinding_aux_EXPORTS" }
     filter {}
-    -- filter { "system:windows" }
-    -- defines { "SYSTEM_WINDOWS" , "_CRT_SECURE_NO_WARNINGS" }
-    -- filter {}
+    filter { "system:windows" }
+        -- defines { "SYSTEM_WINDOWS" , "_CRT_SECURE_NO_WARNINGS" }
+        defines { "SYSTEM_WINDOWS" }
+    filter {}
     -- defines { 
     --     -- required for compilers using -std=c++20, -static-libstdc++ || clang_version < 19. 
     --     -- ==> https://github.com/msys2/MINGW-packages/issues/17730 [further read]

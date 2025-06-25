@@ -19,27 +19,53 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About
-Needed to manage multiple projects in a single workspace with easy integration to clangd, with the option of providing cross-compilation support  
-Had multiple options:
-* **[Make](https://www.gnu.org/software/make/)** - Will not go back to those
-* **[cmake](https://cmake.org/)**           - Industry standard, should've probably used that
-* **[xmake](https://github.com/xmake-io)**  - Didn't need an alternative to cmake
-* **[premake](https://premake.github.io/)** - A meta build system with lua syntax (also like xmake, except more barebones)
+This project is my best current & continuous effort at a portable C++ multi-project environment (without CMake!)   
+This Project aims to work seamlessly across Linux & Windows  
+Current Integration of tools:
+  - [clangd](https://clangd.llvm.org/)
+  - [ASan](https://github.com/google/sanitizers/wiki/addresssanitizer)
+  - [UBSan](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)
+  - [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
+  - [clang-tidy](https://clang.llvm.org/extra/clang-tidy/)
+  - [lldb](https://lldb.llvm.org/use/tutorial.html)
+  - Various useful C++ Libraries
+    * [ImGui](https://github.com/ocornut/imgui)
+    * [GLFW](https://github.com/glfw/glfw/releases)
+    * [glbinding](https://github.com/cginternals/glbinding/releases)
+    * [Catch2](https://github.com/catchorg/Catch2)
+    * [GoogleMock & GoogleTest](https://github.com/google/googletest)
+    * [Google Benchmark](https://github.com/google/benchmark)
 
-Thus, I migrated my previous **[project](https://github.com/inonitz/makefile-library-template)** because I didn't have recompilation targets
+<!-- ABOUT THE PROJECT -->
+### Considerations
+The original motivation was mainly the continuous discomfort with using hand-made **[Makefiles](https://github.com/inonitz/makefile-library-template)** without recompilation targets, I had to recompile everything on every little change  
+More recently, I needed integration with various libraries & tools on vscode  
+I also needed **some** form of cross platform Support (Incoming [DLL Hell](https://stackoverflow.com/questions/1379287/i-keep-hearing-about-dll-hell-what-is-this)) (Also see [ABI Hell](https://stackoverflow.com/questions/2171177/what-is-an-application-binary-interface-abi)), so I eventually (unfortunately) decided I'll manage dependencies manually in a mono-repository (for now).
+
+Considering the problem of build/meta-build systems, I examined multiple choices (found below) and eventually decided to use premake5 because of its relative simplicity to the competition:
+* **[Make](https://www.gnu.org/software/make/)** - Will not go back to those, too cumbersome to manage manually
+* **[CMake](https://cmake.org/)**           - Industry standard, everyone loves to hate it
+* **[xmake](https://github.com/xmake-io)**  - Didn't need an alternative to cmake
+* **[premake5](https://premake.github.io/)** - A meta build system with lua syntax (also like xmake, except more barebones)
+* **[Bazel](https://bazel.build/)** - Seemed a little too much & too complex for what I needed
+* **[Ninja](https://ninja-build.org/)** - I do not know of any particular examples of people writing ninja scripts manually
+  
+Moreover, With the complexity involved in managing updates across multiple projects, when each of which uses this specific Mono-Repository and constantly changes/updates it, I've decided to move each Library here to its separate 'premake5-packaged' repository, with the eventual integration of git submodules to the library-consuming project
+
+
 ### Project Structure
 Each Project contains a ```premake5.lua``` file, describing everything about its compilation/linking  
 **There are 5 sub-project lua files available as reference/guiding points if you don't understand the Explanation below**
 #### To add a project to compilation/linking:
-* Add the project-folder path to ```PROJECT_LIST``` in ```premake5.lua```
+* Add project path to ```PROJECT_LIST``` in ```premake5.lua```
 * Specify a ```LinkMyLibraryName``` function in ```dir.lua``` (see ```LinkLibExampleLibrary()``` for more info)
 * Use ```IncludeProjectHeaders(...)``` & ```LinkMyLibraryName``` in your library/executables' (see ```sample/premake5.lua``` for more info)
 #### To add a dependency (Header Only library, prebuilt shared/static library, etc...) to compilation/linking:
-* Add your library to the folder ```dependencies/```
+* Add the library to ```dependencies/```
 * Specify 2 functions in ```dir.lua```:
   * ```LinkMyDependencyName```
   * ```IncludeDependencyNameHeaders```
-* Use The defined functions in your library/executables' premake5.lua 
+* Use Them in your library/executables' premake5.lua 
 
 
 ### Built With
@@ -59,14 +85,24 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
    - **Windows:**
    - [Msys2 Clang64](https://www.mingw-w64.org/getting-started/msys2-llvm)
    - [Clang LLVM](https://github.com/llvm/llvm-project/releases)
+      * **[NOTE]:** There may be compilation errors with Clang LLVM due to <threads.h>
    - **Linux:**
    - [Installing a specific llvm version](https://askubuntu.com/questions/1508260/how-do-i-install-clang-18-on-ubuntu)
    - [Configure Symlinks](https://unix.stackexchange.com/questions/596226/how-to-change-clang-10-llvm-10-etc-to-clang-llvm-etc) - as clang-'version_number' will not be detected by premake5
 3. Add your toolchain to the global PATH
-4. **[NOTE]:** llvm-clang relies on Platform-Specific System Headers & Libraries
-   - Windows Requires additional setup - A Working Standard Library implementation with System-Headers, either MSVC, msys2, mingw-w64, WinLibs, etc...
-   - Linux Will very likely work out of the box
-5. Powershell / Any Standard unix-shell 
+4. **[NOTE]:** LLVM-Clang relies on Platform-Specific System Headers & Libraries
+   - **Windows:** Standard Library implementation with System-Headers:
+      * MSYS2 (use [clang-mingw64](https://packages.msys2.org/groups/mingw-w64-clang-x86_64-toolchain) instead of LLVM-Clang)
+      * MinGW-w64
+      * WinLibs
+      * MSVC (libraries will be automatically detected)
+   - **Linux:** Will very likely work out of the box
+5. Bash Shell 
+    - **Windows:**
+    - [Git for Windows](https://gitforwindows.org/) 
+    - MSYS2 Clang64 Shell
+    - **Linux:**
+    * Use your favourite package manager
 
 
 ### Installation
@@ -94,36 +130,46 @@ call ```premake5 --help``` in the root of the repository
 
 ### Common Commands:
 ```sh
-    premake5 --proj=program cleanproj 
-    premake cleanall 
-    premake cleancfg
-    premake cleanclangd
-    premake export-compile-commands
-    premake --os=windows --arch=x86_64 --cc=clang gmake
-    premake --os=windows --arch=x86_64 --cc=clang gmake
-    premake --os=windows --arch=x86_64 --cc=clang vs2022
-    premake --os=linux --arch=x86_64 --cc=clang gmake
-    premake --os=linux --arch=x86_64 --cc=gcc gmake
+    premake5 cleanproj --proj=program 
+    premake5 cleanbuild
+    premake5 cleancfg
+    premake5 cleanclangd
+    premake5 cleanall 
+    premake5 export-compile-commands
+    premake5 ecc (same as export-compile-commands)
+    premake5 --os=windows --arch=x86_64 --cc=clang gmake
+    premake5 --os=windows --arch=x86_64 --cc=clang ninja
+    premake5 --os=windows --arch=x86_64 --cc=clang vs2022
+    premake5 --os=linux --arch=x86_64 --cc=clang gmake
+    premake5 --os=linux --arch=x86_64 --cc=gcc gmake
 ```
 
 
 
 <!-- ROADMAP -->
 ## Roadmap
-- Adding an option to delete files based on architecture (e.g ```cleanarch --arch='x'```)
-- Premake should be able to generate vs2022 files. This premake project can't do that (yet)
-- Optimization of execution time:
+- Supporting VS2022 Project Solutions (they do not generate correctly)
+- Generating a launch.json at Project-Generation Time
+- Deleting files based on architecture (e.g ```cleanarch --arch='x'```)
+- Lua script to generate Test-Unit Executable Projects for each library (see ```)
+- Updating the compile_commands.json on command
+- Optimization of Project-Generation Time:
   * ```with-subprojects``` branch
-    * ~7000ms [windows] 
-    * ~8255ms [wsl2] 
+    * ```gmake```
+      * ~3200ms [windows] 
+      * ~2200ms [wsl2] 
+    * ```ninja```
+      * ~3100ms [windows]
+      * ~2800ms [wsl2]
   * ```barebones``` branch
-    * ~350ms [windows]
-    * ~250ms [linux]
+    * ```gmake```
+      * ~350ms [windows]
+      * ~250ms [wsl2]
 
 
 <!-- CONTRIBUTING -->
 ## Contributing
-If you have a suggestion, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".  
+If you have a suggestion, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 
 
 <!-- LICENSE -->
@@ -135,6 +181,7 @@ Distributed under the MIT License. See `LICENSE` file.
 ## Acknowledgements
 * [Kumodatsu](https://github.com/Kumodatsu/template-cpp-premake5/tree/master) For the initial template repo
 * [Jarod42](https://github.com/Jarod42/premake-export-compile-commands/tree/Improvements) For the Improvements branch of export-compile-commands
+* [Premake Ninja](https://github.com/jimon/premake-ninja) - Ninja Build System integration with premake5
 * [Best-README](https://github.com/othneildrew/Best-README-Template)
 
 

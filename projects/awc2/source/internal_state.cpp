@@ -34,18 +34,15 @@ void AWC2ContextData::create(
     u16 __win_width, 
     u16 __win_height, 
     WindowDescriptor const& __win_desc
-) {
-    u64 win_desc_bits;
-    WindowDescriptor win_desc = __win_desc;
+) {    
     const glfw_callback_table default_callbacks{};
 
 
     /* GLFW Window */
-    util2::memcpy(&win_desc_bits, __rcast(u64*, &win_desc), 1);
     bool not_good = m_window.create(
         __win_width, 
         __win_height,
-        win_desc_bits,
+        __win_desc,
         nullptr
     );
     if(not_good) {

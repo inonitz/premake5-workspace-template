@@ -7,20 +7,20 @@
 #   else
 #       include "util2/C/compiler_warning.h"
 #       pragma message WARN("Cannot use <time.h> - No support available for it")
-#endif
+#   endif
 #   include "util2/C/macro.h"
 #   include <stdatomic.h>
 #   include <stdio.h>
 #   include <stdlib.h>
 #   include <stdarg.h>
 #   include <pthread.h>
-#if defined __clang__ && defined _WIN32
+#if defined __clang__ && defined _WIN32 && defined __MINGW64__
 #   include <pthread_time.h>
 #endif
 
 
 #define __UTIL2_GENERIC_FORMAT_BUFFER_MAX_SIZE 32768
-typedef struct __generic_format_char_buffer 
+typedef struct generic_format_char_buffer 
 {
     char mem[__UTIL2_GENERIC_FORMAT_BUFFER_MAX_SIZE];
 } util2_format_buffer;
@@ -31,9 +31,9 @@ typedef struct __generic_format_char_buffer
     static  objects - PTHREAD_MUTEX_INITIALIZER
     runtime objects - pthread_mutex_init
 */
-static alignsz(64) pthread_mutex_t       __write_lock = PTHREAD_MUTEX_INITIALIZER;
-static alignsz(64) atomic_uint_least64_t __markflag;
-static FILE*                             __log_buffer;
+static alignsz(64) pthread_mutex_t       s_write_lock = PTHREAD_MUTEX_INITIALIZER;
+static alignsz(64) atomic_uint_least64_t s_markflag;
+static FILE*                             s_logbuffer;
 
 
 __force_inline static inline void __begin_exclusion()
@@ -42,7 +42,7 @@ __force_inline static inline void __begin_exclusion()
         .tv_sec = 0,
         .tv_nsec = 5000000 /* 5 milliseconds */
     };
-    while( pthread_mutex_trylock(&__write_lock) != 0)
+    while( pthread_mutex_trylock(&s_write_lock) != 0)
         nanosleep(&sleep_request, NULL);
 
     return;
@@ -50,7 +50,7 @@ __force_inline static inline void __begin_exclusion()
 
 __force_inline static inline void __end_exclusion()
 {
-    pthread_mutex_unlock(&__write_lock);
+    pthread_mutex_unlock(&s_write_lock);
     return;
 }
 
@@ -73,7 +73,7 @@ static void __util2_internal_printfmt_va_list(
     va_end(arglistcopy);
 
     if (size > __UTIL2_GENERIC_FORMAT_BUFFER_MAX_SIZE) {
-        fputs("\n[marker3.cpp] => __util2_internal_printfmt_va_list() __VA_ARGS__ too large\n", __log_buffer);
+        fputs("\n[marker3.cpp] => __util2_internal_printfmt_va_list() __VA_ARGS__ too large\n", s_logbuffer);
         invalid_state = BOOL_TRUE;
     }
     if (!invalid_state) { /* on success iterate-over/use the given arg_list inside vsnprintf, va_end() will be called outside the function */
@@ -82,16 +82,16 @@ static void __util2_internal_printfmt_va_list(
 
 
     if (invalid_state || done < 0) {
-        fputs("\n[marker3.cpp] => __util2_internal_printfmt_va_list() Couldn't format __VA_ARGS__\n", __log_buffer);
+        fputs("\n[marker3.cpp] => __util2_internal_printfmt_va_list() Couldn't format __VA_ARGS__\n", s_logbuffer);
         fmtbuf.mem[0] = '\0'; /* if fputs encounters an eol it'll stop */
     }
-    fputs(fmtbuf.mem, __log_buffer);
+    fputs(fmtbuf.mem, s_logbuffer);
     return;
 }
 
 
 __force_inline static inline void __util2_internal_printstr(const char* str) {
-    fputs(str, __log_buffer);
+    fputs(str, s_logbuffer);
     return;
 }
 
@@ -113,15 +113,15 @@ static void __util2_internal_printfmt(const char* format, ...)
 static void __util2_marker_flag_destroy_state()
 {
 #if UTIL2_MARKER_FLAG_LOG_TO_FILE == 1
-    fclose(__log_buffer);
+    fclose(s_logbuffer);
 #endif
-    pthread_mutex_destroy(&__write_lock);
+    pthread_mutex_destroy(&s_write_lock);
     return;
 }
 
 __force_inline static inline void __util2_marker_flag_create_state()
 {
-    __log_buffer = (UTIL2_MARKER_FLAG_LOG_TO_FILE == 1) ? fopen("__marker_log.txt", "w") : stdout;
+    s_logbuffer = (UTIL2_MARKER_FLAG_LOG_TO_FILE == 1) ? fopen("__marker_log.txt", "w") : stdout;
     atexit(&__util2_marker_flag_destroy_state);
     return;
 }
@@ -134,10 +134,10 @@ void util2_marker_flag(
     ...
 ) {
     __begin_exclusion();
-    if(unlikely( atomic_load(&__markflag) == 0 )) 
+    if(unlikely( atomic_load(&s_markflag) == 0 )) 
         __util2_marker_flag_create_state();
 
-    __util2_internal_printfmt("[%llu] %s:%u", atomic_load(&__markflag), file_macro, line_macro);
+    __util2_internal_printfmt("[%llu] %s:%u", atomic_load(&s_markflag), file_macro, line_macro);
     __util2_internal_printstr(" [ADDITIONAL_INFO] ");
     va_list fmt_list;
     va_start(fmt_list, formatstr);
@@ -148,7 +148,7 @@ void util2_marker_flag(
 #if UTIL2_MARKER_FLAG_INCLUDE_NEWLINE_AT_END == 1
     __util2_internal_printstr("\n");
 #endif
-    atomic_fetch_add_explicit(&__markflag, 1, memory_order_relaxed);
+    atomic_fetch_add_explicit(&s_markflag, 1, memory_order_relaxed);
     __end_exclusion();
     return;
 }

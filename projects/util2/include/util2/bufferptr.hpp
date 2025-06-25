@@ -60,7 +60,7 @@ template<typename T, class DeallocatorClass>
 using ManagedBufferPointer = __buffer_pointer_manager<T, true, DeallocatorClass>; 
 
 
-} // namespace util2
+} /* namespace util2 */
 
 
 #endif /* __UTIL2_BUFFER_POINTER_MANAGER__ */

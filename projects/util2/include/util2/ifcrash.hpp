@@ -33,6 +33,35 @@ if(unlikely( !!(condition)))  \
 DISABLE_WARNING_POP
 
 
+#if defined(ifcrash_debug)
+#	error "ifcrash_debug should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#endif
+#if defined(ifcrashdo_debug)
+#	error "ifcrashdo_debug should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#endif
+#if defined(ifcrashstr_debug)
+#	error "ifcrashstr_debug should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#endif
+#if defined(ifcrashfmt_debug)
+#	error "ifcrashfmt_debug should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#endif
+#if defined(ifcrash)
+#	error "ifcrash should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#endif
+#if defined(ifcrashdo)
+#	error "ifcrashdo should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#endif
+#if defined(ifcrashstr)
+#	error "ifcrashstr should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#endif
+#if defined(ifcrashfmt)
+#	error "ifcrashfmt should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#endif
+#if defined(ifcrashfmt_do)
+#	error "ifcrashfmt_do should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#endif
+
+
 #if defined(_DEBUG)
 #    define ifcrash_debug(condition) 			  ifcrash_generic(condition, "DBG",      false, _nofmt,   {},     nullptr)
 #    define ifcrashdo_debug(condition, code)      ifcrash_generic(condition, "CODE_DBG", false, _nofmt, { code }, nullptr)

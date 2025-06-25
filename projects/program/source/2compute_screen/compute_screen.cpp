@@ -1,6 +1,6 @@
 #include "compute_screen.hpp"
-#include <threads.h>
 #include <glbinding/gl/gl.h>
+#include <util2/C/thread_sleep.h>
 #include <util2/C/marker4.h>
 #include <util2/vec2.hpp>
 #include <awc2/C/awc2.h>
@@ -83,15 +83,9 @@ static inline void render(GLState& gldata)
 i32 compute_shader_render_to_screen()
 {
     static constexpr const char* computeShaderFilename = "projects/program/source/2compute_screen/compute_screen.comp";
-    const struct timespec pause_sleep_duration{
-        .tv_sec = 0,
-        .tv_nsec = 6944444
-    };
-    const struct timespec slow_render_sleep_duration{
-        .tv_sec = 0,
-        .tv_nsec = 300 * 1000000
-    };
-    constexpr u8 slowRender{false};
+    constexpr u64 pause_sleep_duration       = 6944444;
+    constexpr u64 slow_render_sleep_duration = 300 * 1000000;
+    constexpr u8  slowRender{false};
     u8 alive {true};
     u8 paused{false};
     u8 contextid;
@@ -151,10 +145,10 @@ i32 compute_shader_render_to_screen()
         awc2newframe();
         awc2begin();
         if(paused) {
-            thrd_sleep(&pause_sleep_duration, NULL);
+            util2_thread_sleep(pause_sleep_duration);
         } else {
             if constexpr (slowRender) {
-                thrd_sleep(&slow_render_sleep_duration, NULL);
+                util2_thread_sleep(slow_render_sleep_duration);
             }
             render(state);
         }

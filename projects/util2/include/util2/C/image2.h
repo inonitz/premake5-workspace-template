@@ -1,5 +1,5 @@
-#ifndef __UTIL2_LOAD_IMAGE__
-#define __UTIL2_LOAD_IMAGE__
+#ifndef __UTIL2_C_DEFINITION_LOAD_IMAGE__
+#define __UTIL2_C_DEFINITION_LOAD_IMAGE__
 #include "util2/C/util2_api.h"
 #include "util2/C/util2_extern.h"
 #include "util2/C/base_type.h"

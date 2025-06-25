@@ -58,7 +58,7 @@ template<typename T, u8 len> void name( \
 		tmp[1] = a[ni(i) + 1] op_symbol arg1a1; \
 		tmp[2] = a[ni(i) + 2] op_symbol arg1a2; \
 		tmp[3] = a[ni(i) + 3] op_symbol arg1a3; \
-		memcpy(&dst.begin()[i], tmp.begin(), tmp.bytes()); \
+		std::memcpy(&dst.begin()[i], tmp.begin(), tmp.bytes()); \
 	} \
 	for(i *= SET_MULTIPLE_VALUES; i < len; ++i) { dst[i] = a[i] op_symbol arg1a4; } \
 	return; \
@@ -132,11 +132,11 @@ template<typename T, u8 len> T vec_length(Vector<T, len> const& a) { return sqrt
 
 #define DEFINE_IMPL_VECTOR_STRUCTURE(type_t, fmt, strfmt, ...) \
 vec##fmt::vec##fmt(const type_t* validAddr) { \
-    memcpy(mem.begin(), validAddr, mem.bytes()); \
+    std::memcpy(mem.begin(), validAddr, mem.bytes()); \
     return; \
 } \
 vec##fmt& vec##fmt::operator=(const vec##fmt& cpy) { \
-    memcpy(begin(), cpy.begin(), bytes()); \
+    std::memcpy(begin(), cpy.begin(), bytes()); \
     return *this; \
 } \
 vec##fmt::__Mem& vec##fmt::operator+(cref b)  { add(mem, b.mem, temporaryBufferVec##fmt); return temporaryBufferVec##fmt;  } \
@@ -228,7 +228,7 @@ DEFINE_IMPL_ROTATE_FUNC(f32, 3f)
 
 
 mat2f::mat2f(const float* validAddr) {
-	memcpy(mem.begin(), validAddr, mem.bytes());
+	std::memcpy(mem.begin(), validAddr, mem.bytes());
 	return;
 }
 mat2f::__Mem& mat2f::operator+(mat2f const& b) { add(mem, b.mem, temporaryBufferMat2f); return temporaryBufferMat2f; }
@@ -257,11 +257,11 @@ char* mat2f::to_string() const
 
 
 mat4f::mat4f(const float* validAddr) {
-    memcpy(mem.begin(), validAddr, mem.bytes());
+    std::memcpy(mem.begin(), validAddr, mem.bytes());
     return;
 }
 mat4f& mat4f::operator=(const mat4f& cpy) {
-    memcpy(begin(), cpy.begin(), bytes());
+    std::memcpy(begin(), cpy.begin(), bytes());
     return *this;
 }
       vec4f  mat4f::column(uint8_t idx)           { ifcrash_debug(idx >= 4); return { row[0][idx], row[1][idx], row[2][idx], row[3][idx] }; }

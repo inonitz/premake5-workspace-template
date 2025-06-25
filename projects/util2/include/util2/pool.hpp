@@ -66,7 +66,7 @@ template<
 template<
 	u32 objectSizeInBytes
 > 
-class Pool<objectSizeInBytes, false> : 
+class UTIL2_API Pool<objectSizeInBytes, false> : 
 	public util2::detail::CommonPoolDef<objectSizeInBytes>
 {
 public:
@@ -82,7 +82,7 @@ private:
 template<
 	u32 objectSizeInBytes
 > 
-class Pool<objectSizeInBytes, true> : 
+class UTIL2_API Pool<objectSizeInBytes, true> : 
 	public util2::detail::CommonPoolDef<objectSizeInBytes>
 {
 public:
