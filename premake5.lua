@@ -1,13 +1,19 @@
 include "searchlocal.lua"
 require(".vscode/export-compile-comms")
+require(".vscode/premake-ninja")
 
 
 WORKSPACE_NAME = "DefaultWorkspace"
 PROJECT_LIST   = {
-    "projects/libexample",
-    "projects/sample"
+    "projects/util2",
+    "projects/glbinding",
+    "projects/glbinding-aux",
+    "projects/glfw34",
+    "projects/imgui",
+    "projects/awc2",
+    "projects/program"
 }
-START_PROJECT = "sample"
+START_PROJECT = "program"
 
 
 include "toolchain.lua"

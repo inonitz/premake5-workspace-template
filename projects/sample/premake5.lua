@@ -45,13 +45,5 @@ project "sample"
 
 
     -- Custom Pre &// Post build Actions
-    prebuildcommands {
-        "{copyfile} %[../../.vscode/compile_commands/%{cfg.shortname}.json] %[../../.vscode/compile_commands/compile_commands.json]"
-    }
-    filter { "system:windows", "configurations:*Dll", "action:gmake" }
-        postbuildcommands {
-            "if not exist %[../../%{BUILD_BINARY_DIRECTORY}] mkdir  %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[../../%{BUILD_BINARY_DIRECTORY}_libexample/* ] %[../../%{BUILD_BINARY_DIRECTORY}] \
-            {copydir} %[%{cfg.buildtarget.directory}] %[../../%{BUILD_BINARY_DIRECTORY}]"
-        }
-    filter {}
+    PreBuildCopyBuildTargetCompileCommandsToFolder()
+    PostBuildCommmandsForExecutable()

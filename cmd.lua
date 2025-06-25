@@ -1,12 +1,12 @@
 -- PROJECT_LIST inside premake5.lua
 getProjectNames = function()
-    folders = {}
+    name_folder_pair = {}
     for _, projpath in ipairs(PROJECT_LIST) do
         local i, j = string.find(projpath, '/')
         local projname = string.sub(projpath, i + 1) 
-        table.insert(folders, { projname, projpath })
+        table.insert(name_folder_pair, { projname, projpath })
     end
-    return folders
+    return name_folder_pair
 end
 
 newoption {
@@ -77,7 +77,7 @@ newaction {
     trigger     = "cleancfg",
     description = "Delete All Build-System-Related files Generated (Makefile, sln, ninja, ...)",
     execute     = function ()
-        local build_extensions = { "/Makefile", "/**.sln", "/**.vcxproj", "/**.vcxproj.filters", "/**.vcxproj.user", "/**.ninja", "/.ninja_deps", "/.ninja_log", "/.ninja_lock" }
+        local build_extensions = { "/Makefile", "/**.make", "/**.sln", "/**.vcxproj", "/**.vcxproj.filters", "/**.vcxproj.user", "/**.ninja", "/.ninja_deps", "/.ninja_log", "/.ninja_lock" }
         local ok, err
         local temp_prj_list = PROJECT_LIST 
         table.insert(temp_prj_list, ".")

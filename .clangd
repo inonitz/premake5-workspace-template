@@ -3,3 +3,10 @@
 # 2. https://clangd.llvm.org/config#builtinheaders
 CompileFlags:
   BuiltinHeaders: QueryDriver
+
+
+Completion:
+  AllScopes: Yes
+  ArgumentLists: FullPlaceholders
+  HeaderInsertion: IWYU
+  CodePatterns: All

@@ -9,22 +9,36 @@ workspace (WORKSPACE_NAME)
         "ProductionLib",
         "ProductionDll",
     }
-    platforms {
-        "x86",
-        "amd64",
-        "ARM",
-        "ARM64"
-    }
+    -- -- Because I'm currently Only targeting against x86-64
+    -- -- I have no real reason to increase build times by generating
+    -- -- Projects I will not use.
+    -- -- When this is relevant, I'll come back to this.
+    -- platforms {
+    --     "amd64",
+    --     "x86",
+    --     "ARM",
+    --     "ARM64"
+    -- }
+    -- filter "platforms:x86"
+    --     architecture "x86"
+    -- filter "platforms:amd64"
+    --     architecture "x86_64"
+    -- filter "platforms:ARM"
+    --     architecture "ARM"
+    -- filter "platforms:ARM64"
+    --     architecture "ARM64"
+    -- filter {}
 
-    filter "platforms:x86"
-        architecture "x86"
+    platforms {
+        "amd64"
+    }
     filter "platforms:amd64"
         architecture "x86_64"
-    filter "platforms:ARM"
-        architecture "ARM"
-    filter "platforms:ARM64"
-        architecture "ARM64"
     filter {}
+
+
+
+
     -- This Might be problematic for standard headers. Triple Check later
     -- filter "architecture:x86"
     --     defines { "__x86__" }
@@ -157,7 +171,8 @@ workspace (WORKSPACE_NAME)
 
     filter { "toolset:gcc or toolset:clang" }
         buildoptions {
-            "-Wshadow"
+            "-Wshadow",
+            "-fvisibility=hidden"
         }
     filter {}
         
