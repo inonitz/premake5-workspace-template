@@ -107,17 +107,17 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 
 
 ### Installation
-#### There are 2 branches available:
-* **with-subprojects** - Includes **Everything** with a sample program
+#### There are 4 branches available:
+* **with-subprojects** - Includes ImGui, GLFW, glbinding, various homebrew Utility Libraries [awc2, util2], with a sample opengl compute program
 * **barebones** - Executable-With-Library Sample, including reference premake files for: 
     * ImGui
     * GLFW
     * glbinding
     * awc2 & util2 (My own Utility Libraries)
+* **GoogleBenchmark** - like barebones, except with [google-benchmark](https://github.com/google/benchmark) and a running example
+* **GoogleTest-Mock** - like barebones, except with [google-test & google-mock](https://github.com/google/googletest) and a running example
+
 ```sh
-# If you want everything
-git clone -b with-subprojects https://github.com/inonitz/premake5-workspace-template.git
-# If you prefer to configure on your own
 git clone -b barebones https://github.com/inonitz/premake5-workspace-template.git
 # Don't forget to add your own remote repo
 git remote set-url origin your_github_username/premake5-workspace-template
@@ -152,7 +152,7 @@ call ```premake5 --help``` in the root of the repository
 - Supporting VS2022 Project Solutions (they do not generate correctly)
 - Generating a launch.json at Project-Generation Time
 - Deleting files based on architecture (e.g ```cleanarch --arch='x'```)
-- Generating Test-Unit Projects for each library (see prototype ```premake5_generate_unit_test_per_tu.lua```)
+- Generating Test Unit-Projects for each library/TU (see prototype ```premake5_generate_unit_test_per_tu.lua```)
 - Adding an action to update compile_commands.json based on target
 - Integrating Cppcheck
 - Integrating a cross-platform C++ profiler With Flame Graphs - [Tracy](https://github.com/wolfpld/tracy)(?)/[Optick](https://github.com/bombomby/optick)(?)/(?)
@@ -160,21 +160,6 @@ call ```premake5 --help``` in the root of the repository
 - Integration of [LLVM Machine-Code Analyzer](https://llvm.org/docs/CommandGuide/llvm-mca.html)
 - Utilizing [Profile-Guided Optimization](https://clang.llvm.org/docs/UsersManual.html#profile-guided-optimization)
 - Automating this whole thing with Dev-Containers & Docker (Several issues, one being very gpu-specific solutions from every vendor) 
-- Optimization of Project-Generation Time:
-  * ```with-subprojects``` branch
-    * ```gmake```
-      * ~3200ms [windows] 
-      * ~2200ms [wsl2] 
-    * ```ninja```
-      * ~3100ms [windows]
-      * ~2800ms [wsl2]
-  * ```barebones``` branch
-    * ```gmake```
-      * ~120ms [windows]
-      * ~TBD [wsl2]
-    * ninja
-      * ~120ms [windows]
-      * ~TBD [wsl2]
 
 
 <!-- CONTRIBUTING -->
