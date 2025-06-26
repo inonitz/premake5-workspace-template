@@ -89,60 +89,14 @@ LinkProjectLibrary = function(ProjectName)
 end
 
 
-LinkUtil2Library = function()
-    LinkProjectLibrary("util2")
+LinkGoogleTestLibrary = function()
+    LinkProjectLibrary("googletest")
     filter { "configurations:*Lib" }
-        defines { "UTIL2_STATIC_DEFINE" }
+        defines { "GTEST_STATIC_DEFINE" }
+    filter { "configurations:*Lib" }
+        defines { "GTEST_LINKED_AS_SHARED_LIBRARY" }
     filter {}
 end
-
-LinkGLFWLibrary = function()
-    LinkProjectLibrary("glfw34")
-    filter { "system:windows", "configurations:*Lib" }
-        links { 
-            "user32",
-            "imm32",
-            "gdi32",
-            "shell32"
-        }
-    filter { "system:linux", "configurations:*Lib" }
-        links { 
-            "pthread",
-            "dl", 
-            "X11", 
-        }
-    filter {}
-end
-
-LinkGLBindingLibraries = function()
-    LinkProjectLibrary("glbinding")
-    filter { "configurations:*Lib" }
-        defines { "GLBINDING_STATIC_DEFINE" }
-    filter {}
-    LinkProjectLibrary("glbinding-aux")
-    filter { "configurations:*Lib" }
-        defines { "GLBINDING_AUX_STATIC_DEFINE" }
-    filter {}
-end
-
-LinkImGuiLibrary = function()
-    LinkProjectLibrary("imgui")
-    filter { "configurations:*Lib" }
-        defines { "IMGUI_STATIC_DEFINE" }
-
-    filter { "configurations:*Lib", "system:windows" }
-        links { "imm32" }
-
-    filter {}
-end
-
-LinkAWC2Library = function()
-    LinkProjectLibrary("awc2")
-    filter { "configurations:*Lib" }
-        defines { "AWC2_STATIC_DEFINE" }
-    filter {}
-end
-
 
 
 PreBuildCopyBuildTargetCompileCommandsToFolder = function()
