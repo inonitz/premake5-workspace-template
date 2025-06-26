@@ -107,13 +107,16 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 
 
 ### Installation
-#### There are 2 branches available:
-* **with-subprojects** - Includes **Everything** with a sample program
+#### There are 4 branches available:
+* **with-subprojects** - Includes ImGui, GLFW, glbinding, various homebrew Utility Libraries [awc2, util2], with a sample opengl compute program
 * **barebones** - Executable-With-Library Sample, including reference premake files for: 
     * ImGui
     * GLFW
     * glbinding
     * awc2 & util2 (My own Utility Libraries)
+* **GoogleBenchmark** - like barebones, except with [google-benchmark](https://github.com/google/benchmark) and a running example
+* **GoogleTest-Mock** - like barebones, except with [google-test & google-mock](https://github.com/google/googletest) and a running example
+
 ```sh
 # If you want everything
 git clone -b with-subprojects https://github.com/inonitz/premake5-workspace-template.git
