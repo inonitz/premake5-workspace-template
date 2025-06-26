@@ -105,7 +105,7 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 
 ### Installation
 #### There are 4 branches available:
-* **with-subprojects** - Includes **Everything** with a sample program
+* **with-subprojects** - Includes ImGui, GLFW, glbinding, various homebrew Utility Libraries [awc2, util2], with a sample opengl compute program
 * **barebones** - Executable-With-Library Sample, including reference premake files for: 
     * ImGui
     * GLFW
