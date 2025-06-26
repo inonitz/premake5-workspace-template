@@ -41,13 +41,13 @@ UTIL2_API UTIL2_EXTERNC void util2_ifcrash2(
     const char*  file_macro,
     u64          line_macro,
     bool_t       condition,
-    const bool_t formatempty,
+    bool_t       formatempty,
     const char*  formatstr,
     ...
 );
 
 
-#   define ifcrash(condition) 			    util2_ifcrash2("",     __FILE__, __LINE__, (condition), BOOL_TRUE,  "",, "")
+#   define ifcrash(condition) 			    util2_ifcrash2("",     __FILE__, __LINE__, (condition), BOOL_TRUE,  "",  "")
 #   define ifcrashstr(condition, str) 	    util2_ifcrash2("STR",  __FILE__, __LINE__, (condition), BOOL_TRUE,  str, "")
 #   define ifcrashfmt(condition, str, ...)  util2_ifcrash2("FMT",  __FILE__, __LINE__, (condition), BOOL_FALSE, str, __VA_ARGS__)
 #   define ifcrashdo(condition, ...) \

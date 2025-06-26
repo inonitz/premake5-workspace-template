@@ -7,11 +7,11 @@
 namespace util2 {
 
 
-template<u16 alignment> UTIL2_API void* aligned_malloc(u64 bytes);
-                        UTIL2_API void  aligned_free(void* ptr);
+template<u16 alignment> UTIL2_API auto aligned_malloc(u64 bytes) -> void*;
+                        UTIL2_API void aligned_free(void* ptr);
 
 
-} // namespace util2
+} /* namespace util2 */
 
 
-#endif
+#endif /* __UTIL2_ALIGNED_MEMORY_ALLOCATOR__ */

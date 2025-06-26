@@ -1,30 +1,35 @@
 #include "util2/pool.hpp"
-#include "util2/ifcrash.hpp"
 #include "util2/aligned_malloc.hpp"
-#include <cstring>
-#include <cstdio>
+
+#include "util2/ifcrash.hpp"
+
 #include <cinttypes>
 
+#include <cstdio>
+#include <cstring>
 
+
+
+/* NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 namespace util2::detail {
 
 
 template<
     u32 objectSizeInBytes
 > 
-void* CommonPoolDef<objectSizeInBytes>::allocate() 
+auto CommonPoolDef<objectSizeInBytes>::allocate() -> void*
 {
-    if(!m_freeBlk) {
+    if(!boolean(m_freeBlk)) {
         // markstr("Allocation Error: Not Enough Blocks (0)\n");
         return nullptr;
     }
 
-    byte* v = &m_buffer[ objectSizeInBytes * (m_available->index - 1) ];
+    byte* value = &m_buffer[ objectSizeInBytes * (m_available->index - 1) ];
     m_available->index *= -1; /* now occupied */
 
     m_available = m_available->next;
     --m_freeBlk;
-    return v;
+    return value;
 }
 
 
@@ -52,7 +57,7 @@ template<
 > 
 u64 CommonPoolDef<objectSizeInBytes>::allocate_index()
 {
-    if(!m_freeBlk) {
+    if(!boolean(m_freeBlk)) {
         // markstr("Allocation Error: Not Enough Blocks (0)\n");
         return DEFAULT64;
     }
@@ -88,17 +93,21 @@ template<
 void CommonPoolDef<objectSizeInBytes>::print() const
 {
     static const char* strs[2] = { "Occupied", "Free    " };
-    bool tmp = false;
+
+
     std::printf("Static Pool Allocator Located at 0x%" PRIxPTR " [%" PRIuLEAST64 "/ %" PRIuLEAST64 "] Occupied\n",
-        __rcast(std::uintptr_t, m_buffer),
+        m_buffer,
         m_elemCount - m_freeBlk,
         m_elemCount
     );
 
     for(u64 i = 0; i < m_elemCount; ++i)
     {
-        tmp = boolean(m_freelist[i].index > 0);
-        std::printf("    [%" PRIuLEAST64 "] [%s] => Object [%" PRIuLEAST64 "]\n", i, strs[tmp], __scast(u64, m_freelist[i].index));
+        std::printf("    [%" PRIuLEAST64 "] [%s] => Object [%" PRIuLEAST64 "]\n", 
+            i, 
+            strs[ boolean(m_freelist[i].index > 0) ], 
+            __scast(u64, m_freelist[i].index)
+        );
     }
     return;
 }
@@ -123,6 +132,7 @@ void CommonPoolDef<objectSizeInBytes>::common_init(u64 amountOfElements)
 }
 
 
+/* NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers) */
 template struct CommonPoolDef<0x008>;
 template struct CommonPoolDef<0x010>;
 template struct CommonPoolDef<0x018>;
@@ -145,6 +155,7 @@ template struct CommonPoolDef<0x140>;
 template struct CommonPoolDef<0x180>;
 template struct CommonPoolDef<0x1c0>;
 template struct CommonPoolDef<0x200>;
+/* NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers) */
 
 
 } // namespace util2::detail
@@ -188,10 +199,10 @@ template<
     u32 objectSizeInBytes
 > 
 void Pool<objectSizeInBytes, true>::create(
-    void*  __aligned_allocated_memory,
+    void*  aligned_allocated_memory,
     u64    amountOfElements
 ) {
-    this->m_buffer   = __scast(byte*, __aligned_allocated_memory);
+    this->m_buffer   = __scast(byte*, aligned_allocated_memory);
     this->m_freelist = __scast(NodeType*, util2::aligned_malloc<sizeof(NodeType)>(sizeof(NodeType) * amountOfElements));
     this->common_init(amountOfElements);
     return;
@@ -211,6 +222,7 @@ void Pool<objectSizeInBytes, true>::destroy()
 }
 
 
+/* NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers) */
 template class Pool<0x008, true>;
 template class Pool<0x010, true>;
 template class Pool<0x018, true>;
@@ -255,6 +267,8 @@ template class Pool<0x140, false>;
 template class Pool<0x180, false>;
 template class Pool<0x1c0, false>;
 template class Pool<0x200, false>;
+/* NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers) */
 
 
+/* NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 } /* namespace util2 */

@@ -1,8 +1,10 @@
 #ifndef __UTIL2_POOL_ALLOCATOR__
 #define __UTIL2_POOL_ALLOCATOR__
 #include "util2/C/util2_api.h"
-#include "util2/C/macro.h"
 #include "util2/C/base_type.h"
+
+#include "util2/C/macro.h"
+
 
 
 namespace util2::detail {
@@ -39,11 +41,11 @@ protected:
 	u64   m_freeBlk;
 
 
-	__force_inline bool occupied(u64 idx) const { 
-		return m_freelist[idx].index < 0;
+	__force_inline auto occupied(u64 idx) const -> bool { 
+		return m_freelist[idx].index < 0; /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 	}
-	__force_inline u64 index_from_pointer(void const* p) const { 
-		return __scast(u64, (__rcast(byte const*, p) - m_buffer) ); 
+	__force_inline auto index_from_pointer(void* ptr) const -> u64 { 
+		return __scast(byte* const, ptr) - m_buffer;
 	}
 	void common_init(u64 amountOfElements);
 };
@@ -87,8 +89,8 @@ class UTIL2_API Pool<objectSizeInBytes, true> :
 {
 public:
 	void create(
-		void*  __aligned_allocated_memory,
-		u64 amountOfElements
+		void* aligned_allocated_memory,
+		u64   amountOfElements
 	);
 	void destroy();
 

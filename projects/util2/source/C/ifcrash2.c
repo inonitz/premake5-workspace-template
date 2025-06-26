@@ -11,7 +11,7 @@ void util2_ifcrash2(
     const char*  file_macro,
     u64          line_macro,
     bool_t       condition,
-    const bool_t formatStrIsActuallyEmpty,
+    bool_t       formatStrIsActuallyEmpty,
     const char*  formatstr,
     ...
 )  {
