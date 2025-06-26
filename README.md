@@ -33,7 +33,7 @@ Current Integration of tools:
     * [GLFW](https://github.com/glfw/glfw/releases)
     * [glbinding](https://github.com/cginternals/glbinding/releases)
     * [Catch2](https://github.com/catchorg/Catch2)
-    * [GoogleMock & GoogleTest](https://github.com/google/googletest)
+    * [GoogleMock & GoogleTest](https://github.com/google/googletest) **<-- This is the branch you're on**
     * [Google Benchmark](https://github.com/google/benchmark)
 
 <!-- ABOUT THE PROJECT -->
@@ -70,12 +70,9 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 
 
 ### Built With
-<br> [<img height="100px" src="https://raw.githubusercontent.com/cginternals/glbinding/master/glbinding-logo.svg?sanitize=true">][glbinding-url] </br>
-<br>
-[<img height="150px" src="https://avatars.githubusercontent.com/u/11135954?s=150&v=4">][Premake-url]
-[<img height="150px" src="https://avatars.githubusercontent.com/u/3905364?s=150&v=4">][GLFW-url]
-[<img height="150px" src="https://avatars.githubusercontent.com/u/8225057?s=150&v=4">][ImGui-url]
-</br>
+<br> [<img height="150px" src="https://avatars.githubusercontent.com/u/11135954?s=150&v=4">][Premake-url] 
+[<img height="150px" src="https://avatars.githubusercontent.com/u/1342004?s=1508&v=4">][GoogleTest-Mock-url] </br>
+
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -107,18 +104,18 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 
 
 ### Installation
-#### There are 2 branches available:
+#### There are 4 branches available:
 * **with-subprojects** - Includes **Everything** with a sample program
 * **barebones** - Executable-With-Library Sample, including reference premake files for: 
     * ImGui
     * GLFW
     * glbinding
     * awc2 & util2 (My own Utility Libraries)
+* **GoogleBenchmark** - like barebones, except with [google-benchmark](https://github.com/google/benchmark) and a running example
+* **GoogleTest-Mock** - like barebones, except with [google-test & google-mock](https://github.com/google/googletest) and a running example
+
 ```sh
-# If you want everything
-git clone -b with-subprojects https://github.com/inonitz/premake5-workspace-template.git
-# If you prefer to configure on your own
-git clone -b barebones https://github.com/inonitz/premake5-workspace-template.git
+git clone -b GoogleTest-Mock https://github.com/inonitz/premake5-workspace-template.git
 # Don't forget to add your own remote repo
 git remote set-url origin your_github_username/premake5-workspace-template
 git remote -v
@@ -152,29 +149,14 @@ call ```premake5 --help``` in the root of the repository
 - Supporting VS2022 Project Solutions (they do not generate correctly)
 - Generating a launch.json at Project-Generation Time
 - Deleting files based on architecture (e.g ```cleanarch --arch='x'```)
-- Generating Test-Unit Projects for each library (see prototype ```premake5_generate_unit_test_per_tu.lua```)
+- Generating Test Unit-Projects for each library (see working example for GoogleTest-Samples  [```sample/premake5.lua```](https://github.com/inonitz/premake5-workspace-template/blob/GoogleTest-Mock/projects/sample/premake5.lua) )
 - Adding an action to update compile_commands.json based on target
 - Integrating Cppcheck
 - Integrating a cross-platform C++ profiler With Flame Graphs - [Tracy](https://github.com/wolfpld/tracy)(?)/[Optick](https://github.com/bombomby/optick)(?)/(?)
 - Cross-platform package management - [Spack](github.com/spack/spack?tab=readme-ov-file)(?)
 - Integration of [LLVM Machine-Code Analyzer](https://llvm.org/docs/CommandGuide/llvm-mca.html)
 - Utilizing [Profile-Guided Optimization](https://clang.llvm.org/docs/UsersManual.html#profile-guided-optimization)
-- Automating this whole thing with Dev-Containers & Docker (Several issues, one being very gpu-specific solutions from every vendor) 
-- Optimization of Project-Generation Time:
-  * ```with-subprojects``` branch
-    * ```gmake```
-      * ~3200ms [windows] 
-      * ~2200ms [wsl2] 
-    * ```ninja```
-      * ~3100ms [windows]
-      * ~2800ms [wsl2]
-  * ```barebones``` branch
-    * ```gmake```
-      * ~120ms [windows]
-      * ~TBD [wsl2]
-    * ninja
-      * ~120ms [windows]
-      * ~TBD [wsl2]
+- Automating this whole thing with Dev-Containers & Docker (Several issues, one being very gpu-specific solutions from every vendor)
 
 
 <!-- CONTRIBUTING -->
@@ -212,11 +194,6 @@ Distributed under the MIT License. See `LICENSE` file.
 [product-screenshot]: images/screenshot.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 
-[ImGui-url]: https://github.com/ocornut/imgui
-[ImGui.js]: https://avatars.githubusercontent.com/u/8225057?v=4&size=150
-[glbinding-url]: https://github.com/cginternals/glbinding/releases/tag/v3.3.0
-[glbinding.js]: https://raw.githubusercontent.com/cginternals/glbinding/master/glbinding-logo.svg?sanitize=true
-[GLFW-url]: https://github.com/glfw/glfw/releases/tag/3.4
-[GLFW.js]: https://avatars.githubusercontent.com/u/3905364?s=200&v=4&size=150
+[GoogleTest-Mock-url]: https://github.com/google/googletest
 [Premake-url]: https://github.com/premake/premake-core
 [Premake.js]: https://avatars.githubusercontent.com/u/11135954?s=150&v=4
