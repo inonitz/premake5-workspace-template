@@ -104,7 +104,7 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
 
 
 ### Installation
-#### There are 3 branches available:
+#### There are 4 branches available:
 * **with-subprojects** - Includes **Everything** with a sample program
 * **barebones** - Executable-With-Library Sample, including reference premake files for: 
     * ImGui
@@ -112,6 +112,8 @@ Each Project contains a ```premake5.lua``` file, describing everything about its
     * glbinding
     * awc2 & util2 (My own Utility Libraries)
 * **GoogleBenchmark** - like barebones, except with [google-benchmark](https://github.com/google/benchmark) and a running example
+* **GoogleTest-Mock** - like barebones, except with [google-test & google-mock](https://github.com/google/googletest) and a running example
+
 ```sh
 git clone -b GoogleBenchmark https://github.com/inonitz/premake5-workspace-template.git
 # Don't forget to add your own remote repo
@@ -154,22 +156,7 @@ call ```premake5 --help``` in the root of the repository
 - Cross-platform package management - [Spack](github.com/spack/spack?tab=readme-ov-file)(?)
 - Integration of [LLVM Machine-Code Analyzer](https://llvm.org/docs/CommandGuide/llvm-mca.html)
 - Utilizing [Profile-Guided Optimization](https://clang.llvm.org/docs/UsersManual.html#profile-guided-optimization)
-- Automating this whole thing with Dev-Containers & Docker (Several issues, one being very gpu-specific solutions from every vendor) 
-- Optimization of Project-Generation Time:
-  * ```with-subprojects``` branch
-    * ```gmake```
-      * ~3200ms [windows] 
-      * ~2200ms [wsl2] 
-    * ```ninja```
-      * ~3100ms [windows]
-      * ~2800ms [wsl2]
-  * ```barebones``` branch
-    * ```gmake```
-      * ~120ms [windows]
-      * ~TBD [wsl2]
-    * ninja
-      * ~120ms [windows]
-      * ~TBD [wsl2]
+- Automating this whole thing with Dev-Containers & Docker (Several issues, one being very gpu-specific solutions from every vendor)
 
 
 <!-- CONTRIBUTING -->
