@@ -37,8 +37,6 @@ workspace (WORKSPACE_NAME)
     filter {}
 
 
-
-
     -- This Might be problematic for standard headers. Triple Check later
     -- filter "architecture:x86"
     --     defines { "__x86__" }
@@ -53,22 +51,14 @@ workspace (WORKSPACE_NAME)
     -- filter {}
 
 
-    filter { "toolset:not gcc", "files:**.c" }
+    filter { "toolset:not gcc", "files:**.c or files:**.h" }
         cdialect "C11"
-    filter { "toolset:not gcc", "files:**.h" }
-        cdialect "C11"
-    filter { "toolset:not gcc", "files:**.cpp" }
-        cppdialect "C++17"
-    filter { "toolset:not gcc", "files:**.hpp" }
+    filter { "toolset:not gcc", "files:**.hpp or files:**.cpp or files:**.cc" }
         cppdialect "C++17"
     filter {}
-    filter { "toolset:gcc", "files:**.c" }
+    filter { "toolset:gcc", "files:**.h or files:**.c" }
         cdialect "gnu11"
-    filter { "toolset:gcc", "files:**.h" }
-        cdialect "gnu11"
-    filter { "toolset:gcc", "files:**.cpp" }
-        cppdialect "gnu++17"
-    filter { "toolset:gcc", "files:**.hpp" }
+    filter { "toolset:gcc", "files:**.hpp or files:**.cpp or files:**.cc" }
         cppdialect "gnu++17"
     filter {}
 
@@ -81,23 +71,6 @@ workspace (WORKSPACE_NAME)
         optimize "Off"
         symbols  "On"
 
-    filter { "configurations:Debug*", "toolset:gcc" }
-        buildoptions { 
-            "-g",
-            "-ggdb"
-        }
-
-    filter { "configurations:Debug*", "toolset:clang" }
-        buildoptions { 
-            "-g", 
-            "-fno-limit-debug-info", 
-            "-fstandalone-debug",
-            "-gcolumn-info", 
-            "-glldb"
-        }
-    filter {}
-
-
     -- Production Configuration Across Multiple Platforms
     filter { "configurations:Production*" }
         defines { "DEBUG" }
@@ -105,13 +78,13 @@ workspace (WORKSPACE_NAME)
         optimize "On"
         symbols  "On"
 
-    filter { "configurations:Production*", "toolset:gcc" }
+    filter { "configurations:Debug* or configurations:Production*", "toolset:gcc" }
         buildoptions { 
             "-g",
             "-ggdb"
         }
 
-    filter { "configurations:Production*", "toolset:clang" }
+    filter { "configurations:Debug* or configurations:Production*", "toolset:clang" }
         buildoptions { 
             "-g", 
             "-fno-limit-debug-info", 
@@ -132,15 +105,15 @@ workspace (WORKSPACE_NAME)
             "-fsanitize=address",
             "-fsanitize=undefined",
         }
+    filter {}
         -- Do Note: Production Builds have a problem with leak-Sanitizer
         -- Use the following before running your executable
         -- Linux:   export LSAN_OPTIONS=verbosity=1:log_threads=1
-        -- Windows: $env:LSAN_OPTIONS="verbosity=1:log_threads=1"
+        -- Windows: $env:LSAN_OPTIONS="verbosity=1:log_threads=1" (disregard the fact that leak sanitizer doesn't work on windows)
         -- The actual solution would be to generate a run.sh/run.bat script every time I finish building
         -- Such that I'll be able to export the env-vars before executing my program
         -- But I don't need such fancy functionality, 
         -- especially when debug builds just work with leak-Sanitizer
-    filter {}
     -- Specify Leak Sanitizer for Debug/Production (Unix/Posix only for now...)
     filter { "system:not windows", "configurations:Debug* or configurations:Production*", "toolset:gcc or toolset:clang" }
         buildoptions { 
@@ -150,7 +123,6 @@ workspace (WORKSPACE_NAME)
             "-fsanitize=leak"
         }
     filter {}
-
 
 
     -- Release Configuration Across Multiple Platforms
@@ -171,8 +143,22 @@ workspace (WORKSPACE_NAME)
 
     filter { "toolset:gcc or toolset:clang" }
         buildoptions {
+            "-fvisibility=hidden",
             "-Wshadow",
-            "-fvisibility=hidden"
+            "-Wfloat-equal",
+            "-fstrict-aliasing",
+            "-Wno-unused-variable",
+            "-Werror=old-style-cast"
         }
     filter {}
-        
+
+
+    -- For Debugging Purposes
+    filter { "toolset:gcc or toolset:clang" }
+        -- buildoptions {
+        --     " --verbose -v -ferror-limit=0 -fuse-ld=ld.lld.exe"
+        -- }
+        linkoptions {
+            " --verbose -v -ferror-limit=0"
+        }
+    filter {}

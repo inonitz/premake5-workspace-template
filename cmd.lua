@@ -135,13 +135,35 @@ newaction {
 
 
 newaction {
-    trigger     = "buildall",
+    trigger     = "builddbgdll",
     description = "Trigger the following actions: export-compile-commands, gmake",
     execute = function()
         print("[ACTION] = [buildall] Begin\n")
         os.execute("premake5 export-compile-commands")
         os.execute("premake5 gmake")
         os.execute("make config=debuglib_amd64 -j 16")
+        print("[ACTION] = [buildall] End\n")
+    end
+}
+
+
+newaction {
+    trigger     = "build_dbgdll",
+    description = "Trigger the following actions: ecc, gmake make(all targets)",
+    execute = function()
+        print("[ACTION] = [build_parallel] Begin\n")
+        os.execute("premake5 --cc=clang ecc")
+        os.execute("premake5 --cc=clang gmake")
+        local temp_prj_list = PROJECT_LIST 
+        for _, path in ipairs(temp_prj_list) do
+            -- Extract raw name of every project
+            local path_split = {}
+            for word in string.gmatch(path, '([^/]+)') do
+                path_split[#path_split + 1] = word
+            end
+            printf("Executing Parallel of project %s", path_split[2])
+            os.execute("make config=debugdll_amd64 " .. path_split[2] .. " -j 16")
+        end
         print("[ACTION] = [buildall] End\n")
     end
 }
