@@ -5,6 +5,7 @@ IndentWidth: 4
 TabWidth: 4
 UseTab: ForIndentation
 
+IndentAccessModifiers: false
 SeparateDefinitionBlocks: Always
 MaxEmptyLinesToKeep: 2
 
