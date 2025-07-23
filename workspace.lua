@@ -6,8 +6,8 @@ workspace (WORKSPACE_NAME)
         "DebugDll",
         "ReleaseLib",
         "ReleaseDll",
-        "ProductionLib",
-        "ProductionDll",
+        "RelWithDbgInfoLib",
+        "RelWithDbgInfoDll"
     }
     -- -- Because I'm currently Only targeting against x86-64
     -- -- I have no real reason to increase build times by generating
@@ -99,19 +99,19 @@ workspace (WORKSPACE_NAME)
 
 
     -- Production Configuration Across Multiple Platforms
-    filter { "configurations:Production*" }
+    filter { "configurations:RelWithDbgInfo*" }
         defines { "DEBUG" }
         runtime  "Release"
         optimize "On"
         symbols  "On"
 
-    filter { "configurations:Production*", "toolset:gcc" }
+    filter { "configurations:RelWithDbgInfo*", "toolset:gcc" }
         buildoptions { 
             "-g",
             "-ggdb"
         }
 
-    filter { "configurations:Production*", "toolset:clang" }
+    filter { "configurations:RelWithDbgInfo*", "toolset:clang" }
         buildoptions { 
             "-g", 
             "-fno-limit-debug-info", 
@@ -123,7 +123,7 @@ workspace (WORKSPACE_NAME)
 
 
     -- Specify Address Sanitizer for Debug/Production
-    filter { "configurations:Debug* or configurations:Production*", "toolset:gcc or toolset:clang" }
+    filter { "configurations:Debug* or configurations:RelWithDbgInfo*", "toolset:gcc or toolset:clang" }
         buildoptions { 
             "-fsanitize=address",
             "-fsanitize=undefined",
@@ -142,7 +142,7 @@ workspace (WORKSPACE_NAME)
         -- especially when debug builds just work with leak-Sanitizer
     filter {}
     -- Specify Leak Sanitizer for Debug/Production (Unix/Posix only for now...)
-    filter { "system:not windows", "configurations:Debug* or configurations:Production*", "toolset:gcc or toolset:clang" }
+    filter { "system:not windows", "configurations:Debug* or configurations:RelWithDbgInfo*", "toolset:gcc or toolset:clang" }
         buildoptions { 
             "-fsanitize=leak"
         }

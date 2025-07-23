@@ -25,7 +25,7 @@ project "sample"
 
     -- Build Options
     buildoptions {
-        "-march=native"
+        -- "-march=native"
     }
 
     -- Linking Options 

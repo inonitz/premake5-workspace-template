@@ -31,11 +31,11 @@ SetupLinkingFlagsForDebugInfo = function()
     local pdbpath = '"' .. _MAIN_SCRIPT_DIR .. BUILD_BINARY_DIRECTORY_GENERIC ..  "/%{prj.name}.pdb" .. '"'
 
 
-    filter { "system:windows", "configurations:Debug* or configurations:Production*", "action:gmake or action:ninja" }
+    filter { "system:windows", "configurations:Debug* or configurations:RelWithDbgInfo*", "action:gmake or action:ninja" }
         linkoptions( "-g -Wl,--pdb=-Wl,--pdb=" .. pdbpath )
     filter {}
     -- Incomplete and untested, when working with vs2022 figure it out
-    filter { "system:windows", "configurations:Debug* or configurations:Production*", "action:vs2022" }
+    filter { "system:windows", "configurations:Debug* or configurations:RelWithDbgInfo*", "action:vs2022" }
         symbolspath( pdbpath )
     filter {}
 end
@@ -52,14 +52,20 @@ SetupBuildDirectoriesForLibrary = function()
         kind "SharedLib"
         targetdir (_MAIN_SCRIPT_DIR .. BUILD_BINARY_DIRECTORY_GENERIC)
         objdir    (_MAIN_SCRIPT_DIR .. BUILD_OBJECT_DIRECTORY_GENERIC)
-        -- Ninja builds in the root folder for each project, i.e 'root/'
-        -- while make moves to each projects' directory and builds relative to 'root/projects/project_name'
-        -- This in turn causes the --out-implib to be incorrect (specifically because cfg.linktarget.abspath is not actually the absolute path, only relative to 'root')
-        -- For more info on the last comment (^^^) see: https://github.com/premake/premake-core/issues/94#event-1245523356
-        -- Anyway, this option helps us bypass whatever the compiler emitted using premake5' cfg (The path below is Absolute).
+        filter { "system:windows" }
+            -- Ninja builds in the root folder for each project, i.e 'root/'
+            -- while make moves to each projects' directory and builds relative to 'root/projects/project_name'
+            -- This in turn causes the --out-implib to be incorrect (specifically because cfg.linktarget.abspath is not actually the absolute path, only relative to 'root')
+            -- For more info on the last comment (^^^) see: https://github.com/premake/premake-core/issues/94#event-1245523356
+            -- Anyway, this option helps us bypass whatever the compiler emitted using premake5' cfg (The path below is Absolute).
+            linkoptions {
+                "-Wl,--out-implib=" .. _MAIN_SCRIPT_DIR .. BUILD_BINARY_DIRECTORY_GENERIC .. "/%{cfg.linktarget.name}"
+            }
+        filter {}
         linkoptions {
-            "-Wl,--out-implib=" .. _MAIN_SCRIPT_DIR .. BUILD_BINARY_DIRECTORY_GENERIC .. "/%{cfg.linktarget.name}"
+            "-Wl,-rpath=."
         }
+        flags { "RelativeLinks" }
     filter {}
     SetupLinkingFlagsForDebugInfo()
 end
@@ -74,6 +80,10 @@ SetupBuildDirectoriesForExecutable = function()
     filter "configurations:*Dll"
         targetdir (_MAIN_SCRIPT_DIR .. BUILD_BINARY_DIRECTORY_GENERIC)
         objdir    (_MAIN_SCRIPT_DIR .. BUILD_OBJECT_DIRECTORY_GENERIC)
+        linkoptions {
+            "-Wl,-rpath=."
+        }
+        flags { "RelativeLinks" }
     filter {}
     SetupLinkingFlagsForDebugInfo()
 end
