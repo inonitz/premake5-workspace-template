@@ -63,7 +63,7 @@
 #           endif
 #       elif defined __GNUC__ || defined __clang__
 #           define UTIL2_DEPRECATED __attribute__((deprecated))
-#           define UTIL2_DEPRECATED_MSG(MSG) __declspec(deprecated(MSG))
+#           define UTIL2_DEPRECATED_MSG(MSG) __attribute__((deprecated(MSG)))
 #       else /* Should Only reach here for non-*nix, un-supported platforms */
 #           define UTIL2_DEPRECATED
 #           define UTIL2_DEPRECATED_MSG(MSG)

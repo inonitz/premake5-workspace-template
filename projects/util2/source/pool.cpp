@@ -39,7 +39,7 @@ template<
 void CommonPoolDef<objectSizeInBytes>::free(void* ptr)
 {
     u64 idx = index_from_pointer(ptr) / objectSizeInBytes;
-    ifcrash_debug(!isaligned(ptr, objectSize()) || !occupied(idx) || (m_freeBlk == m_elemCount));
+    ifcrash(!isaligned(ptr, objectSize()) || !occupied(idx) || (m_freeBlk == m_elemCount));
 
     m_freelist[idx].index *= -1;
     m_freelist[idx].next = m_available;
@@ -76,7 +76,7 @@ template<
 > 
 void CommonPoolDef<objectSizeInBytes>::free_index(u64 idx)
 {
-    ifcrash_debug(!occupied(idx) || m_freeBlk == m_elemCount || idx >= m_elemCount);
+    ifcrash(!occupied(idx) || m_freeBlk == m_elemCount || idx >= m_elemCount);
     m_freelist[idx].index *= -1;
     m_freelist[idx].next = m_available;
     m_available = &m_freelist[idx];
@@ -118,7 +118,7 @@ template<
 > 
 void CommonPoolDef<objectSizeInBytes>::common_init(u64 amountOfElements)
 {
-    ifcrash_debug(amountOfElements == 0);
+    ifcrash(amountOfElements == 0);
     m_elemCount = amountOfElements; 
     m_freeBlk   = amountOfElements;
     for(u64 i = 0; i < amountOfElements - 1; ++i)

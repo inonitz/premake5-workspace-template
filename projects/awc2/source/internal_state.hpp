@@ -52,7 +52,7 @@ struct alignsz(32) AWC2ContextData
 
 // struct AWC2Data
 // {
-//     util::BufferPointer<AWC2ContextData> poolmem;
+//     util2::BufferPointer<AWC2ContextData> poolmem;
 //     u8    activeid = DEFAULT8;
 //     bool  init     = false;
 //     u8    reserved[6]{0};

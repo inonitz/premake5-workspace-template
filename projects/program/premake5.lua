@@ -6,8 +6,8 @@ project "program"
     files {
         "include/**.hpp",
         "include/**.h",
-
         "source/**.hpp",
+
         "source/**.cpp",
 
         "source/**.h",
@@ -45,8 +45,6 @@ project "program"
         links { "gdi32", "shell32", "pthread" }
     filter "system:linux" 
         links { "dl", "pthread" }
-    filter {}
-
 
     -- Macros
     defines {}

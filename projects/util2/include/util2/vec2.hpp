@@ -3,7 +3,7 @@
 #include "util2/C/util2_api.h"
 #include "util2/C/macro.h"
 #include "util2/string.hpp"
-#include "util2/ifcrash.hpp"
+#include "util2/C/ifcrash2.h"
 #include <nmmintrin.h>
 #include <array>
 
@@ -47,8 +47,8 @@ public:
 	}
 
 
-	T& 		 operator[](uint8_t idx) 	   { ifcrash_debug((u32)idx >= length); return __data[idx]; }
-	const T& operator[](uint8_t idx) const { ifcrash_debug((u32)idx >= length); return __data[idx]; }
+	T& 		 operator[](uint8_t idx) 	   { ifcrash((u32)idx >= length); return __data[idx]; }
+	const T& operator[](uint8_t idx) const { ifcrash((u32)idx >= length); return __data[idx]; }
 
 	      T* begin()       { return &__data[0];      }
 	      T* end()         { return &__data[length]; }

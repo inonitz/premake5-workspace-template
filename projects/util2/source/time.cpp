@@ -7,6 +7,6 @@ static util2::Time::Timestamp g_generalPurposeStamp[UTIL2_TIME_NAMESPACE_STATIC_
 
 util2::Time::Timestamp& util2::Time::getGeneralPurposeStamp(u8 index)
 {
-    ifcrash_debug(index > UTIL2_TIME_NAMESPACE_STATIC_TIMESTAMP_MAXIMUM); 
+    ifcrash(index > UTIL2_TIME_NAMESPACE_STATIC_TIMESTAMP_MAXIMUM); 
     return g_generalPurposeStamp[index];
 }

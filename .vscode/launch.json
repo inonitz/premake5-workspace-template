@@ -31,12 +31,12 @@
                 // "breakpoint set --name main"
             ]
         },
-        // Windows Production
+        // Windows RelWithDbgInfo
         {
             "type": "lldb",
             "request": "launch",
-            "name": "LLDB (Windows-x86_64-Static-Production)",
-            "program": "${workspaceFolder}\\build\\bin\\ProductionLib_amd64_program\\program.exe",
+            "name": "LLDB (Windows-x86_64-Static-RelWithDbgInfo)",
+            "program": "${workspaceFolder}\\build\\bin\\RelWithDbgInfoLib_amd64_program\\program.exe",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
@@ -48,8 +48,8 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "LLDB (Windows-x86_64-Dll-Production)",
-            "program": "${workspaceFolder}\\build\\bin\\ProductionDll_amd64\\program.exe",
+            "name": "LLDB (Windows-x86_64-Dll-RelWithDbgInfo)",
+            "program": "${workspaceFolder}\\build\\bin\\RelWithDbgInfoDll_amd64\\program.exe",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
@@ -78,7 +78,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "LLDB (Linux-x86_64-Shared-Debug)",
-            "program": "${workspaceFolder}/build/bin/DebugDll_amd64_program/program",
+            "program": "${workspaceFolder}/build/bin/DebugDll_amd64/program_new",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
@@ -88,12 +88,12 @@
             ]
         },
 
-        // Linux Production
+        // Linux RelWithDbgInfo
         {
             "type": "lldb",
             "request": "launch",
-            "name": "LLDB (Linux-x86_64-Static-Production)",
-            "program": "${workspaceFolder}/build/bin/ProductionLib_amd64_program/program",
+            "name": "LLDB (Linux-x86_64-Static-RelWithDbgInfo)",
+            "program": "${workspaceFolder}/build/bin/RelWithDbgInfoLib_amd64_program/program",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
@@ -105,8 +105,8 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "LLDB (Linux-x86_64-Shared-Production)",
-            "program": "${workspaceFolder}/build/bin/ProductionDll_amd64_program/program",
+            "name": "LLDB (Linux-x86_64-Shared-RelWithDbgInfo)",
+            "program": "${workspaceFolder}/build/bin/RelWithDbgInfoDll_amd64/program",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,

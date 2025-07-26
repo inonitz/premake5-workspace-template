@@ -43,22 +43,22 @@ end
 
 
 -- Primarily for debugging
--- filter { "toolset:clang", "system:windows" }
---     makesettings {
---         "CC  = " .. '"' .. "clang.exe"   .. '"' .. " --verbose",
---         -- "CXX = " .. '"' .. "clang++.exe" .. '"' .. " --verbose -ferror-limit=0 -fuse-ld=" .. '"' .. "C:/CTools/msys64/clang64/bin/lld-link" .. '"',
---         "CXX = " .. '"' .. "clang++.exe" .. '"' .. " --verbose -ferror-limit=0 -fuse-ld=" .. '"' .. "C:/CTools/msys2/clang64/bin/ld.lld" .. '"',
---         "LD  = " .. '"' .. "ld.lld.exe"  .. '"' .. " --verbose",
---         "AR  = " .. '"' .. "llvm-ar.exe" .. '"' .. " v"
---     }
--- filter {}
--- filter { "toolset:clang", "system:not windows" }
---     makesettings {
---         "CC  = " .. '"' .. "clang"   .. '"' .. " --verbose",
---         "CXX = " .. '"' .. "clang++" .. '"' .. " --verbose -ferror-limit=0 -fuse-ld=" .. '"' .. "/usr/bin/ld.lld" .. '"',
---         "LD  = " .. '"' .. "ld.lld"  .. '"' .. " --verbose",
---         "AR  = " .. '"' .. "llvm-ar" .. '"' .. " v"
---     }
+filter { "toolset:clang", "system:windows" }
+    makesettings {
+        "CC  = " .. '"' .. "clang.exe"   .. '"' .. " --verbose",
+        -- "CXX = " .. '"' .. "clang++.exe" .. '"' .. " --verbose -ferror-limit=0 -fuse-ld=" .. '"' .. "C:/CTools/msys64/clang64/bin/lld-link" .. '"',
+        "CXX = " .. '"' .. "clang++.exe" .. '"' .. " --verbose -ferror-limit=0 -fuse-ld=" .. '"' .. "C:/CTools/msys2/clang64/bin/ld.lld" .. '"',
+        "LD  = " .. '"' .. "ld.lld.exe"  .. '"' .. " --verbose",
+        "AR  = " .. '"' .. "llvm-ar.exe" .. '"' .. " v"
+    }
+filter {}
+filter { "toolset:clang", "system:not windows" }
+    makesettings {
+        "CC  = " .. '"' .. "clang"   .. '"' .. " --verbose",
+        "CXX = " .. '"' .. "clang++" .. '"' .. " --verbose -ferror-limit=0 -fuse-ld=" .. '"' .. "/usr/bin/ld.lld" .. '"',
+        "LD  = " .. '"' .. "ld.lld"  .. '"' .. " --verbose",
+        "AR  = " .. '"' .. "llvm-ar" .. '"' .. " v"
+    }
 -- filter {}
 -- filter { "toolset:gcc" }
 --     makesettings {

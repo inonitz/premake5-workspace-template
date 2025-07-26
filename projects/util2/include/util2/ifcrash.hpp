@@ -33,8 +33,8 @@ if(unlikely( !!(condition)))  \
 DISABLE_WARNING_POP
 
 
-#if defined(ifcrash_debug)
-#	error "ifcrash_debug should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
+#if defined(ifcrash)
+#	error "ifcrash should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
 #endif
 #if defined(ifcrashdo_debug)
 #	error "ifcrashdo_debug should not be defined before this point. You must have mixed ifcrash.hpp & ifcrash2.h"
@@ -63,12 +63,12 @@ DISABLE_WARNING_POP
 
 
 #if defined(_DEBUG)
-#    define ifcrash_debug(condition) 			  ifcrash_generic(condition, "DBG",      false, _nofmt,   {},     nullptr)
+#    define ifcrash(condition) 			  ifcrash_generic(condition, "DBG",      false, _nofmt,   {},     nullptr)
 #    define ifcrashdo_debug(condition, code)      ifcrash_generic(condition, "CODE_DBG", false, _nofmt, { code }, nullptr)
 #    define ifcrashstr_debug(condition, str) 	  ifcrash_generic(condition, "STR_DBG",  true,  _nofmt,   {}, str)
 #    define ifcrashfmt_debug(condition, str, ...) ifcrash_generic(condition, "FMT_DBG",  true,    _fmt,   {}, str, __VA_ARGS__)
 #else
-#    define ifcrash_debug(condition) {}
+#    define ifcrash(condition) {}
 #    define ifcrashstr_debug(condition, str) {}
 #    define ifcrashfmt_debug(condition, str, ...) {}
 #    define ifcrashdo_debug(condition, action) {}

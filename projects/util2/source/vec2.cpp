@@ -236,10 +236,10 @@ mat2f::__Mem& mat2f::operator-(mat2f const& b) { sub(mem, b.mem, temporaryBuffer
 mat2f::__Mem& mat2f::operator*(mat2f const& b) { mul(mem, b.mem, temporaryBufferMat2f); return temporaryBufferMat2f; }
 mat2f::__Mem& mat2f::operator*(float        b) { mul(mem, b,     temporaryBufferMat2f); return temporaryBufferMat2f; }
 mat2f::__Mem& mat2f::operator/(float        b) { div(mem, b,     temporaryBufferMat2f); return temporaryBufferMat2f; }
-      vec2f  mat2f::column    (uint8_t idx)	      { ifcrash_debug(idx >= 2); return { mem[idx], mem[idx + 2] }; }
-const vec2f  mat2f::column    (uint8_t idx) const { ifcrash_debug(idx >= 2); return { mem[idx], mem[idx + 2] }; }
-      vec2f& mat2f::operator[](uint8_t idx)	      { ifcrash_debug(idx >= 2); return row[idx]; }
-const vec2f& mat2f::operator[](uint8_t idx)	const { ifcrash_debug(idx >= 2); return row[idx]; }
+      vec2f  mat2f::column    (uint8_t idx)	      { ifcrash(idx >= 2); return { mem[idx], mem[idx + 2] }; }
+const vec2f  mat2f::column    (uint8_t idx) const { ifcrash(idx >= 2); return { mem[idx], mem[idx + 2] }; }
+      vec2f& mat2f::operator[](uint8_t idx)	      { ifcrash(idx >= 2); return row[idx]; }
+const vec2f& mat2f::operator[](uint8_t idx)	const { ifcrash(idx >= 2); return row[idx]; }
 float&       mat2f::operator()(uint8_t i, uint8_t j)       { return mem[i * 2 + j]; }
 const float& mat2f::operator()(uint8_t i, uint8_t j) const { return mem[i * 2 + j]; }
 mat2f::__Mem& operator*(float a, mat2f const& b) { mul(b.mem, a, temporaryBufferMat2f); return temporaryBufferMat2f; }
@@ -264,10 +264,10 @@ mat4f& mat4f::operator=(const mat4f& cpy) {
     std::memcpy(begin(), cpy.begin(), bytes());
     return *this;
 }
-      vec4f  mat4f::column(uint8_t idx)           { ifcrash_debug(idx >= 4); return { row[0][idx], row[1][idx], row[2][idx], row[3][idx] }; }
-const vec4f  mat4f::column(uint8_t idx)     const { ifcrash_debug(idx >= 4); return { row[0][idx], row[1][idx], row[2][idx], row[3][idx] }; }
-      vec4f& mat4f::operator[](uint8_t idx)       { ifcrash_debug(idx >= 4); return row[idx]; }
-const vec4f& mat4f::operator[](uint8_t idx) const { ifcrash_debug(idx >= 4); return row[idx]; }
+      vec4f  mat4f::column(uint8_t idx)           { ifcrash(idx >= 4); return { row[0][idx], row[1][idx], row[2][idx], row[3][idx] }; }
+const vec4f  mat4f::column(uint8_t idx)     const { ifcrash(idx >= 4); return { row[0][idx], row[1][idx], row[2][idx], row[3][idx] }; }
+      vec4f& mat4f::operator[](uint8_t idx)       { ifcrash(idx >= 4); return row[idx]; }
+const vec4f& mat4f::operator[](uint8_t idx) const { ifcrash(idx >= 4); return row[idx]; }
 float&       mat4f::operator()(uint8_t i, uint8_t j)       { return mem[i * 4 + j]; }
 const float& mat4f::operator()(uint8_t i, uint8_t j) const { return mem[i * 4 + j]; }
 mat4f::__Mem& mat4f::operator+(mat4f const& b) { add(mem, b.mem, temporaryBufferMat4f); return temporaryBufferMat4f; }

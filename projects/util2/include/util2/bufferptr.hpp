@@ -22,7 +22,7 @@ class _buffer_pointer_manager {
 		if constexpr (deallocate_on_destroy) {
 			Deallocator()(m_buffer);
 		}
-		m_buffer = __scast(T*, DEFAULT64);
+		m_buffer = __rcast(T*, DEFAULT64);
 		m_size   = DEFAULT32;
 		return;
 	}
@@ -73,7 +73,7 @@ class _buffer_pointer_manager {
 	/* NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 
   private:
-	T*  m_buffer = __scast(T*, DEFAULT64);
+	T*  m_buffer = __rcast(T*, DEFAULT64);
 	u32 m_size   = DEFAULT32;
 };
 

@@ -120,7 +120,7 @@ public:
 	void refreshFromBuffers() {
 		BufferData buf;
 		for(size_t i = 0; i < m_shaders.size(); ++i) {
-			ifcrash_debug(m_sources[i].size() > UINT32_MAX);
+			ifcrash(m_sources[i].size() > UINT32_MAX);
 			buf = { m_sources[i].data(), __scast(u32, m_sources[i].size()) };
 			refreshShaderSource(i, buf);
 		}
