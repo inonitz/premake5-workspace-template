@@ -108,10 +108,12 @@
     // VSCodeClangdAbsPath            - clangd executable
     // VSCodeClangdQueryDriverAbsPath - compiler executable (clang, gcc, etc...)
     // VSCodeClangFormatAbsPath       - clang-format executable
-    "clangd.path": "${env:VSCodeClangdAbsPath}",
+    // "clangd.path": "${env:VSCodeClangdAbsPath}",
+    "clangd.path": "${env:LLVM_BIN_PATH}/clangd.exe",
     "clangd.arguments": [
         "--compile-commands-dir=${workspaceFolder}/.vscode/compile_commands",
-        "--query-driver=${env:VSCodeClangdQueryDriverAbsPath}",
+        "--query-driver=${env:HIP_BIN_PATH}/clang++",
+        "--resource-dir=${env:HIP_PATH}/lib/clang/19",
         "--background-index",
         "--pch-storage=memory",
         "-j=16",

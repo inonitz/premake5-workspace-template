@@ -1,0 +1,16 @@
+* Migrate Changes to util2 back to other branches that use it
+* Separate all projects to git submodules, and have this workspace fetch all submodules on init
+* Have different branches to fetch different projects
+    --> All of this will require to change the way I setup the projects,
+        simply because a workspace must be defined, and when a project is standalone
+        in a gitsubmodule it must have a premake5 workspace, which, when fetched as a submodule
+        will conflict with the premake5-workspace-template workspace.lua file
+        can probably do it with Conditional variables inside the lua scripts.
+
+* Also fix clangd errors with AMD HIP C++ extensions somehow...
+    because AMD didn't supply a clangd executable i'm assuming that clangd
+    should just work with AMD HIP, but from testing it out right now
+    that does NOT seem to be the case.
+    Further investigation needed
+
+* Also the helloworld kernel does not execute - fix

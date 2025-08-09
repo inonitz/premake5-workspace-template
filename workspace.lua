@@ -39,7 +39,6 @@ workspace (WORKSPACE_NAME)
 
 
 
-    -- This Might be problematic for standard headers. Triple Check later
     -- filter "architecture:x86"
     --     defines { "__x86__" }
     -- filter "architecture:x86_64"
@@ -80,6 +79,9 @@ workspace (WORKSPACE_NAME)
         runtime  "Debug"
         optimize "Off"
         symbols  "On"
+        buildoptions {
+            "--verbose"
+        }
 
     filter { "configurations:Debug*", "toolset:gcc" }
         buildoptions { 
